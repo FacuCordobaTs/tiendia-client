@@ -1,0 +1,171 @@
+import React, { createContext, useContext, useState, ReactNode, useEffect } from "react";
+
+interface User {
+  id: number;
+  email: string;
+  password: string;
+  credits: number;
+}
+
+interface SignUpUserInfo {
+  email: string | null;
+  password: string | null;
+}
+
+interface AuthContextType {
+  user: User | null;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
+  loading: boolean;
+  register: (info: SignUpUserInfo) => Promise<boolean>;
+  login: (email: string, password: string) => Promise<boolean>;
+  logout: () => Promise<void>;
+  signUpInfo: SignUpUserInfo;
+  setSignUpInfo: React.Dispatch<React.SetStateAction<SignUpUserInfo>>;
+  showPaymentModal: boolean;
+  setShowPaymentModal: React.Dispatch<React.SetStateAction<boolean>>;
+}
+ 
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) throw new Error("There is no Auth provider");
+  return context;
+};
+
+interface AuthProviderProps {
+  children: ReactNode;
+}
+
+export default function AuthProvider({ children }: AuthProviderProps) {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [signUpInfo, setSignUpInfo] = useState<SignUpUserInfo>({
+    email: null,
+    password: null,
+  });
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const url = "https://api.tiendia.app/api";
+
+  const login = async (email: string, password: string) => {
+    try {
+      const response = await fetch(url + "/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        console.log(error);
+        throw new Error(error.message);
+      }
+
+      const data = await response.json();
+      setUser(data.user[0]);
+      return true;
+    } catch (error) {
+      console.error("Login error:", error);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const register = async (info: SignUpUserInfo) => {
+    setLoading(true);
+    try {
+      const response = await fetch(url + "/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(info),
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        console.log(error);
+        throw new Error(error.message);
+      }
+
+      const data = await response.json();
+      setUser(data.user[0]);
+      return true;
+    } catch (error) {
+      console.error("Register error:", error);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const logout = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(url + "/auth/logout", {
+        method: "DELETE",
+        credentials: "include",
+      });
+      console.log(response)
+      if (!response.ok) {
+        const error = await response.json();
+        console.log(error);
+        throw new Error(error.message);
+      }
+
+      setUser(null);
+    } catch (error) {
+      console.error("Logout error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await fetch(url + "/auth/profile", {
+          credentials: "include",
+        });
+        const data = await response.json();
+        if (data.user) {
+          setUser({
+            id: data.user[0].id,
+            email: data.user[0].email,
+            password: data.user[0].password,
+            credits: data.user[0].credits,
+          });
+        } else {
+          setUser(null);
+        }
+      } catch (error) {
+        console.error("Auth check error:", error);
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkAuth();
+  }, []);
+
+  return (
+    <AuthContext.Provider
+      value={{
+        user,
+        setUser,
+        loading,
+        register,
+        login,
+        logout,
+        signUpInfo,
+        setSignUpInfo,
+        showPaymentModal,
+        setShowPaymentModal,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
+}
