@@ -1,149 +1,157 @@
-import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Rocket, Check, Sparkles, Mail } from "lucide-react"
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"; // Importa subcomponentes de Card
+import { Badge } from "@/components/ui/badge";
+import { Sparkles, Image as ImageIcon, Check, Clock, DollarSign, TrendingUp, Upload } from "lucide-react"; // Iconos más relevantes
+import { useNavigate } from "react-router";
+import { useAuth } from "@/context/AuthContext";
+
+// --- Componente auxiliar para las tarjetas de características ---
+function FeatureCard({ icon: Icon, title, description }: { icon: React.ElementType, title: string, description: string }) {
+  return (
+    <Card className="bg-card/50 hover:border-primary/30 transition-colors duration-300 ease-in-out transform hover:-translate-y-1">
+      <CardHeader className="flex flex-row items-center gap-4 pb-2">
+        <div className="p-2 bg-primary/10 rounded-md">
+          <Icon className="h-6 w-6 text-primary" />
+        </div>
+        <CardTitle className="text-lg font-semibold">{title}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <p className="text-sm text-muted-foreground">{description}</p>
+      </CardContent>
+    </Card>
+  );
+}
 
 export default function LandingPage() {
+  const navigate = useNavigate();
+
+  const { user } = useAuth();
+
+  // --- URLs para las imágenes de ejemplo - ¡REEMPLÁZALAS! ---
+  const beforeImageUrl = "placeholder-antes.jpeg"; // Ruta a tu imagen de ejemplo "Antes"
+  const afterImageUrl = "placeholder-despues.png"; // Ruta a tu imagen de ejemplo "Después"
+  // --- Asegúrate de que estas imágenes existan en tu carpeta `public/images` o similar ---
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 flex flex-col items-center">
-      {/* Hero Section */}
-      <section className="container py-24 text-center space-y-8">
-        <Badge variant="outline" className="text-sm px-4 py-1 bg-primary/10 text-primary">
-          🚀 Lanza tu tienda inteligente hoy
+    <div className="min-h-screen bg-gradient-to-b from-background to-blue-50/50 dark:to-slate-900/50 flex flex-col items-center text-foreground px-4"> {/* Fondo suave */}
+
+      {/* --- Hero Section --- */}
+      <section className="container pt-20 pb-16 md:pt-28 md:pb-24 text-center space-y-6 max-w-4xl"> {/* Ajuste de padding y max-width */}
+        <Badge variant="outline" className="text-sm px-4 py-1 border-primary/50 bg-primary/10 text-primary font-medium shadow-sm">
+          <Sparkles className="h-3 w-3 mr-2" /> Fotos de Producto con IA
         </Badge>
-        
-        <h1 className="text-5xl md:text-6xl font-bold tracking-tight bg-gradient-to-r from-primary to-foreground bg-clip-text text-transparent">
-          tiendia.app
+
+        <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight md:leading-snug"> {/* Ajuste de tamaño y espaciado */}
+          Transforma tus Fotos <span className="bg-gradient-to-r from-blue-500 to-cyan-400 dark:from-blue-400 dark:to-cyan-300 bg-clip-text text-transparent">en Imagenes Profesionales</span> por tan solo $50
         </h1>
-        
-        <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-          Plataforma todo-en-uno para crear y gestionar tu ecommerce con inteligencia artificial
+
+        <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
+          Sube la foto de tu producto y deja que nuestra IA genere imágenes profesionales de alta calidad en segundos. ¡Sin necesidad de estudio ni fotógrafo!
         </p>
-        <Button size="lg" className="gap-2 text-lg" onClick={() => window.location.href = 'https://ecommerce-admin-eyh.pages.dev/signin'}>
-            <Rocket className="h-5 w-5" />
-            Comenzar gratis
-        </Button>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-12">
-          {[
-            ["🛍️", "Creación en 5 min"],
-            ["🤖", "Asistente IA"],
-            ["💸", "0% comisiones"],
-            ["📱", "App integrada"]
-          ].map(([emoji, text]) => (
-            <div key={text} className="flex flex-col items-center gap-2 p-4 bg-muted/50 rounded-lg">
-              <span className="text-2xl">{emoji}</span>
-              <span className="font-medium">{text}</span>
-            </div>
-          ))}
+        <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+           <Button size="lg" className="gap-2 text-lg shadow-lg hover:shadow-primary/30 transition-shadow duration-300" onClick={() => navigate(user ? "/home" : "/register")}>
+             <Upload className="h-5 w-5" />
+             {user ? "Ir a tus productos" : "Comenzar por $50"}
+           </Button>
+           {/* <Button size="lg" variant="outline" className="gap-2 text-lg">
+               Ver Ejemplo <ArrowRight className="h-5 w-5" />
+           </Button> */}
         </div>
       </section>
 
-      {/* Pricing Section */}
-      <section className="container py-12 space-y-12">
-        <h2 className="text-3xl font-bold text-center">Planes para cada necesidad</h2>
-        
-        <div className="grid md:grid-cols-3 gap-8">
-          {/* Plan Básico */}
-          <Card className="p-6 relative hover:border-primary transition-colors">
-            <div className="space-y-6">
-              <h3 className="text-2xl font-bold">Básico</h3>
-              <div className="flex items-baseline gap-2">
-                <span className="text-4xl font-bold">$5.000</span>
-                <span className="text-muted-foreground">/mes</span>
-              </div>
-              <Button className="w-full gap-2">
-                <Sparkles className="h-4 w-4" />
-                Comenzar ya
-              </Button>
-              
-              <ul className="space-y-3">
-                {[
-                  "🛒 Tienda en linea",
-                  "📦 Aceptar pedidos",
-                  "💵 Pagos sin comisiones",
-                  "🤖 Gestión autónoma",
-                  "📲 Notificaciones app",
-                  "👗 Ropa y comida",
-                  "🎨 Interfaz estándar"
-                ].map(item => (
-                  <li key={item} className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-primary" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </Card>
+      {/* --- Before & After Section --- */}
+      <section className="container py-16 md:py-24">
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
+          De Esto... <span className="text-muted-foreground/80">a Esto</span> ✨
+        </h2>
+        <div className="grid md:grid-cols-2 gap-8 items-center max-w-5xl mx-auto">
+          {/* Antes */}
+          <div className="flex flex-col items-center">
+            <h3 className="text-xl font-semibold mb-4 text-muted-foreground">Tu Foto Original</h3>
+            <Card className="overflow-hidden shadow-lg w-full">
+              <img
+                src={beforeImageUrl} 
+                alt="Foto de producto antes de la IA"
+                className="aspect-square object-cover w-full transition-transform duration-300 ease-in-out hover:scale-105"
+              />
+            </Card>
+          </div>
 
-          {/* Plan Profesional */}
-          <Card className="p-6 border-primary relative hover:border-primary/80">
-            <div className="absolute top-4 right-4">
-              <Badge className="bg-primary/10 text-primary">Más popular</Badge>
-            </div>
-            <div className="space-y-6">
-              <h3 className="text-2xl font-bold">Profesional</h3>
-              <div className="flex items-baseline gap-2">
-                <span className="text-4xl font-bold">$10.000</span>
-                <span className="text-muted-foreground">/mes</span>
-              </div>
-              <Button variant="outline" className="w-full gap-2">
-                <Mail className="h-4 w-4" />
-                Contactanos
-              </Button>
-              
-              <ul className="space-y-3">
-                {[
-                  "✅ Todo el plan Básico",
-                  "📞 Notificaciones WhatsApp",
-                  "🎨 Interfaz personalizada",
-                  "🌐 Dominio propio",
-                  "🧾 Facturas electrónicas",
-                  "📈 Estadísticas avanzadas",
-                  "📸 Redes sociales integradas"
-                ].map(item => (
-                  <li key={item} className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-primary" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </Card>
+          {/* Después */}
+          <div className="flex flex-col items-center">
+            <h3 className="text-xl font-semibold mb-4 text-primary">Generada con tiendia.app</h3>
+            <Card className="overflow-hidden shadow-xl border-2 border-primary/50 w-full">
+               <img
+              src={afterImageUrl} 
+              alt="Foto de producto generada por IA"
+              className="aspect-square object-cover w-full object-top transition-transform duration-300 ease-in-out hover:scale-105"
+              />
+            </Card>
+          </div>
+        </div>
+        <p className="text-center text-muted-foreground mt-8 max-w-2xl mx-auto">
+          Nuestra IA analiza tu producto y lo presenta en el mejor escenario posible, con iluminación y estilo profesional.
+        </p>
+      </section>
 
-          {/* Plan Piloto */}
-          <Card className="p-6 relative hover:border-primary">
-            <div className="space-y-6">
-              <h3 className="text-2xl font-bold">Piloto Automático</h3>
-              <div className="flex items-baseline gap-2">
-                <span className="text-4xl font-bold">$50.000</span>
-                <span className="text-muted-foreground">/mes</span>
-              </div>
-              <Button variant="outline" className="w-full gap-2">
-                <Mail className="h-4 w-4" />
-                Contactanos
-              </Button>
-              
-              <ul className="space-y-3">
-                {[
-                  "✅ Todos los planes anteriores",
-                  "💬 Agentes IA multiplataforma",
-                  "🤖 Automatización completa",
-                  "📊 Analítica predictiva",
-                  "🛡️ Soporte prioritario",
-                  "🎯 Campañas automáticas",
-                  "🚀 Onboarding personalizado"
-                ].map(item => (
-                  <li key={item} className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-primary" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </Card>
+      {/* --- Features/Benefits Section --- */}
+      <section className="container py-16 md:py-24 bg-muted/30 dark:bg-slate-800/20 rounded-2xl my-16"> {/* Fondo suave para destacar */}
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
+          Ventajas que Impulsarán tu Tienda
+        </h2>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+          <FeatureCard
+            icon={ImageIcon}
+            title="Calidad de Estudio"
+            description="Obtén imágenes profesionales sin costosos equipos ni fotógrafos."
+          />
+          <FeatureCard
+            icon={Clock}
+            title="Generación Instantánea"
+            description="Transforma tus fotos en segundos, no días. Acelera tus lanzamientos."
+          />
+           <FeatureCard
+            icon={DollarSign}
+            title="Ahorro Significativo"
+            description="Reduce drásticamente los costos asociados a la fotografía de producto tradicional."
+          />
+          <FeatureCard
+            icon={TrendingUp}
+            title="Atrae Más Clientes"
+            description="Imágenes atractivas aumentan la confianza y las conversiones en tu tienda."
+          />
+           <FeatureCard
+            icon={Upload}
+            title="Increíblemente Fácil"
+            description="Solo necesitas subir tu foto. Nuestra IA se encarga de la magia."
+          />
+          <FeatureCard
+            icon={Check}
+            title="Resultados Consistentes"
+            description="Mantén un estilo visual profesional y coherente en todos tus productos."
+          />
         </div>
       </section>
+
+       {/* --- Simple CTA / Pricing Placeholder --- */}
+      <section className="container py-16 md:py-24 text-center space-y-6 max-w-3xl">
+         <h2 className="text-3xl md:text-4xl font-bold">
+           ¿Listo para Elevar tus Productos?
+         </h2>
+         <p className="text-lg md:text-xl text-muted-foreground">
+           Regístrate y para generar tus primeras imágenes hoy mismo.
+         </p>
+         <Button size="lg" className="gap-2 text-lg shadow-lg hover:shadow-primary/30 transition-shadow duration-300" onClick={() => navigate("/register")}>
+             <Sparkles className="h-5 w-5" />
+             Probar Ahora
+         </Button>
+       </section>
+
+      {/* --- Footer --- */}
+      <footer className="container py-8 text-center text-sm text-muted-foreground mt-12 border-t border-border/20">
+        © {new Date().getFullYear()} tiendia.app - Imágenes IA para tu Éxito. Todos los derechos reservados.
+      </footer>
     </div>
-  )
+  );
 }
