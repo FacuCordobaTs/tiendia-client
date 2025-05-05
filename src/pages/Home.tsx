@@ -316,7 +316,7 @@ function App() {
                   <Sparkles className="h-6 w-6 sm:h-8 sm:w-8 animate-bounce opacity-75" />
                 </div>
               </div>
-              <p className="text-base sm:text-lg text-muted-foreground animate-pulse mt-4">Creando magia...</p>
+              <p className="text-base sm:text-lg text-muted-foreground animate-pulse mt-4">Generando imagen...</p>
             </div>
           ) : (
             <>
@@ -324,7 +324,7 @@ function App() {
               <DialogHeader className="px-4 sm:px-6 pt-5 pb-4 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
                 <DialogTitle className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-gray-50 flex items-center">
                   <Wand2 className="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3 text-purple-500" />
-                  Transformación Mágica
+                  Imagen Generada
                 </DialogTitle>
                 <DialogDescription className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
                   Compara el antes y el después.
