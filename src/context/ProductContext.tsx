@@ -45,7 +45,6 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
       if (user) {
         const response = await fetch(url+'/products/list/'+user.id);
         const data = await response.json();
-        console.log(data)
         if (data.products.length > 1) 
           setProducts(data.products.map((p: any) => ({
             ...p
@@ -88,7 +87,6 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
       }
 
       const result = await response.json();
-      console.log(result)
       setProducts(prevProducts => [
         ...prevProducts,
         {
