@@ -43,7 +43,6 @@ function App() {
   const [isTutorialOpen, setIsTutorialOpen] = useState(false);
   const [modificationPrompt, setModificationPrompt] = useState<string>('');
   const [isModifying, setIsModifying] = useState<boolean>(false);
-  const [currentProductId, setCurrentProductId] = useState<number | null>(null);
   const [currentImageId, setCurrentImageId] = useState<number | null>(null);
   const { user, setUser } = useAuth();
   const { products, getProducts } = useProduct();
@@ -60,7 +59,6 @@ function App() {
     setCurrentAdImageUrl(null);
     setOriginalImageUrl(originalUrl);
     setModificationPrompt('');
-    setCurrentProductId(id);
     setCurrentImageId(null);
 
     try {
@@ -214,7 +212,6 @@ function App() {
     setIsModifying(false);
     setCurrentAdImageUrl(null);
     setOriginalImageUrl(null);
-    setCurrentProductId(null);
     setCurrentImageId(null);
     setModificationPrompt('');
   };
