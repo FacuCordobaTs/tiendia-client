@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dialog";
 // Importar Check si es necesario (no se usa en el código final actual) o quitar si no se usa.
 // import { Download, CreditCard, Sparkles, HelpCircle, Wand2, Image as ImageIcon, Check } from 'lucide-react';
-import { Download, CreditCard, Sparkles, HelpCircle, Wand2, Image as ImageIcon } from 'lucide-react'; // Asegurarse de que ImageIcon esté importado
+import { Download, CreditCard, Sparkles, HelpCircle, Wand2, Image as ImageIcon, RefreshCw } from 'lucide-react'; // Asegurarse de que ImageIcon esté importado
 import { ScrollArea } from '@/components/ui/scroll-area';
 import AdminProductCard from '@/components/AdminProductCard';
 import { Button } from '@/components/ui/button';
@@ -44,6 +44,7 @@ function App() {
   const [modificationPrompt, setModificationPrompt] = useState<string>('');
   const [isModifying, setIsModifying] = useState<boolean>(false);
   const [currentImageId, setCurrentImageId] = useState<number | null>(null);
+  const [currentProductId, setCurrentProductId] = useState<number | null>(null);
   const { user, setUser } = useAuth();
   const { products, getProducts } = useProduct();
   const navigate = useNavigate();
@@ -60,6 +61,7 @@ function App() {
     setOriginalImageUrl(originalUrl);
     setModificationPrompt('');
     setCurrentImageId(null);
+    setCurrentProductId(id);
 
     try {
       const response = await fetch(`https://api.tiendia.app/api/products/generate-ad/${id}`, {
@@ -100,8 +102,7 @@ function App() {
       }
     } catch (error: any) {
       console.error("Error en handleGenerateAd:", error);
-      // Evitar toast duplicado si ya se mostró uno del response.ok check
-           toast.error(error.message || 'Ocurrió un error inesperado.', { id: 'error-toast' });
+      toast.error(error.message || 'Ocurrió un error inesperado.', { id: 'error-toast' });
     } finally {
       setLoading(false);
     }
@@ -158,9 +159,7 @@ function App() {
       }
     } catch (error: any) {
       console.error("Error en handleModifyImage:", error);
-      // Evitar toast duplicado
-           toast.error(error.message || 'Ocurrió un error al modificar.', { id: 'modify-error-toast' });
-       
+      toast.error(error.message || 'Ocurrió un error al modificar.', { id: 'modify-error-toast' });
     } finally {
       setIsModifying(false);
     }
@@ -193,6 +192,56 @@ function App() {
     }
   };
 
+  const handleRegenerateImage = async () => {
+    if (!currentProductId || !user || user.credits < 50) {
+      toast.error('Créditos insuficientes para regenerar la imagen.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await fetch(`https://api.tiendia.app/api/products/generate-ad/${currentProductId}`, {
+        method: "POST",
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ includeModel: true })
+      });
+
+      if (!response.ok) {
+        let errorMessage = `Error: ${response.status} ${response.statusText}`;
+        try {
+          const errorBody = await response.json();
+          errorMessage = errorBody.error || errorBody.message || errorMessage;
+        } catch (e) {
+          console.error("Could not parse error response body:", e);
+        }
+        toast.error(`Error al regenerar: ${errorMessage}`);
+        throw new Error(errorMessage);
+      }
+
+      const result = await response.json();
+
+      if (result && result.adImageUrl && result.imageId) {
+        setUser(prevUser => (
+          prevUser ? { ...prevUser, credits: prevUser.credits - 50 } : null
+        ));
+        setCurrentAdImageUrl(result.adImageUrl);
+        setCurrentImageId(result.imageId);
+        toast.success('¡Imagen regenerada con éxito!');
+      } else {
+        console.error("Respuesta inesperada de la API:", result);
+        toast.error('Error al obtener la imagen regenerada.');
+      }
+    } catch (error: any) {
+      console.error("Error en handleRegenerateImage:", error);
+      toast.error(error.message || 'Ocurrió un error inesperado.', { id: 'regenerate-error-toast' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const navigateToCredits = () => {
     navigate('/credits');
   };
@@ -213,6 +262,7 @@ function App() {
     setCurrentAdImageUrl(null);
     setOriginalImageUrl(null);
     setCurrentImageId(null);
+    setCurrentProductId(null);
     setModificationPrompt('');
   };
 
@@ -417,17 +467,29 @@ function App() {
               {/* Footer del Diálogo con Botones Principales */}
               {/* AJUSTE: flex-col sm:flex-row y order para apilar en móvil */}
               <DialogFooter className="px-4 sm:px-6 py-3 sm:py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-3 flex-shrink-0">
-                <Button
-                  variant="outline"
-                  onClick={closeAdDialog}
-                  className="w-full sm:w-auto order-2 sm:order-1 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 text-sm py-2"
-                >
-                  Cerrar
-                </Button>
+                <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto order-2 sm:order-1">
+                  <Button
+                    variant="outline"
+                    onClick={closeAdDialog}
+                    className="w-full sm:w-auto border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 text-sm py-2"
+                  >
+                    Cerrar
+                  </Button>
+                  {currentAdImageUrl && (
+                    <Button
+                      onClick={handleRegenerateImage}
+                      disabled={loading || isModifying || (user?.credits ?? 0) < 50}
+                      className="w-full sm:w-auto bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-all hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <RefreshCw className="mr-1 h-4 w-4" />
+                      Regenerar
+                    </Button>
+                  )}
+                </div>
                 {currentAdImageUrl && (
                   <Button
                     onClick={handleDownloadImage}
-                    disabled={isModifying}
+                    disabled={isModifying || loading}
                     className="w-full sm:w-auto order-1 sm:order-2 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white px-5 py-2 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-all hover:shadow-md"
                   >
                     <Download className="mr-1 h-4 w-4" />
