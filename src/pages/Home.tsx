@@ -297,11 +297,6 @@ function App() {
           )}
         </section>
       </main>
-
-      {/* ############################################ */}
-      {/* ## DIÁLOGO DE GENERACIÓN ANTES/DESPUÉS   ## */}
-      {/* ##        (MODIFICADO PARA MÓVIL)       ## */}
-      {/* ############################################ */}
       <Dialog open={isAdDialogOpen} onOpenChange={closeAdDialog}>
         {/* AJUSTE DE TAMAÑO: Ancho relativo en móvil, max-w en desktop */}
         <DialogContent className="w-[95vw] sm:w-[90vw] md:max-w-2xl lg:max-w-3xl max-h-[90vh] flex flex-col bg-white dark:bg-gray-900 rounded-xl shadow-2xl p-0 overflow-hidden">
