@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dialog";
 // Importar Check si es necesario (no se usa en el código final actual) o quitar si no se usa.
 // import { Download, CreditCard, Sparkles, HelpCircle, Wand2, Image as ImageIcon, Check } from 'lucide-react';
-import { Download, CreditCard, Sparkles, HelpCircle, Wand2, Image as ImageIcon, RefreshCw } from 'lucide-react'; // Asegurarse de que ImageIcon esté importado
+import { Download, CreditCard, Sparkles, HelpCircle, Wand2, Image as ImageIcon, RefreshCw, X } from 'lucide-react'; // Asegurarse de que ImageIcon esté importado
 import { ScrollArea } from '@/components/ui/scroll-area';
 import AdminProductCard from '@/components/AdminProductCard';
 import { Button } from '@/components/ui/button';
@@ -48,6 +48,7 @@ function App() {
   const { user, setUser } = useAuth();
   const { products, getProducts } = useProduct();
   const navigate = useNavigate();
+  const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
 
   const handleGenerateAd = async (id: number, includeModel: boolean, originalUrl: string | null) => {
     if (!user || user.credits < 50) {
@@ -253,7 +254,7 @@ function App() {
       // setIsTutorialOpen(true); // Descomentar si se quiere mostrar al inicio
       localStorage.setItem('tutorialSeen', 'true');
     }
-  }, [getProducts]);
+  }, []);
 
   const closeAdDialog = () => {
     setIsAdDialogOpen(false);
@@ -378,59 +379,83 @@ function App() {
 
               {/* Área Principal con Scroll */}
               <ScrollArea className="flex-1 overflow-y-auto p-4 sm:p-6">
-                {/* LAYOUT DE IMÁGENES: grid-cols-2 siempre, gap ajustado */}
-                <div className="grid grid-cols-2 gap-3 sm:gap-4">
-
-                  {/* Columna "Antes" */}
-                  <div className="w-full">
-                    <h3 className="text-center text-xs font-medium text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider">Antes</h3>
-                    {/* CONTENEDOR DE IMAGEN: aspect-ratio + object-contain */}
-                    <div className="aspect-w-1 aspect-h-1 bg-gray-100 dark:bg-gray-800 rounded-lg sm:rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm">
-                      {originalImageUrl ? (
-                        <img
-                          src={originalImageUrl}
-                          alt="Imagen original"
-                          className="w-full h-full object-contain" // CLAVE
-                        />
-                      ) : (
-                        <div className="flex items-center justify-center h-full text-gray-400">
-                          <ImageIcon className="w-8 h-8 sm:w-10 sm:w-10" />
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Columna "Después" */}
-                  <div className="w-full relative">
-                    <h3 className="text-center text-xs font-medium text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider">Después ✨</h3>
-                    {/* Loader de Modificación (superpuesto) */}
-                    {isModifying && (
-                      <div className="absolute inset-0 bg-white/70 dark:bg-gray-900/70 backdrop-blur-sm flex items-center justify-center rounded-lg sm:rounded-xl z-10">
-                        <div className="flex flex-col items-center gap-2">
-                          <div className="relative h-8 w-8 sm:h-10 sm:h-10">
-                            <div className="absolute inset-0 rounded-full border-2 border-t-transparent border-blue-400 animate-spin"></div>
-                          </div>
-                          <p className="text-xs text-blue-600 dark:text-blue-300 animate-pulse">Modificando...</p>
-                        </div>
+                {isFullscreen ? (
+                  // Fullscreen Image View
+                  <div className="relative w-full h-full min-h-[350px] sm:min-h-[400px] flex items-center justify-center">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setIsFullscreen(false)}
+                      className="absolute top-2 right-2 z-10 bg-white/80 dark:bg-gray-800/80 hover:bg-white dark:hover:bg-gray-800 rounded-full"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                    {currentAdImageUrl ? (
+                      <img
+                        src={currentAdImageUrl}
+                        alt="Anuncio generado o modificado"
+                        className="max-w-full max-h-[400px] object-contain rounded-lg"
+                      />
+                    ) : (
+                      <div className="flex items-center justify-center h-full text-gray-400">
+                        <ImageIcon className="w-8 h-8 sm:w-10 sm:w-10" />
                       </div>
                     )}
-                    {/* CONTENEDOR DE IMAGEN */}
-                    <div className={`aspect-w-1 aspect-h-1 bg-gray-100 dark:bg-gray-800 rounded-lg sm:rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm transition-opacity duration-300 ${isModifying ? 'opacity-50' : 'opacity-100'}`}>
-                      {currentAdImageUrl ? (
-                        <img
-                          src={currentAdImageUrl}
-                          alt="Anuncio generado o modificado"
-                          className="w-full h-full object-contain" // CLAVE
-                        />
-                      ) : (
-                        <div className="flex items-center justify-center h-full text-gray-400 flex-col gap-1 sm:gap-2 px-2 sm:px-4 text-center">
-                          <ImageIcon className="w-8 h-8 sm:w-10 sm:w-10" />
-                          {!loading && <span className="text-xs text-red-500">No se pudo generar.</span>}
+                  </div>
+                ) : (
+                  // Comparison View
+                  <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                    {/* Columna "Antes" */}
+                    <div className="w-full">
+                      <h3 className="text-center text-xs font-medium text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider">Antes</h3>
+                      <div className="aspect-w-1 aspect-h-1 bg-gray-100 dark:bg-gray-800 rounded-lg sm:rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm">
+                        {originalImageUrl ? (
+                          <img
+                            src={originalImageUrl}
+                            alt="Imagen original"
+                            className="w-full h-full object-contain"
+                          />
+                        ) : (
+                          <div className="flex items-center justify-center h-full text-gray-400">
+                            <ImageIcon className="w-8 h-8 sm:w-10 sm:w-10" />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Columna "Después" */}
+                    <div className="w-full relative">
+                      <h3 className="text-center text-xs font-medium text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider">Después ✨</h3>
+                      {isModifying && (
+                        <div className="absolute inset-0 bg-white/70 dark:bg-gray-900/70 backdrop-blur-sm flex items-center justify-center rounded-lg sm:rounded-xl z-10">
+                          <div className="flex flex-col items-center gap-2">
+                            <div className="relative h-8 w-8 sm:h-10 sm:h-10">
+                              <div className="absolute inset-0 rounded-full border-2 border-t-transparent border-blue-400 animate-spin"></div>
+                            </div>
+                            <p className="text-xs text-blue-600 dark:text-blue-300 animate-pulse">Modificando...</p>
+                          </div>
                         </div>
                       )}
+                      <div 
+                        className={`aspect-w-1 aspect-h-1 bg-gray-100 dark:bg-gray-800 rounded-lg sm:rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm transition-opacity duration-300 ${isModifying ? 'opacity-50' : 'opacity-100'} cursor-pointer hover:opacity-90`}
+                        onClick={() => currentAdImageUrl && setIsFullscreen(true)}
+                      >
+                        {currentAdImageUrl ? (
+                          <img
+                            src={currentAdImageUrl}
+                            alt="Anuncio generado o modificado"
+                            className="w-full h-full object-contain"
+                          />
+                        ) : (
+                          <div className="flex items-center justify-center h-full text-gray-400 flex-col gap-1 sm:gap-2 px-2 sm:px-4 text-center">
+                            <ImageIcon className="w-8 h-8 sm:w-10 sm:w-10" />
+                            {!loading && <span className="text-xs text-red-500">No se pudo generar.</span>}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div> {/* Fin del grid de imágenes */}
+                )}
 
                 {/* Sección de Modificación */}
                 {currentAdImageUrl && !loading && (
