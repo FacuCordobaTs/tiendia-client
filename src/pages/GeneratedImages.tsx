@@ -96,20 +96,22 @@ function GeneratedImagesPage() {
         fetchGeneratedImages();
     }, [user?.id]);
 
-    const handleDownloadImage = async (event: React.MouseEvent | React.MouseEvent<HTMLButtonElement>, url: string, filename?: string) => { // Allow button event
+    const handleDownloadImage = async (event: React.MouseEvent | React.MouseEvent<HTMLButtonElement>, url: string, filename: string) => { // Allow button event
         event.stopPropagation();
         // Use currentModifyImageUrl if downloading from modify dialog, otherwise use provided url
-        const imageUrlToDownload = isModifyDialogOpen && currentModifyImageUrl ? currentModifyImageUrl : `${url}`;
-        const finalFilename = filename || imageUrlToDownload.split('/').pop() || `generated-image-${Date.now()}.png`;
+        // const imageUrlToDownload = isModifyDialogOpen && currentModifyImageUrl ? currentModifyImageUrl : `${url}`;
+        // const finalFilename = filename || imageUrlToDownload.split('/').pop() || `generated-image-${Date.now()}.png`;
 
         try {
-            const response = await fetch(imageUrlToDownload);
+            console.log("Descargando imagen:", url);
+            const response = await fetch(url);
+            console.log("Respuesta:", response);
             if (!response.ok) throw new Error('Network response was not ok.');
             const blob = await response.blob();
             const downloadUrl = window.URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = downloadUrl;
-            link.download = finalFilename;
+            link.download = filename;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
