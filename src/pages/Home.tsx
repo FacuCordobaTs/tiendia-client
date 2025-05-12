@@ -458,48 +458,14 @@ function App() {
                 )}
 
                 {/* Sección de Modificación */}
-                {currentAdImageUrl && !loading && (
-                  <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-200 dark:border-gray-700 space-y-3 sm:space-y-4">
-                    <label htmlFor="modification-prompt" className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Ajustes <span className="text-gray-400">(Opcional)</span>
-                    </label>
-                    <Textarea
-                      id="modification-prompt"
-                      placeholder="Ej: Cambia el fondo a uno más oscuro..."
-                      value={modificationPrompt}
-                      onChange={(e) => setModificationPrompt(e.target.value)}
-                      className="min-h-[60px] sm:min-h-[70px] text-sm bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                      disabled={isModifying}
-                    />
-                    {/* Layout ajustado para texto de costo y botón */}
-                    <div className="flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-4">
-                      <p className="text-xs text-gray-500 dark:text-gray-400 flex-1 text-left w-full sm:w-auto"> {/* Asegura que ocupe espacio en móvil */}
-                        Costo: 50 créditos por modificación.
-                      </p>
-                      <Button
-                        onClick={handleModifyImage}
-                        disabled={!modificationPrompt || isModifying || !currentImageId || (user?.credits ?? 0) < 50}
-                        className={`w-full sm:w-auto bg-gradient-to-r from-blue-500 to-cyan-400 hover:from-blue-600 hover:to-cyan-500 text-white px-4 py-1.5 sm:px-5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium flex items-center justify-center gap-2 transition-all ${(!modificationPrompt || isModifying || !currentImageId || (user?.credits ?? 0) < 50) ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-md'}`}
-                      >
-                        <Wand2 className="mr-1 h-4 w-4" />
-                        Modificar
-                      </Button>
-                    </div>
-                  </div>
-                )}
+               
               </ScrollArea>
 
               {/* Footer del Diálogo con Botones Principales */}
               {/* AJUSTE: flex-col sm:flex-row y order para apilar en móvil */}
               <DialogFooter className="px-4 sm:px-6 py-3 sm:py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-3 flex-shrink-0">
                 <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto order-2 sm:order-1">
-                  <Button
-                    variant="outline"
-                    onClick={closeAdDialog}
-                    className="w-full sm:w-auto border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 text-sm py-2"
-                  >
-                    Cerrar
-                  </Button>
+                  
                   {currentAdImageUrl && (
                     <Button
                       onClick={handleRegenerateImage}
