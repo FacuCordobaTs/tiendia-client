@@ -21,7 +21,6 @@ import EditProductForm from '@/components/EditProductForm';
 import { useAuth } from '@/context/AuthContext';
 import { useNavigate } from 'react-router';
 import TutorialDialog from '@/components/TutorialDialog';
-import { Textarea } from '@/components/ui/textarea';
 import toast from 'react-hot-toast';
 // Quitar Separator si ya no se usa en el nuevo layout
 // import { Separator } from '@/components/ui/separator';
@@ -41,9 +40,9 @@ function App() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isTutorialOpen, setIsTutorialOpen] = useState(false);
-  const [modificationPrompt, setModificationPrompt] = useState<string>('');
+  // const [modificationPrompt, setModificationPrompt] = useState<string>('');
   const [isModifying, setIsModifying] = useState<boolean>(false);
-  const [currentImageId, setCurrentImageId] = useState<number | null>(null);
+  // const [currentImageId, setCurrentImageId] = useState<number | null>(null);
   const [currentProductId, setCurrentProductId] = useState<number | null>(null);
   const { user, setUser } = useAuth();
   const { products, getProducts } = useProduct();
@@ -60,8 +59,8 @@ function App() {
     setIsAdDialogOpen(true);
     setCurrentAdImageUrl(null);
     setOriginalImageUrl(originalUrl);
-    setModificationPrompt('');
-    setCurrentImageId(null);
+    // setModificationPrompt('');
+    // setCurrentImageId(null);
     setCurrentProductId(id);
 
     try {
@@ -95,7 +94,7 @@ function App() {
           prevUser ? { ...prevUser, credits: prevUser.credits - 50 } : null
         ));
         setCurrentAdImageUrl(result.adImageUrl);
-        setCurrentImageId(result.imageId);
+        // setCurrentImageId(result.imageId);
         toast.success('¡Imagen generada con éxito!');
       } else {
         console.error("Respuesta inesperada de la API:", result);
@@ -109,62 +108,62 @@ function App() {
     }
   };
 
-  const handleModifyImage = async () => {
-    if (!currentImageId || !modificationPrompt) {
-      toast.error('Ingresa las instrucciones para modificar.');
-      return;
-    }
-    if (!user || user.credits < 50) {
-      toast.error('Créditos insuficientes para modificar la imagen.');
-      return;
-    }
+  // const handleModifyImage = async () => {
+  //   if (!currentImageId || !modificationPrompt) {
+  //     toast.error('Ingresa las instrucciones para modificar.');
+  //     return;
+  //   }
+  //   if (!user || user.credits < 50) {
+  //     toast.error('Créditos insuficientes para modificar la imagen.');
+  //     return;
+  //   }
 
-    setIsModifying(true);
-    try {
-      const response = await fetch(`https://api.tiendia.app/api/products/images/modify/${currentImageId}`, {
-        method: "POST",
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ prompt: modificationPrompt }),
-      });
+  //   setIsModifying(true);
+  //   try {
+  //     const response = await fetch(`https://api.tiendia.app/api/products/images/modify/${currentImageId}`, {
+  //       method: "POST",
+  //       credentials: 'include',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify({ prompt: modificationPrompt }),
+  //     });
 
-      if (!response.ok) {
-        let errorMessage = `Error: ${response.status} ${response.statusText}`;
-        try {
-          const errorBody = await response.json();
-          errorMessage = errorBody.error || errorBody.message || errorMessage;
-        } catch (e) {
-          console.error("Could not parse error response body:", e);
-        }
-        const rawError = await response.text().catch(() => "");
-        console.error("Detalles del error de modificación:", rawError);
-        toast.error(`Error al modificar: ${errorMessage}`);
-        throw new Error(errorMessage);
-      }
+  //     if (!response.ok) {
+  //       let errorMessage = `Error: ${response.status} ${response.statusText}`;
+  //       try {
+  //         const errorBody = await response.json();
+  //         errorMessage = errorBody.error || errorBody.message || errorMessage;
+  //       } catch (e) {
+  //         console.error("Could not parse error response body:", e);
+  //       }
+  //       const rawError = await response.text().catch(() => "");
+  //       console.error("Detalles del error de modificación:", rawError);
+  //       toast.error(`Error al modificar: ${errorMessage}`);
+  //       throw new Error(errorMessage);
+  //     }
 
-      const result = await response.json();
+  //     const result = await response.json();
 
-      if (result && result.modifiedImageUrl && result.imageId) {
-        setUser(prevUser => (
-          prevUser ? { ...prevUser, credits: prevUser.credits - 50 } : null
-        ));
-        setCurrentAdImageUrl(result.modifiedImageUrl);
-        setCurrentImageId(result.imageId);
-        toast.success('¡Imagen modificada con éxito!');
-        setModificationPrompt('');
-      } else {
-        console.error("Respuesta inesperada de la API (modificación):", result);
-        toast.error('Error al obtener la imagen modificada.');
-      }
-    } catch (error: any) {
-      console.error("Error en handleModifyImage:", error);
-      toast.error(error.message || 'Ocurrió un error al modificar.', { id: 'modify-error-toast' });
-    } finally {
-      setIsModifying(false);
-    }
-  };
+  //     if (result && result.modifiedImageUrl && result.imageId) {
+  //       setUser(prevUser => (
+  //         prevUser ? { ...prevUser, credits: prevUser.credits - 50 } : null
+  //       ));
+  //       setCurrentAdImageUrl(result.modifiedImageUrl);
+  //       setCurrentImageId(result.imageId);
+  //       toast.success('¡Imagen modificada con éxito!');
+  //       setModificationPrompt('');
+  //     } else {
+  //       console.error("Respuesta inesperada de la API (modificación):", result);
+  //       toast.error('Error al obtener la imagen modificada.');
+  //     }
+  //   } catch (error: any) {
+  //     console.error("Error en handleModifyImage:", error);
+  //     toast.error(error.message || 'Ocurrió un error al modificar.', { id: 'modify-error-toast' });
+  //   } finally {
+  //     setIsModifying(false);
+  //   }
+  // };
 
   const handleDownloadImage = async () => {
     if (!currentAdImageUrl) return;
@@ -229,7 +228,7 @@ function App() {
           prevUser ? { ...prevUser, credits: prevUser.credits - 50 } : null
         ));
         setCurrentAdImageUrl(result.adImageUrl);
-        setCurrentImageId(result.imageId);
+        // setCurrentImageId(result.imageId);
         toast.success('¡Imagen regenerada con éxito!');
       } else {
         console.error("Respuesta inesperada de la API:", result);
@@ -262,9 +261,9 @@ function App() {
     setIsModifying(false);
     setCurrentAdImageUrl(null);
     setOriginalImageUrl(null);
-    setCurrentImageId(null);
+    // setCurrentImageId(null);
     setCurrentProductId(null);
-    setModificationPrompt('');
+    // setModificationPrompt('');
   };
 
   return (
