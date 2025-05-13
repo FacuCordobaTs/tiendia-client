@@ -90,23 +90,23 @@ function CreditsPage() {
     const imagesGeneratable = Math.floor(creditsValue / CREDIT_COST_PER_IMAGE) || 0;
 
     return (
-        <div className="min-h-screen bg-gray-50 md:pt-6 md:pl-72 pt-16 pl-4 pr-4 flex flex-col">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-950 md:pt-6 md:pl-72 pt-16 pl-4 pr-4 flex flex-col">
             <AdminSidebar />
 
             <header className="py-8">
-                <h1 className="text-3xl md:text-4xl font-bold pl-4 flex items-center gap-2">
+                <h1 className="text-3xl md:text-4xl font-bold pl-4 flex items-center gap-2 text-gray-800 dark:text-gray-100">
                     <CreditCard className="w-8 h-8" /> Cargar Créditos
                 </h1>
             </header>
 
             <main className="p-4 flex-grow flex items-center justify-center">
-                <Card className="w-full max-w-md shadow-lg transition-all duration-500 ease-in-out">
+                <Card className="w-full max-w-md shadow-lg transition-all duration-500 ease-in-out bg-white dark:bg-gray-900 border dark:border-gray-700">
                     <CardHeader>
-                        <CardTitle className="text-xl text-center">Ingresa el monto a cargar</CardTitle>
+                        <CardTitle className="text-xl text-center text-gray-900 dark:text-gray-50">Ingresa el monto a cargar</CardTitle>
                     </CardHeader>
                     <CardContent className="flex flex-col items-center justify-center">
                         <div className="w-full flex justify-center items-center mb-6">
-                            <span className="text-2xl text-gray-400">$</span>
+                            <span className="text-2xl text-gray-400 dark:text-gray-500">$</span>
                             <input
                                 id="amount-input"
                                 type="number"
@@ -117,22 +117,22 @@ function CreditsPage() {
                                 placeholder="00000"
                                 min={MIN_CREDITS}
                                 max={MAX_CREDITS}
-                                className="text-6xl font-bold text-center bg-transparent focus:outline-none w-48 placeholder-gray-200"
+                                className="text-6xl font-bold text-center bg-transparent focus:outline-none w-48 placeholder-gray-200 dark:placeholder-gray-700 text-gray-900 dark:text-gray-50"
                                 disabled={loading}
                             />
                         </div>
 
                         {credits && (
-                            <div className="text-center text-gray-600 text-sm mt-2 transition-opacity duration-300">
+                            <div className="text-center text-gray-600 dark:text-gray-400 text-sm mt-2 transition-opacity duration-300">
                                 <p>Con {creditsValue.toLocaleString('es-AR')} créditos podrás generar:</p>
-                                <p className="font-semibold text-primary">{imagesGeneratable} {imagesGeneratable === 1 ? 'imagen' : 'imágenes'}</p>
+                                <p className="font-semibold text-primary dark:text-purple-400">{imagesGeneratable} {imagesGeneratable === 1 ? 'imagen' : 'imágenes'}</p>
                             </div>
                         )}
 
                         {error && (
-                            <Alert variant="destructive" className="mt-4">
-                                <AlertCircle className="h-4 w-4" />
-                                <AlertTitle>Error</AlertTitle>
+                            <Alert variant="destructive" className="mt-4 bg-red-50 dark:bg-red-900/30 border-red-200 dark:border-red-700/50 text-red-800 dark:text-red-200">
+                                <AlertCircle className="h-4 w-4 text-red-500 dark:text-red-400" />
+                                <AlertTitle className="font-semibold">Error</AlertTitle>
                                 <AlertDescription>{error}</AlertDescription>
                             </Alert>
                         )}
@@ -155,7 +155,7 @@ function CreditsPage() {
                 </Card>
             </main>
 
-            <footer className="py-6 text-center text-sm text-gray-500 mt-auto">
+            <footer className="py-6 text-center text-sm text-gray-500 dark:text-gray-400 mt-auto">
                 <p>✨ tiendia.app - Pago seguro con Mercado Pago</p>
             </footer>
         </div>
