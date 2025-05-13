@@ -369,12 +369,6 @@ const AddProductForm = ({ open, onOpenChange }: AddProductFormProps) => {
             </DialogHeader>
             <ScrollArea className="flex-1 overflow-y-auto p-4 sm:p-6">
               <div className="grid gap-4">
-                <div className="text-sm text-gray-600 flex justify-between items-center">
-                  <span>Créditos disponibles:</span>
-                  <span className={`font-semibold ${hasEnoughCredits ? 'text-green-600' : 'text-red-500'}`}>
-                    {user?.credits || 0} / {REQUIRED_CREDITS} necesarios
-                  </span>
-                </div>
                 {insufficientCredits && (
                   <Alert variant="destructive" className="mb-2">
                     <AlertCircle className="h-4 w-4 mr-2" />
@@ -426,23 +420,6 @@ const AddProductForm = ({ open, onOpenChange }: AddProductFormProps) => {
                     )}
                   </div>
                 </div>
-                {imagePreview && !isCompressing && (
-                  <div className="space-y-2">
-                    <h3 className="font-medium text-sm">Preferencias de Imagen</h3>
-                    <Button
-                      onClick={() => setIncludeModel(!includeModel)}
-                      variant="outline"
-                      disabled={isLoading}
-                      className={`w-full rounded-lg transition-all px-3 py-3 h-auto flex flex-row items-center text-left ${includeModel ? 'bg-gradient-to-r from-orange-500 to-red-400 text-white hover:text-white border-transparent' : 'hover:bg-gray-100 dark:hover:bg-gray-800'}`}
-                    >
-                      <div className={`w-6 h-6 rounded-full ${includeModel ? 'bg-white/30' : 'bg-amber-100'} flex items-center justify-center mr-2 flex-shrink-0`}>
-                        <span className={includeModel ? 'text-white' : 'text-amber-500'}>☀️</span>
-                      </div>
-                      <span className="font-medium flex-grow">Incluir un fondo neutro</span>
-                      {includeModel && <span className="ml-auto text-xs font-semibold">(Activado)</span>}
-                    </Button>
-                  </div>
-                )}
                 {imagePreview && !isCompressing && (
                   <div className="flex flex-col sm:flex-row gap-2 pt-2">
                     <Button
