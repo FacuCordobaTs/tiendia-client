@@ -30,7 +30,6 @@ export default function AdminProductCard({ product, handleGenerateAd, onEdit }: 
   onEdit: () => void;
 }) {
   const { name, imageURL } = product;
-  const [includeModel, setIncludeModel] = useState(true);
   const [insufficientCredits, setInsufficientCredits] = useState(false);
 
   // Obtener información del usuario actual
@@ -46,7 +45,7 @@ export default function AdminProductCard({ product, handleGenerateAd, onEdit }: 
     }
     setInsufficientCredits(false); // Resetear alerta si hay créditos
     // ACTUALIZACIÓN: Pasar product.imageURL como tercer argumento
-    handleGenerateAd(product.id, includeModel, product.imageURL);
+    handleGenerateAd(product.id, true, product.imageURL);
   };
 
   return (
@@ -134,21 +133,15 @@ export default function AdminProductCard({ product, handleGenerateAd, onEdit }: 
              <h3 className="font-medium text-gray-700 dark:text-gray-300 mb-2 text-sm">Opciones de Generación</h3>
              {/* Simplificado a una sola opción por ahora, se puede expandir */}
              <Button
-                onClick={() => setIncludeModel(!includeModel)}
                 variant="outline"
-                className={`w-full rounded-lg transition-all px-4 py-3 h-auto flex items-center justify-between text-left border ${
-                 includeModel
-                   ? 'bg-blue-50 border-blue-300 dark:bg-blue-900/30 dark:border-blue-700'
-                   : 'border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800'
-               }`}
+                className={`w-full rounded-lg transition-all px-4 py-3 h-auto flex items-center justify-between text-left border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800`}
               >
                <div className="flex items-center">
-                  <div className={`w-5 h-5 rounded-full flex items-center justify-center mr-3 transition-colors ${includeModel ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'}`}>
-                   {includeModel && <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
+                  <div className={`w-5 h-5 rounded-full flex items-center justify-center mr-3 transition-colors  bg-blue-500`}>
+                   {<svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
                  </div>
-                 <span className={`font-medium text-sm ${includeModel ? 'text-blue-800 dark:text-blue-200' : 'text-gray-700 dark:text-gray-300'}`}>Fondo neutro</span>
+                 <span className={`font-medium text-sm text-blue-800 dark:text-blue-200`}>Fondo neutro</span>
                </div>
-                <span className="text-xs text-gray-500 dark:text-gray-400">{includeModel ? 'Activado' : 'Desactivado'}</span>
              </Button>
            </div>
 
