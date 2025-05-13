@@ -242,24 +242,24 @@ function GeneratedImagesPage() {
 
     const renderSkeletons = () => (
         Array.from({ length: 8 }).map((_, index) => (
-            <Card key={index} className="overflow-hidden">
-                <AspectRatio ratio={1 / 1} className="bg-muted">
-                    <Skeleton className="w-full h-full" />
+            <Card key={index} className="overflow-hidden bg-white dark:bg-gray-800 border dark:border-gray-700">
+                <AspectRatio ratio={1 / 1} className="bg-muted dark:bg-gray-700">
+                    <Skeleton className="w-full h-full bg-gray-200 dark:bg-gray-600" />
                 </AspectRatio>
                 <CardContent className="p-3">
-                    <Skeleton className="h-4 w-3/4 mb-2" />
-                    <Skeleton className="h-3 w-1/2" />
+                    <Skeleton className="h-4 w-3/4 mb-2 bg-gray-200 dark:bg-gray-600" />
+                    <Skeleton className="h-3 w-1/2 bg-gray-200 dark:bg-gray-600" />
                 </CardContent>
             </Card>
         ))
     );
 
     return (
-        <div className="min-h-screen bg-gray-50 md:pt-6 md:pl-72 pt-16 pl-4 pr-4 flex flex-col">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-950 md:pt-6 md:pl-72 pt-16 pl-4 pr-4 flex flex-col">
             <AdminSidebar />
 
             <header className="py-8">
-                <h1 className="text-3xl md:text-4xl font-bold pl-4 flex items-center gap-2">
+                <h1 className="text-3xl md:text-4xl font-bold pl-4 flex items-center gap-2 text-gray-800 dark:text-gray-100">
                     <ImageIcon className="w-8 h-8" /> Galería de Imágenes Generadas
                 </h1>
             </header>
@@ -270,16 +270,16 @@ function GeneratedImagesPage() {
                         {renderSkeletons()}
                     </div>
                 ) : error ? (
-                    <Alert variant="destructive" className="max-w-lg mx-auto">
-                        <AlertCircle className="h-4 w-4" />
-                        <AlertTitle>Error</AlertTitle>
+                    <Alert variant="destructive" className="max-w-lg mx-auto bg-red-50 dark:bg-red-900/30 border-red-200 dark:border-red-700/50 text-red-800 dark:text-red-200">
+                        <AlertCircle className="h-4 w-4 text-red-500 dark:text-red-400" />
+                        <AlertTitle className="font-semibold">Error</AlertTitle>
                         <AlertDescription>{error}</AlertDescription>
                     </Alert>
                 ) : images.length === 0 ? (
-                    <div className="text-center py-16">
-                        <ImageIcon className="mx-auto h-12 w-12 text-gray-400" />
-                        <h3 className="mt-2 text-lg font-medium text-gray-900">No hay imágenes</h3>
-                        <p className="mt-1 text-sm text-gray-500">
+                    <div className="text-center py-16 bg-white dark:bg-gray-800/50 rounded-lg border border-dashed border-gray-300 dark:border-gray-700">
+                        <ImageIcon className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" />
+                        <h3 className="mt-2 text-lg font-medium text-gray-900 dark:text-gray-200">No hay imágenes</h3>
+                        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                             Aún no has generado ninguna imagen publicitaria para tus productos.
                         </p>
                     </div>
@@ -288,10 +288,10 @@ function GeneratedImagesPage() {
                         {images.map((image) => (
                             <Card
                                 key={image.imageId}
-                                className="overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer group relative"
+                                className="overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer group relative bg-white dark:bg-gray-800 border dark:border-gray-700"
                                 onClick={() => openImageViewDialog(image.imageUrl)}
                             >
-                                <AspectRatio ratio={1 / 1} className="bg-muted relative">
+                                <AspectRatio ratio={1 / 1} className="bg-muted dark:bg-gray-700/50 relative">
                                     <img
                                         src={`${image.imageUrl}`}
                                         alt={`Imagen generada para ${image.productName || 'producto'}`}
@@ -299,11 +299,11 @@ function GeneratedImagesPage() {
                                         loading="lazy"
                                     />
                                     {/* Overlay with buttons shown on hover */}
-                                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-opacity duration-300 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
+                                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 dark:group-hover:bg-opacity-60 transition-opacity duration-300 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
                                         <Button
                                             variant="outline"
                                             size="icon"
-                                            className="bg-white/80 hover:bg-white text-gray-800"
+                                            className="bg-white/80 hover:bg-white text-gray-800 dark:bg-gray-700/80 dark:hover:bg-gray-600 dark:text-gray-100"
                                             onClick={(e) => handleDownloadImage(e, image.imageUrl, `tiendia-${image.productName || image.imageId}.png`)}
                                             title="Descargar Imagen"
                                         >
@@ -313,7 +313,7 @@ function GeneratedImagesPage() {
                                         <Button
                                            variant="outline"
                                            size="icon"
-                                           className="bg-white/80 hover:bg-white text-blue-600"
+                                           className="bg-white/80 hover:bg-white text-blue-600 dark:bg-gray-700/80 dark:hover:bg-gray-600 dark:text-blue-400"
                                            onClick={(e) => openModifyDialog(e, image)}
                                            title="Modificar Imagen"
                                         >
@@ -322,7 +322,7 @@ function GeneratedImagesPage() {
                                         <Button
                                             variant="destructive"
                                             size="icon"
-                                            className="bg-red-500/80 hover:bg-red-600/90 text-white"
+                                            className="bg-red-500/80 hover:bg-red-600/90 text-white dark:bg-red-600/80 dark:hover:bg-red-700/90 dark:text-red-100"
                                             onClick={(e) => openDeleteDialog(e, image.imageId)}
                                             title="Eliminar Imagen"
                                         >
@@ -331,11 +331,11 @@ function GeneratedImagesPage() {
                                     </div>
                                 </AspectRatio>
                                 <CardContent className="p-3">
-                                    <p className="text-sm font-medium truncate" title={image.productName || 'Producto sin nombre'}>
+                                    <p className="text-sm font-medium truncate text-gray-800 dark:text-gray-200" title={image.productName || 'Producto sin nombre'}>
                                         {image.productName || 'Producto sin nombre'}
                                     </p>
                                     {image.createdAt && (
-                                        <p className="text-xs text-muted-foreground">
+                                        <p className="text-xs text-muted-foreground dark:text-gray-400">
                                             Generada: {new Date(image.createdAt).toLocaleDateString()}
                                         </p>
                                     )}
@@ -348,16 +348,16 @@ function GeneratedImagesPage() {
 
             {/* Alert Dialog for Delete Confirmation */}
             <AlertDialog open={isDeleteAlertOpen} onOpenChange={setIsDeleteAlertOpen}>
-                <AlertDialogContent>
+                <AlertDialogContent className="bg-white dark:bg-gray-900 border dark:border-gray-700">
                     <AlertDialogHeader>
-                        <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
-                        <AlertDialogDescription>
+                        <AlertDialogTitle className="text-gray-900 dark:text-gray-50">¿Estás seguro?</AlertDialogTitle>
+                        <AlertDialogDescription className="text-gray-600 dark:text-gray-400">
                             Esta acción no se puede deshacer. Se eliminará permanentemente la imagen generada.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel disabled={isDeleting}>Cancelar</AlertDialogCancel>
-                        <AlertDialogAction onClick={confirmDeleteImage} disabled={isDeleting} className="bg-destructive hover:bg-destructive/90">
+                        <AlertDialogCancel disabled={isDeleting} className="dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600">Cancelar</AlertDialogCancel>
+                        <AlertDialogAction onClick={confirmDeleteImage} disabled={isDeleting} className="bg-destructive hover:bg-destructive/90 dark:bg-red-600 dark:hover:bg-red-700 dark:text-red-100">
                             {isDeleting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                             Eliminar
                         </AlertDialogAction>
@@ -367,16 +367,16 @@ function GeneratedImagesPage() {
 
             {/* Dialog for Image Preview */}
             <Dialog open={isImageViewOpen} onOpenChange={setIsImageViewOpen}>
-                <DialogContent className="max-w-3xl p-0">
+                <DialogContent className="max-w-3xl p-0 bg-white dark:bg-gray-900 border dark:border-gray-700 rounded-lg overflow-hidden">
                     {selectedImageUrl && (
-                        <img src={selectedImageUrl} alt="Vista previa de imagen generada" className="w-full h-auto rounded-lg" />
+                        <img src={selectedImageUrl} alt="Vista previa de imagen generada" className="w-full h-auto" />
                     )}
                 </DialogContent>
             </Dialog>
 
             {/* Dialog for Image Modification */}
             <Dialog open={isModifyDialogOpen} onOpenChange={setIsModifyDialogOpen}>
-                <DialogContent className="sm:max-w-[525px] flex flex-col max-h-[90vh]">
+                <DialogContent className="sm:max-w-[525px] flex flex-col max-h-[90vh] bg-white dark:bg-gray-900 border dark:border-gray-700">
                     {isModifying ? (
                         <div className="flex items-center justify-center min-h-[300px] flex-col gap-4">
                             <div className="relative h-16 w-16">
@@ -386,13 +386,13 @@ function GeneratedImagesPage() {
                                     {/* <Wand2 className="h-6 w-6 animate-ping opacity-50" /> */}
                                 </div>
                             </div>
-                            <p className="text-muted-foreground animate-pulse">Modificando imagen...</p>
+                            <p className="text-muted-foreground dark:text-gray-400 animate-pulse">Modificando imagen...</p>
                         </div>
                     ) : (
                         <>
                             <DialogHeader>
-                                <DialogTitle>Modificar Imagen <span role="img" aria-label="wand">🪄</span></DialogTitle>
-                                <DialogDescription>
+                                <DialogTitle className="text-gray-900 dark:text-gray-50">Modificar Imagen <span role="img" aria-label="wand">🪄</span></DialogTitle>
+                                <DialogDescription className="text-gray-600 dark:text-gray-400">
                                     {currentModifyImageUrl ? 'Modifica la imagen con nuevas instrucciones.' : 'Cargando imagen...'}
                                 </DialogDescription>
                             </DialogHeader>
@@ -414,19 +414,19 @@ function GeneratedImagesPage() {
 
                             {/* Sección de Modificación y Descarga */}
                             {currentModifyImageUrl && (
-                                <div className="mt-4 pt-4 border-t border-border space-y-4">
+                                <div className="mt-4 pt-4 border-t border-border dark:border-gray-700 space-y-4">
                                     {/* Campo para instrucciones de modificación */}
                                     <div className="space-y-2">
-                                        <label htmlFor="modification-prompt" className="text-sm font-medium">Instrucciones para modificar:</label>
+                                        <label htmlFor="modification-prompt" className="text-sm font-medium text-gray-700 dark:text-gray-300">Instrucciones para modificar:</label>
                                         <Textarea
                                             id="modification-prompt"
                                             placeholder="Ej: Haz el producto más grande..."
                                             value={modificationPrompt}
                                             onChange={(e) => setModificationPrompt(e.target.value)}
-                                            className="min-h-[80px]"
+                                            className="min-h-[80px] bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 focus:ring-blue-500 focus:border-blue-500"
                                             disabled={isModifying}
                                         />
-                                        <p className="text-xs text-muted-foreground">Costo de modificación: 50 créditos.</p>
+                                        <p className="text-xs text-muted-foreground dark:text-gray-400">Costo de modificación: 50 créditos.</p>
                                     </div>
 
                                     {/* Botones */}
@@ -442,6 +442,7 @@ function GeneratedImagesPage() {
                                         <Button
                                             onClick={(e) => handleDownloadImage(e, currentModifyImageUrl, `tiendia-modificada-${currentModifyImageId}.png`)}
                                             variant="outline"
+                                            className="dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 dark:border-gray-600"
                                             disabled={isModifying}
                                         >
                                             <Download className="mr-2 h-4 w-4" />
@@ -455,7 +456,7 @@ function GeneratedImagesPage() {
                 </DialogContent>
             </Dialog>
 
-            <footer className="container py-8 text-sm text-muted-foreground mt-auto">
+            <footer className="container py-8 text-sm text-muted-foreground dark:text-gray-400 mt-auto">
                 <p>✨ tiendia.app - Transformando tu negocio con IA</p>
             </footer>
         </div>
