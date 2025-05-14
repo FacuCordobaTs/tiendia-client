@@ -1,19 +1,11 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { FaGoogle } from "react-icons/fa";
 import { useNavigate, useSearchParams } from "react-router"; // Asegúrate de importar desde react-router-dom
-import { Image as ImageIcon, Clock, DollarSign, TrendingUp, Sparkles, Loader2 } from "lucide-react";
-import { useAuth } from "@/context/AuthContext";
-
+import { Image as ImageIcon, Clock, DollarSign, TrendingUp, Sparkles } from "lucide-react";
 export default function RegisterPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { register } = useAuth();
   const [searchParams] = useSearchParams();
 
   useEffect(() => {
@@ -24,32 +16,14 @@ export default function RegisterPage() {
        if (oauthError === 'access_denied') message = 'Permiso denegado para registrarse con Google.';
        if (oauthError === 'email_google_conflict') message = 'Este email ya está asociado con otra cuenta de Google. Intenta iniciar sesión.';
        if (oauthError === 'google_callback_failed') message = 'Falló la comunicación con Google. Inténtalo de nuevo.';
-      setError(message);
       
       navigate('/register', { replace: true });
     }
   }, [searchParams, navigate]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      register({email, password});
-      navigate('/home');
-
-    } catch (err: any) {
-      setError(err.message || 'Ocurrió un error al registrar la cuenta. Por favor, inténtalo de nuevo.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const handleGoogleLogin = () => {
-    setError(null);
     setIsLoading(true); 
-    console.log('Iniciando sesión con Google...');
     window.location.href = 'https://api.tiendia.app/api/auth/google'; 
   };
 
@@ -115,70 +89,7 @@ export default function RegisterPage() {
               <FaGoogle className="h-4 w-4" />
               Continuar con Google
             </Button>
-
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">
-                  O crea tu cuenta con email
-                </span>
-              </div>
-            </div>
-
-            <form className="space-y-4" onSubmit={handleSubmit}>
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="tu@email.com"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  disabled={isLoading}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="password">Contraseña</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  required
-                  minLength={6} // Añade validación mínima de longitud
-                  placeholder="••••••••" // Placeholder para contraseña
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  disabled={isLoading}
-                />
-              </div>
-
-              {error && (
-                <p className="text-sm text-red-600 dark:text-red-500 text-center">
-                  {error}
-                </p>
-              )}
-
-              <Button className="w-full" type="submit" disabled={isLoading}>
-                {isLoading ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : null}
-                {isLoading ? 'Creando cuenta...' : 'Crear cuenta'}
-              </Button>
-            </form>
-
-            <div className="text-center text-sm">
-              <Button
-                variant="link"
-                className="text-xs"
-                onClick={() => navigate('/login')}
-                disabled={isLoading}
-              >
-                ¿Ya tienes una cuenta? Inicia sesión
-              </Button>
-            </div>
+          
           </div>
         </div>
       </div>
