@@ -16,7 +16,7 @@ export default function RegisterPage() {
        if (oauthError === 'access_denied') message = 'Permiso denegado para registrarse con Google.';
        if (oauthError === 'email_google_conflict') message = 'Este email ya está asociado con otra cuenta de Google. Intenta iniciar sesión.';
        if (oauthError === 'google_callback_failed') message = 'Falló la comunicación con Google. Inténtalo de nuevo.';
-      
+      console.log(message)
       navigate('/register', { replace: true });
     }
   }, [searchParams, navigate]);
