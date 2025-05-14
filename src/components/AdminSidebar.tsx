@@ -168,17 +168,17 @@ export default function AdminSidebar() {
             <Button 
               variant="outline" 
               className="justify-start gap-3 h-12 text-base"
-              onClick={() => window.location.href = 'mailto:soporte@ejemplo.com'}
+              onClick={() => window.location.href = 'mailto:facucordoba200@gmail.com'}
             >
               <Mail className="h-5 w-5" />
-              soporte@ejemplo.com
+              facucordoba200@gmail.com
             </Button>
             <Button 
               className="justify-start gap-3 h-12 text-base bg-green-600 hover:bg-green-700 text-white"
-              onClick={() => window.open('https://wa.me/5491112345678', '_blank')}
+              onClick={() => window.open('https://wa.me/3408681915', '_blank')}
             >
               <FaWhatsapp className="h-5 w-5" />
-              +54 9 11 1234-5678
+              3408 681915
             </Button>
           </div>
         </DialogContent>

@@ -11,18 +11,18 @@ interface TutorialDialogProps {
 
 const slides = [
   {
-    title: "Paso 1: Carga Créditos",
-    description: "Para empezar a generar imágenes publicitarias necesitas créditos. Cada imagen generada consume 50 créditos. Puedes cargarlos fácilmente desde la sección 'Cargar Créditos'.",
+    title: "Paso 1: Créditos",
+    description: "Al registrarte, recibiste 500 créditos gratis. Cada imagen generada consume 50 créditos. Si necesitas más, puedes cargarlos fácilmente desde la sección 'Cargar Créditos'.",
     image: "/placeholder-credits.png" // Placeholder image path
   },
   {
-    title: "Paso 2: Sube tu Producto",
-    description: "Añade tu primer producto haciendo clic en 'Añadir Producto'. Sube una imagen clara de tu artículo. Una vez subido, ¡estarás listo para generar tu primera imagen publicitaria!",
+    title: "Paso 2: Añadir Producto",
+    description: "Añade tu primer producto haciendo clic en 'Añadir Producto'. Sube una imagen clara de tu artículo. Una vez subido, ¡estarás listo para generar tu primera fotografia profesional!",
     image: "/placeholder-upload.png" // Placeholder image path
   },
   {
-    title: "Paso 3: Genera Imágenes",
-    description: "Encuentra tu producto en la lista y haz clic en 'Generar Anuncio'. Puedes elegir si incluir un fondo neutro o no. ¡Experimenta para obtener los mejores resultados!",
+    title: "Paso 3: Generar Imágenes",
+    description: "Encuentra tu producto en la lista y haz clic en 'Generar Imágenes'. ¡Experimenta para obtener los mejores resultados!",
     image: "/placeholder-generate.png" // Placeholder image path
   },
   {
