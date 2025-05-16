@@ -118,7 +118,6 @@ function GeneratedImagesPage() {
             window.URL.revokeObjectURL(downloadUrl);
         } catch (error) {
             console.error('Error al descargar la imagen:', error);
-            setError("Error al descargar la imagen.");
             toast.error("Error al descargar la imagen."); // Added toast
         }
     };

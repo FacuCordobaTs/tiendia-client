@@ -136,6 +136,10 @@ function CreditsPage() {
                                 <AlertDescription>{error}</AlertDescription>
                             </Alert>
                         )}
+
+                        <p className="mt-4 text-sm text-center text-gray-600 dark:text-gray-400">
+                            Si ya realizaste tu pago y todavia no lo ves acreditado en la app simplemente recarga la pagina
+                        </p>
                     </CardContent>
                     <CardFooter>
                         <Button
