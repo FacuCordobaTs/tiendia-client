@@ -266,61 +266,44 @@ const AddProductForm = ({ open, onOpenChange }: AddProductFormProps) => {
 
   const startCamera = async () => {
     try {
-      // Primero intentamos con la cámara trasera
+      // Configuración básica para la cámara
       const constraints = {
-        video: {
-          facingMode: { exact: 'environment' },
-          width: { ideal: 1280 },
-          height: { ideal: 720 }
-        }
+        video: true
       };
 
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia(constraints);
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-          streamRef.current = stream;
-          // Forzar la reproducción del video
-          await videoRef.current.play();
-          setIsCameraActive(true);
-        }
-      } catch (backCameraError) {
-        console.log("Error con cámara trasera, intentando con cámara frontal");
-        // Si falla la cámara trasera, intentamos con la frontal
-        const frontConstraints = {
-          video: {
-            facingMode: 'user',
-            width: { ideal: 1280 },
-            height: { ideal: 720 }
-          }
-        };
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        streamRef.current = stream;
         
-        const frontStream = await navigator.mediaDevices.getUserMedia(frontConstraints);
-        if (videoRef.current) {
-          videoRef.current.srcObject = frontStream;
-          streamRef.current = frontStream;
-          // Forzar la reproducción del video
-          await videoRef.current.play();
-          setIsCameraActive(true);
-        }
+        // Esperar a que el video esté listo
+        videoRef.current.onloadedmetadata = () => {
+          videoRef.current?.play()
+            .then(() => {
+              setIsCameraActive(true);
+            })
+            .catch((error) => {
+              console.error("Error playing video:", error);
+              toast.error("Error al iniciar la cámara");
+              stopCamera();
+            });
+        };
       }
     } catch (error) {
       console.error("Error accessing camera:", error);
-      toast.error("No se pudo acceder a la cámara. Por favor, verifica los permisos de la cámara en tu dispositivo.");
+      toast.error("No se pudo acceder a la cámara. Por favor, verifica los permisos.");
       setIsCameraActive(false);
     }
   };
 
   const stopCamera = () => {
     if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => {
-        track.stop();
-      });
+      streamRef.current.getTracks().forEach(track => track.stop());
       streamRef.current = null;
     }
     if (videoRef.current) {
       videoRef.current.srcObject = null;
-      videoRef.current.pause();
     }
     setIsCameraActive(false);
   };
@@ -516,10 +499,15 @@ const AddProductForm = ({ open, onOpenChange }: AddProductFormProps) => {
                     <div className="grid grid-cols-2 gap-4">
                       <div
                         className="aspect-[4/3] bg-gray-50 dark:bg-gray-800 rounded-lg overflow-hidden cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex flex-col items-center justify-center p-4"
-                        onClick={startCamera}
+                        onClick={() => {
+                          // Asegurarse de que el diálogo esté completamente abierto antes de iniciar la cámara
+                          setTimeout(() => {
+                            startCamera();
+                          }, 100);
+                        }}
                       >
                         <Camera className="w-12 h-12 text-gray-400 mb-2" />
-                        <span className="text-sm font-medium text-gray-600 dark:text-gray-300">Usar Cámara 3</span>
+                        <span className="text-sm font-medium text-gray-600 dark:text-gray-300">Usar Cámara</span>
                       </div>
                       <div
                         className="aspect-[4/3] bg-gray-50 dark:bg-gray-800 rounded-lg overflow-hidden cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex flex-col items-center justify-center p-4"
