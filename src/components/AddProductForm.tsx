@@ -266,28 +266,42 @@ const AddProductForm = ({ open, onOpenChange }: AddProductFormProps) => {
 
   const startCamera = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { 
+      const constraints = {
+        video: {
           facingMode: 'environment',
           width: { ideal: 1920 },
           height: { ideal: 1080 }
-        } 
-      });
+        }
+      };
+
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         streamRef.current = stream;
+        videoRef.current.onloadedmetadata = () => {
+          videoRef.current?.play().catch(error => {
+            console.error("Error playing video:", error);
+            toast.error("Error al iniciar la cámara");
+          });
+        };
       }
       setIsCameraActive(true);
     } catch (error) {
       console.error("Error accessing camera:", error);
-      toast.error("No se pudo acceder a la cámara");
+      toast.error("No se pudo acceder a la cámara. Asegúrate de dar los permisos necesarios.");
+      setIsCameraActive(false);
     }
   };
 
   const stopCamera = () => {
     if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current.getTracks().forEach(track => {
+        track.stop();
+      });
       streamRef.current = null;
+    }
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
     }
     setIsCameraActive(false);
   };
@@ -445,7 +459,9 @@ const AddProductForm = ({ open, onOpenChange }: AddProductFormProps) => {
                         ref={videoRef}
                         autoPlay
                         playsInline
+                        muted
                         className="w-full h-full object-cover"
+                        style={{ transform: 'scaleX(-1)' }}
                       />
                       <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
                         <div className="flex justify-center gap-4">
