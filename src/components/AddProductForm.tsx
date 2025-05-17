@@ -493,7 +493,7 @@ const AddProductForm = ({ open, onOpenChange }: AddProductFormProps) => {
                         onClick={startCamera}
                       >
                         <Camera className="w-12 h-12 text-gray-400 mb-2" />
-                        <span className="text-sm font-medium text-gray-600 dark:text-gray-300">Usar Cámara</span>
+                        <span className="text-sm font-medium text-gray-600 dark:text-gray-300">Usar Cámara 2</span>
                       </div>
                       <div
                         className="aspect-[4/3] bg-gray-50 dark:bg-gray-800 rounded-lg overflow-hidden cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex flex-col items-center justify-center p-4"
