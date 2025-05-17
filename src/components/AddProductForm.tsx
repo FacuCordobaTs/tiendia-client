@@ -266,29 +266,47 @@ const AddProductForm = ({ open, onOpenChange }: AddProductFormProps) => {
 
   const startCamera = async () => {
     try {
+      // Primero intentamos con la cámara trasera
       const constraints = {
         video: {
-          facingMode: 'environment',
-          width: { ideal: 1920 },
-          height: { ideal: 1080 }
+          facingMode: { exact: 'environment' },
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
         }
       };
 
-      const stream = await navigator.mediaDevices.getUserMedia(constraints);
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        streamRef.current = stream;
-        videoRef.current.onloadedmetadata = () => {
-          videoRef.current?.play().catch(error => {
-            console.error("Error playing video:", error);
-            toast.error("Error al iniciar la cámara");
-          });
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+          streamRef.current = stream;
+          // Forzar la reproducción del video
+          await videoRef.current.play();
+          setIsCameraActive(true);
+        }
+      } catch (backCameraError) {
+        console.log("Error con cámara trasera, intentando con cámara frontal");
+        // Si falla la cámara trasera, intentamos con la frontal
+        const frontConstraints = {
+          video: {
+            facingMode: 'user',
+            width: { ideal: 1280 },
+            height: { ideal: 720 }
+          }
         };
+        
+        const frontStream = await navigator.mediaDevices.getUserMedia(frontConstraints);
+        if (videoRef.current) {
+          videoRef.current.srcObject = frontStream;
+          streamRef.current = frontStream;
+          // Forzar la reproducción del video
+          await videoRef.current.play();
+          setIsCameraActive(true);
+        }
       }
-      setIsCameraActive(true);
     } catch (error) {
       console.error("Error accessing camera:", error);
-      toast.error("No se pudo acceder a la cámara. Asegúrate de dar los permisos necesarios.");
+      toast.error("No se pudo acceder a la cámara. Por favor, verifica los permisos de la cámara en tu dispositivo.");
       setIsCameraActive(false);
     }
   };
@@ -302,6 +320,7 @@ const AddProductForm = ({ open, onOpenChange }: AddProductFormProps) => {
     }
     if (videoRef.current) {
       videoRef.current.srcObject = null;
+      videoRef.current.pause();
     }
     setIsCameraActive(false);
   };
@@ -461,8 +480,15 @@ const AddProductForm = ({ open, onOpenChange }: AddProductFormProps) => {
                         playsInline
                         muted
                         className="w-full h-full object-cover"
-                        style={{ transform: 'scaleX(-1)' }}
                       />
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        {!videoRef.current?.srcObject && (
+                          <div className="text-white text-center p-4">
+                            <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2" />
+                            <p>Iniciando cámara...</p>
+                          </div>
+                        )}
+                      </div>
                       <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
                         <div className="flex justify-center gap-4">
                           <Button
@@ -474,7 +500,7 @@ const AddProductForm = ({ open, onOpenChange }: AddProductFormProps) => {
                           </Button>
                           <Button
                             onClick={captureImage}
-                            disabled={isCapturing}
+                            disabled={isCapturing || !videoRef.current?.srcObject}
                             className="w-16 h-16 rounded-full bg-white hover:bg-white/90 transition-all duration-200 flex items-center justify-center"
                           >
                             {isCapturing ? (
@@ -493,7 +519,7 @@ const AddProductForm = ({ open, onOpenChange }: AddProductFormProps) => {
                         onClick={startCamera}
                       >
                         <Camera className="w-12 h-12 text-gray-400 mb-2" />
-                        <span className="text-sm font-medium text-gray-600 dark:text-gray-300">Usar Cámara 2</span>
+                        <span className="text-sm font-medium text-gray-600 dark:text-gray-300">Usar Cámara 3</span>
                       </div>
                       <div
                         className="aspect-[4/3] bg-gray-50 dark:bg-gray-800 rounded-lg overflow-hidden cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex flex-col items-center justify-center p-4"
