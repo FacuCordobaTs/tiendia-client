@@ -1,9 +1,10 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useProduct } from '@/context/ProductContext';
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Loader2, PlusCircle, AlertCircle, Wand2, Download, Camera, Image as ImageIcon } from 'lucide-react';
+import { Loader2, PlusCircle, AlertCircle, Wand2, Download, Camera, Image as ImageIcon, X } from 'lucide-react';
+import { FaCloudUploadAlt } from "react-icons/fa";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { FiImage } from 'react-icons/fi';
 import { useAuth } from '@/context/AuthContext';
@@ -11,6 +12,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useNavigate } from 'react-router';
 import toast from 'react-hot-toast';
 import { Textarea } from './ui/textarea';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export interface Product {
   id: number;
@@ -41,13 +43,110 @@ const AddProductForm = ({ open, onOpenChange }: AddProductFormProps) => {
   const [modificationPrompt, setModificationPrompt] = useState<string>('');
   const [isModifying, setIsModifying] = useState<boolean>(false);
   const [currentImageId, setCurrentImageId] = useState<number | null>(null);
-  const [isCameraActive, setIsCameraActive] = useState(false);
-  const [isCapturing, setIsCapturing] = useState(false);
+  const [activeTab, setActiveTab] = useState<string>("gallery");
+  const [isCameraActive, setIsCameraActive] = useState<boolean>(false);
+  const [isCapturing, setIsCapturing] = useState<boolean>(false);
+  const [cameraPermissionDenied, setCameraPermissionDenied] = useState<boolean>(false);
+  
   const videoRef = useRef<HTMLVideoElement>(null);
-  const streamRef = useRef<MediaStream | null>(null);
-
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const { user, setUser } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    return () => {
+      // Cleanup camera stream when component unmounts
+      if (videoRef.current && videoRef.current.srcObject) {
+        const stream = videoRef.current.srcObject as MediaStream;
+        const tracks = stream.getTracks();
+        tracks.forEach(track => track.stop());
+      }
+    };
+  }, []);
+
+  const startCamera = async () => {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      toast.error("Camera access not supported by your browser");
+      return;
+    }
+
+    try {
+      setCameraPermissionDenied(false);
+      setIsCameraActive(true);
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 720 } }
+      });
+      
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+      }
+    } catch (err) {
+      console.error("Error accessing camera:", err);
+      setCameraPermissionDenied(true);
+      toast.error("Camera access denied. Please allow access to your camera.");
+    }
+  };
+
+  const stopCamera = () => {
+    if (videoRef.current && videoRef.current.srcObject) {
+      const stream = videoRef.current.srcObject as MediaStream;
+      const tracks = stream.getTracks();
+      tracks.forEach(track => track.stop());
+      videoRef.current.srcObject = null;
+    }
+    setIsCameraActive(false);
+  };
+
+  const captureImage = () => {
+    if (!videoRef.current || !canvasRef.current) return;
+    
+    setIsCapturing(true);
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    
+    // Match canvas dimensions to video dimensions
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    
+    // Draw the video frame to the canvas
+    const ctx = canvas.getContext('2d');
+    ctx?.drawImage(video, 0, 0, canvas.width, canvas.height);
+    
+    // Convert canvas to blob
+    canvas.toBlob(async (blob) => {
+      if (blob) {
+        const file = new File([blob], `camera_capture_${Date.now()}.jpg`, { type: 'image/jpeg' });
+        setFileSize(file.size);
+        setImageFile(file);
+        
+        const reader = new FileReader();
+        reader.readAsDataURL(blob);
+        reader.onload = () => {
+          if (reader.result) {
+            const dataUrl = reader.result as string;
+            setOriginalImageUrl(dataUrl);
+            setImagePreview(dataUrl);
+            
+            // Stop the camera and switch to preview
+            stopCamera();
+            
+            // Automatically start generation
+            handleGenerateClick(new Event('click') as unknown as React.FormEvent);
+          }
+        };
+      }
+      setIsCapturing(false);
+    }, 'image/jpeg', 0.9);
+  };
+
+  const switchTab = (tab: string) => {
+    setActiveTab(tab);
+    if (tab === "camera") {
+      startCamera();
+    } else if (isCameraActive) {
+      stopCamera();
+    }
+  };
 
   const toBase64 = (file: Blob): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -257,86 +356,17 @@ const AddProductForm = ({ open, onOpenChange }: AddProductFormProps) => {
     setInsufficientCredits(false);
     setModificationPrompt('');
     setCurrentImageId(null);
-    stopCamera();
-    setIsCameraActive(false);
-    setIsCapturing(false);
+    setActiveTab("gallery");
+    if (isCameraActive) stopCamera();
   };
 
   const hasEnoughCredits = user && user.credits >= REQUIRED_CREDITS;
 
-  const startCamera = async () => {
-    try {
-      // Configuración básica para la cámara
-      const constraints = {
-        video: true
-      };
-
-      const stream = await navigator.mediaDevices.getUserMedia(constraints);
-      
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        streamRef.current = stream;
-        
-        // Esperar a que el video esté listo
-        videoRef.current.onloadedmetadata = () => {
-          videoRef.current?.play()
-            .then(() => {
-              setIsCameraActive(true);
-            })
-            .catch((error) => {
-              console.error("Error playing video:", error);
-              toast.error("Error al iniciar la cámara");
-              stopCamera();
-            });
-        };
-      }
-    } catch (error) {
-      console.error("Error accessing camera:", error);
-      toast.error("No se pudo acceder a la cámara. Por favor, verifica los permisos.");
-      setIsCameraActive(false);
-    }
-  };
-
-  const stopCamera = () => {
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
-      streamRef.current = null;
-    }
-    if (videoRef.current) {
-      videoRef.current.srcObject = null;
-    }
-    setIsCameraActive(false);
-  };
-
-  const captureImage = async () => {
-    if (!videoRef.current) return;
-    
-    setIsCapturing(true);
-    try {
-      const canvas = document.createElement('canvas');
-      canvas.width = videoRef.current.videoWidth;
-      canvas.height = videoRef.current.videoHeight;
-      const ctx = canvas.getContext('2d');
-      ctx?.drawImage(videoRef.current, 0, 0);
-      
-      canvas.toBlob((blob) => {
-        if (blob) {
-          const file = new File([blob], `camera_${Date.now()}.jpg`, { type: 'image/jpeg' });
-          handleFileChange({ target: { files: [file] } } as any);
-          stopCamera();
-        }
-      }, 'image/jpeg', 0.95);
-    } catch (error) {
-      console.error("Error capturing image:", error);
-      toast.error("Error al capturar la imagen");
-    } finally {
-      setIsCapturing(false);
-    }
-  };
-
   return (
     <Dialog open={open} onOpenChange={(isOpen) => {
-      if (!isOpen) resetForm();
+      if (!isOpen) {
+        resetForm();
+      }
       onOpenChange(isOpen);
     }}>
       <DialogTrigger asChild>
@@ -443,162 +473,221 @@ const AddProductForm = ({ open, onOpenChange }: AddProductFormProps) => {
             <DialogHeader className="px-4 sm:px-6 pt-5 pb-4 border-b border-gray-200 dark:border-gray-700">
               <DialogTitle className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-gray-50">Generar Producto con IA</DialogTitle>
             </DialogHeader>
-            <ScrollArea className="flex-1 overflow-y-auto p-4 sm:p-6">
-              <div className="grid gap-4">
-                {insufficientCredits && (
-                  <Alert variant="destructive" className="mb-2">
-                    <AlertCircle className="h-4 w-4 mr-2" />
-                    <AlertDescription>
-                      No tienes suficientes créditos. Se requieren {REQUIRED_CREDITS} créditos.
-                    </AlertDescription>
-                  </Alert>
-                )}
-                <div className="space-y-2">
-                  <Label htmlFor="image-upload" className="text-sm font-medium">Sube la imagen del producto</Label>
-                  {isCameraActive ? (
-                    <div className="relative aspect-[4/3] bg-black rounded-lg overflow-hidden">
-                      <video
-                        ref={videoRef}
-                        autoPlay
-                        playsInline
-                        muted
-                        className="w-full h-full object-cover"
-                      />
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        {!videoRef.current?.srcObject && (
-                          <div className="text-white text-center p-4">
-                            <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2" />
-                            <p>Iniciando cámara...</p>
-                          </div>
-                        )}
+            <div className="flex-1 overflow-hidden">
+              <Tabs value={activeTab} onValueChange={switchTab} className="h-full">
+                <div className="px-4 sm:px-6 pt-4">
+                  <TabsList className="grid grid-cols-2 w-full bg-gray-100 dark:bg-gray-800">
+                    <TabsTrigger value="gallery" className="flex items-center gap-2 py-3">
+                      <ImageIcon className="h-4 w-4" />
+                      <span>Galería</span>
+                    </TabsTrigger>
+                    <TabsTrigger value="camera" className="flex items-center gap-2 py-3">
+                      <Camera className="h-4 w-4" />
+                      <span>Cámara</span>
+                    </TabsTrigger>
+                  </TabsList>
+                </div>
+                
+                <TabsContent value="gallery" className="h-full">
+                  <ScrollArea className="h-full max-h-[60vh] p-4 sm:p-6">
+                    <div className="grid gap-4">
+                      {insufficientCredits && (
+                        <Alert variant="destructive" className="mb-2">
+                          <AlertCircle className="h-4 w-4 mr-2" />
+                          <AlertDescription>
+                            No tienes suficientes créditos. Se requieren {REQUIRED_CREDITS} créditos.
+                          </AlertDescription>
+                        </Alert>
+                      )}
+                      <div className="space-y-2">
+                        <Label htmlFor="image-upload" className="text-sm font-medium">Selecciona una imagen de tu galería</Label>
+                        <div
+                          className={`mt-1 flex justify-center px-4 pt-4 pb-4 border-2 ${isCompressing ? 'border-yellow-300' : imagePreview ? 'border-blue-300' : 'border-gray-300 border-dashed'} rounded-md hover:border-blue-400 cursor-pointer transition-colors`}
+                          onClick={() => !isCompressing && document.getElementById('image-upload')?.click()}
+                        >
+                          {isCompressing ? (
+                            <div className="flex flex-col items-center justify-center py-4">
+                              <Loader2 className="h-8 w-8 animate-spin text-yellow-500 mb-2" />
+                              <p className="text-sm text-gray-600">Comprimiendo imagen...</p>
+                            </div>
+                          ) : imagePreview ? (
+                            <div className="flex flex-col items-center">
+                              <img src={imagePreview} alt="Previsualización" className="max-h-40 w-auto object-contain rounded" />
+                              {fileSize > 0 && (
+                                <span className="text-xs mt-2 text-gray-500">
+                                  {formatFileSize(fileSize)} {fileSize > MAX_FILE_SIZE ? '(Comprimida)' : ''}
+                                </span>
+                              )}
+                            </div>
+                          ) : (
+                            <div className="space-y-1 text-center">
+                              <FaCloudUploadAlt className="mx-auto h-10 w-10 text-gray-400" />
+                              <div className="flex text-sm text-gray-600">
+                                <span className="relative bg-white rounded-md font-medium text-blue-600 hover:text-blue-500">
+                                  <span>Haz clic para subir</span>
+                                  <input
+                                    id="image-upload"
+                                    name="imageFile"
+                                    type="file"
+                                    className="sr-only"
+                                    accept="image/png, image/jpeg, image/webp"
+                                    onChange={handleFileChange}
+                                    disabled={isCompressing}
+                                  />
+                                </span>
+                              </div>
+                              <p className="text-xs text-gray-500">PNG, JPG, WEBP hasta 3MB</p>
+                              <p className="text-xs text-gray-400">(Imágenes grandes se comprimirán)</p>
+                            </div>
+                          )}
+                        </div>
                       </div>
-                      <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
-                        <div className="flex justify-center gap-4">
+                      {imagePreview && !isCompressing && (
+                        <div className="flex flex-col sm:flex-row gap-2 pt-2">
                           <Button
+                            type="button"
                             variant="outline"
-                            onClick={stopCamera}
-                            className="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white border-white/30"
+                            disabled={isLoading}
+                            onClick={() => {
+                              setImageFile(null);
+                              setImagePreview(null);
+                              setOriginalImageUrl(null);
+                            }}
+                            className="flex-1"
                           >
+                            <X className="h-4 w-4 mr-2" />
                             Cancelar
                           </Button>
                           <Button
-                            onClick={captureImage}
-                            disabled={isCapturing || !videoRef.current?.srcObject}
-                            className="w-16 h-16 rounded-full bg-white hover:bg-white/90 transition-all duration-200 flex items-center justify-center"
+                            type="button"
+                            disabled={isLoading || !imageFile || !hasEnoughCredits}
+                            onClick={handleGenerateClick}
+                            className={`${hasEnoughCredits ? "bg-gradient-to-r from-blue-500 to-cyan-400" : "bg-gray-400"} transition-all duration-500 text-white flex-1`}
                           >
-                            {isCapturing ? (
-                              <Loader2 className="h-8 w-8 animate-spin text-gray-600" />
+                            {isLoading ? (
+                              <>
+                                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                                Generando...
+                              </>
+                            ) : !hasEnoughCredits ? (
+                              <>
+                                <AlertCircle className="w-4 h-4 mr-2" />
+                                Créditos insuficientes
+                              </>
                             ) : (
-                              <div className="w-14 h-14 rounded-full border-4 border-gray-600" />
+                              <>
+                                <FiImage className="w-4 h-4 mr-2" />
+                                Generar ({REQUIRED_CREDITS} créditos)
+                              </>
                             )}
                           </Button>
                         </div>
-                      </div>
+                      )}
                     </div>
-                  ) : (
-                    <div className="grid grid-cols-2 gap-4">
-                      <div
-                        className="aspect-[4/3] bg-gray-50 dark:bg-gray-800 rounded-lg overflow-hidden cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex flex-col items-center justify-center p-4"
-                        onClick={() => {
-                          // Asegurarse de que el diálogo esté completamente abierto antes de iniciar la cámara
-                          setTimeout(() => {
-                            startCamera();
-                          }, 100);
-                        }}
-                      >
-                        <Camera className="w-12 h-12 text-gray-400 mb-2" />
-                        <span className="text-sm font-medium text-gray-600 dark:text-gray-300">Usar Cámara</span>
-                      </div>
-                      <div
-                        className="aspect-[4/3] bg-gray-50 dark:bg-gray-800 rounded-lg overflow-hidden cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex flex-col items-center justify-center p-4"
-                        onClick={() => document.getElementById('image-upload')?.click()}
-                      >
-                        <ImageIcon className="w-12 h-12 text-gray-400 mb-2" />
-                        <span className="text-sm font-medium text-gray-600 dark:text-gray-300">Galería</span>
-                        <input
-                          id="image-upload"
-                          name="imageFile"
-                          type="file"
-                          className="sr-only"
-                          accept="image/png, image/jpeg, image/webp"
-                          onChange={handleFileChange}
-                          disabled={isCompressing}
-                        />
-                      </div>
-                    </div>
-                  )}
-                  {imagePreview && !isCameraActive && (
-                    <div className="mt-4">
-                      <div className="relative aspect-[4/3] bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden">
-                        <img
-                          src={imagePreview}
-                          alt="Previsualización"
-                          className="w-full h-full object-contain"
-                        />
-                        {fileSize > 0 && (
-                          <div className="absolute bottom-2 left-2 right-2 bg-black/60 backdrop-blur-sm text-white text-xs py-1 px-2 rounded-full text-center">
-                            {formatFileSize(fileSize)} {fileSize > MAX_FILE_SIZE ? '(Comprimida)' : ''}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                </div>
-                {imagePreview && !isCameraActive && (
-                  <div className="flex flex-col sm:flex-row gap-2 pt-2">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      disabled={isLoading}
-                      onClick={() => {
-                        onOpenChange(false);
-                        resetForm();
-                      }}
-                      className="flex-1"
-                    >
-                      Cancelar
-                    </Button>
-                    <Button
-                      type="button"
-                      disabled={isLoading || !imageFile || !hasEnoughCredits}
-                      onClick={handleGenerateClick}
-                      className={`${hasEnoughCredits ? "bg-gradient-to-r from-blue-500 to-cyan-400" : "bg-gray-400"} transition-all duration-500 text-white flex-1`}
-                    >
-                      {isLoading ? (
-                        <>
-                          <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                          Generando...
-                        </>
-                      ) : !hasEnoughCredits ? (
-                        <>
-                          <AlertCircle className="w-4 h-4 mr-2" />
-                          Créditos insuficientes
-                        </>
+                  </ScrollArea>
+                </TabsContent>
+                
+                <TabsContent value="camera" className="h-full">
+                  <div className="flex flex-col h-full">
+                    <div className="relative flex-grow flex justify-center items-center bg-black p-2">
+                      {cameraPermissionDenied ? (
+                        <div className="text-center p-6">
+                          <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+                          <p className="text-white text-lg mb-4">Acceso a la cámara denegado</p>
+                          <p className="text-gray-300 text-sm mb-6">Para usar esta función, por favor permite el acceso a la cámara en la configuración de tu navegador.</p>
+                          <Button 
+                            onClick={() => {
+                              setCameraPermissionDenied(false);
+                              startCamera();
+                            }}
+                            className="bg-white text-black hover:bg-gray-100"
+                          >
+                            Reintentar
+                          </Button>
+                        </div>
                       ) : (
                         <>
-                          <FiImage className="w-4 h-4 mr-2" />
-                          Generar ({REQUIRED_CREDITS} créditos)
+                          <video 
+                            ref={videoRef} 
+                            autoPlay 
+                            playsInline 
+                            className="h-full w-full object-cover rounded-lg"
+                            style={{ display: isCameraActive ? 'block' : 'none' }}
+                          />
+                          
+                          <canvas 
+                            ref={canvasRef} 
+                            className="hidden"
+                          />
+                          
+                          {isCameraActive && (
+                            <div className="absolute bottom-6 left-0 right-0 flex justify-center">
+                              <Button
+                                onClick={captureImage}
+                                disabled={isCapturing}
+                                className="rounded-full w-16 h-16 p-0 border-4 border-white bg-white bg-opacity-20 backdrop-blur-sm hover:bg-opacity-30 transition-all"
+                              >
+                                {isCapturing ? (
+                                  <Loader2 className="h-8 w-8 animate-spin text-white" />
+                                ) : (
+                                  <div className="rounded-full w-12 h-12 bg-white"></div>
+                                )}
+                              </Button>
+                            </div>
+                          )}
+                          
+                          {!isCameraActive && !isLoading && (
+                            <div className="text-center p-8">
+                              <Camera className="h-16 w-16 text-gray-300 mx-auto mb-6" />
+                              <p className="text-gray-300 text-lg mb-8">Activa la cámara para tomar una foto</p>
+                              <Button 
+                                onClick={startCamera}
+                                className="bg-gradient-to-r from-blue-500 to-cyan-400 hover:from-blue-600 hover:to-cyan-500 text-white px-6 py-3 rounded-full font-medium"
+                              >
+                                <Camera className="h-5 w-5 mr-2" />
+                                Activar Cámara
+                              </Button>
+                            </div>
+                          )}
+                          
+                          {isLoading && (
+                            <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex flex-col items-center justify-center z-10">
+                              <Loader2 className="h-12 w-12 animate-spin text-blue-400 mb-4" />
+                              <p className="text-lg text-white font-medium">Generando imagen...</p>
+                              <p className="text-sm text-gray-300 mt-2">Esto puede tomar unos momentos</p>
+                            </div>
+                          )}
                         </>
                       )}
-                    </Button>
+                    </div>
+                    
+                    <div className="p-4 text-center bg-gray-50 dark:bg-gray-800">
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                        La foto se procesará automáticamente después de tomarla
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        Costo: {REQUIRED_CREDITS} créditos
+                      </p>
+                    </div>
                   </div>
-                )}
-                {insufficientCredits && (
-                  <div className="mt-3 text-sm text-center">
-                    <p className="text-gray-600">
-                      Necesitas {REQUIRED_CREDITS} créditos para generar una imagen.
-                    </p>
-                    <Button
-                      variant="link"
-                      className="text-blue-500 hover:text-blue-600 p-0 mt-1"
-                      onClick={() => navigate("/credits")}
-                    >
-                      Recargar créditos
-                    </Button>
-                  </div>
-                )}
-              </div>
-            </ScrollArea>
+                </TabsContent>
+              </Tabs>
+              
+              {insufficientCredits && (
+                <div className="mt-3 text-sm text-center p-4 border-t border-gray-200 dark:border-gray-700">
+                  <p className="text-gray-600 dark:text-gray-300">
+                    Necesitas {REQUIRED_CREDITS} créditos para generar una imagen.
+                  </p>
+                  <Button
+                    variant="link"
+                    className="text-blue-500 hover:text-blue-600 p-0 mt-1"
+                    onClick={() => navigate("/credits")}
+                  >
+                    Recargar créditos
+                  </Button>
+                </div>
+              )}
+            </div>
           </div>
         )}
       </DialogContent>
