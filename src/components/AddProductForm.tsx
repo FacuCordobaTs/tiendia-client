@@ -370,30 +370,30 @@ const AddProductForm = ({ open, onOpenChange }: AddProductFormProps) => {
       onOpenChange(isOpen);
     }}>
       <DialogTrigger asChild>
-        <Button>
+        <Button className="bg-gradient-to-r from-blue-500 to-cyan-400 hover:from-blue-600 hover:to-cyan-500 text-white shadow-lg hover:shadow-xl transition-all duration-300 rounded-full px-6 py-2">
           <PlusCircle className="h-5 w-5 mr-2" />
           Agregar Producto con IA
         </Button>
       </DialogTrigger>
-      <DialogContent className="w-[95vw] sm:w-[90vw] md:max-w-2xl lg:max-w-3xl max-h-[90vh] flex flex-col bg-white dark:bg-gray-900 rounded-xl shadow-2xl p-0 overflow-hidden">
+      <DialogContent className="w-[95vw] sm:w-[90vw] md:max-w-2xl lg:max-w-3xl max-h-[90vh] flex flex-col bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl rounded-2xl shadow-2xl p-0 overflow-hidden border border-white/20">
         {currentAdImageUrl && generatedProductName ? (
           <>
-            <DialogHeader className="px-4 sm:px-6 pt-5 pb-4 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
-              <DialogTitle className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-gray-50 flex items-center">
-                <Wand2 className="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3 text-purple-500" />
+            <DialogHeader className="px-6 pt-6 pb-4 border-b border-white/10 backdrop-blur-sm">
+              <DialogTitle className="text-xl font-semibold text-gray-900 dark:text-gray-50 flex items-center">
+                <Wand2 className="w-6 h-6 mr-3 text-purple-500" />
                 Producto Generado
               </DialogTitle>
-              <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
+              <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                 Compara el antes y el después
               </div>
             </DialogHeader>
-            <ScrollArea className="flex-1 overflow-y-auto p-4 sm:p-6">
-              <div className="grid gap-4">
-                <h3 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-gray-100">{generatedProductName}</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                  <div>
-                    <h4 className="text-center text-xs font-medium text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider">Antes</h4>
-                    <div className="aspect-w-1 aspect-h-1 bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+            <ScrollArea className="flex-1 overflow-y-auto p-6">
+              <div className="grid gap-6">
+                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">{generatedProductName}</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl p-4 shadow-lg border border-white/20">
+                    <h4 className="text-center text-sm font-medium text-gray-500 dark:text-gray-400 mb-3 uppercase tracking-wider">Antes</h4>
+                    <div className="aspect-w-1 aspect-h-1 bg-gray-100/50 dark:bg-gray-800/50 rounded-lg overflow-hidden border border-white/20">
                       <img
                         src={originalImageUrl || ''}
                         alt="Imagen Original"
@@ -401,17 +401,17 @@ const AddProductForm = ({ open, onOpenChange }: AddProductFormProps) => {
                       />
                     </div>
                   </div>
-                  <div className="relative">
-                    <h4 className="text-center text-xs font-medium text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider">Después ✨</h4>
+                  <div className="relative bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl p-4 shadow-lg border border-white/20">
+                    <h4 className="text-center text-sm font-medium text-gray-500 dark:text-gray-400 mb-3 uppercase tracking-wider">Después ✨</h4>
                     {isModifying && (
                       <div className="absolute inset-0 bg-white/70 dark:bg-gray-900/70 backdrop-blur-sm flex items-center justify-center rounded-lg z-10">
                         <div className="flex flex-col items-center gap-2">
                           <Loader2 className="h-8 w-8 animate-spin text-blue-400" />
-                          <p className="text-xs text-blue-600 dark:text-blue-300">Modificando...</p>
+                          <p className="text-sm text-blue-600 dark:text-blue-300">Modificando...</p>
                         </div>
                       </div>
                     )}
-                    <div className="aspect-w-1 aspect-h-1 bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+                    <div className="aspect-w-1 aspect-h-1 bg-gray-100/50 dark:bg-gray-800/50 rounded-lg overflow-hidden border border-white/20">
                       <img
                         src={currentAdImageUrl}
                         alt="Imagen Generada"
@@ -420,7 +420,7 @@ const AddProductForm = ({ open, onOpenChange }: AddProductFormProps) => {
                     </div>
                   </div>
                 </div>
-                <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700 space-y-4">
+                <div className="mt-6 pt-6 border-t border-white/10 space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="modification-prompt" className="text-sm font-medium">Instrucciones para modificar (opcional):</Label>
                     <Textarea
@@ -428,16 +428,16 @@ const AddProductForm = ({ open, onOpenChange }: AddProductFormProps) => {
                       placeholder="Ej: Cambia el fondo a una playa..."
                       value={modificationPrompt}
                       onChange={(e) => setModificationPrompt(e.target.value)}
-                      className="min-h-[80px] bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600"
+                      className="min-h-[80px] bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border-white/20 focus:border-blue-400 transition-colors"
                       disabled={isModifying}
                     />
                     <p className="text-xs text-gray-500 dark:text-gray-400">Costo: 50 créditos por modificación.</p>
                   </div>
-                  <div className="flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-3">
+                  <div className="flex flex-col sm:flex-row justify-between items-center gap-3">
                     <Button
                       onClick={handleModifyImage}
                       disabled={!modificationPrompt || isModifying}
-                      className="w-full sm:w-auto bg-gradient-to-r from-blue-500 to-cyan-400 hover:from-blue-600 hover:to-cyan-500 text-white px-4 py-2 rounded-lg"
+                      className="w-full sm:w-auto bg-gradient-to-r from-blue-500 to-cyan-400 hover:from-blue-600 hover:to-cyan-500 text-white px-6 py-2 rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
                     >
                       <Wand2 className="mr-2 h-4 w-4" />
                       Modificar Imagen
@@ -446,7 +446,7 @@ const AddProductForm = ({ open, onOpenChange }: AddProductFormProps) => {
                       onClick={handleDownloadImage}
                       variant="outline"
                       disabled={isModifying}
-                      className="w-full sm:w-auto border-gray-300 dark:border-gray-600"
+                      className="w-full sm:w-auto border-white/20 hover:border-blue-400 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-full px-6 py-2 transition-all duration-300"
                     >
                       <Download className="mr-2 h-4 w-4" />
                       Descargar
@@ -455,14 +455,14 @@ const AddProductForm = ({ open, onOpenChange }: AddProductFormProps) => {
                 </div>
               </div>
             </ScrollArea>
-            <div className="px-4 sm:px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-3">
+            <div className="px-6 py-4 border-t border-white/10 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm flex flex-col sm:flex-row justify-between items-center gap-3">
               <Button
                 variant="outline"
                 onClick={() => {
                   resetForm();
                   onOpenChange(false);
                 }}
-                className="w-full sm:w-auto border-gray-300 dark:border-gray-600"
+                className="w-full sm:w-auto border-white/20 hover:border-blue-400 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-full px-6 py-2 transition-all duration-300"
               >
                 Cerrar
               </Button>
@@ -470,60 +470,126 @@ const AddProductForm = ({ open, onOpenChange }: AddProductFormProps) => {
           </>
         ) : (
           <div className="flex flex-col h-full">
-            <DialogHeader className="px-4 sm:px-6 pt-5 pb-4 border-b border-gray-200 dark:border-gray-700">
-              <DialogTitle className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-gray-50">Generar Producto con IA</DialogTitle>
+            <DialogHeader className="px-6 pt-6 pb-4 border-b border-white/10 backdrop-blur-sm">
+              <DialogTitle className="text-2xl font-semibold text-gray-900 dark:text-gray-50">Generar Producto con IA</DialogTitle>
             </DialogHeader>
             <div className="flex-1 overflow-hidden">
               <Tabs value={activeTab} onValueChange={switchTab} className="h-full">
-                <div className="px-4 sm:px-6 pt-4">
-                  <TabsList className="grid grid-cols-2 w-full bg-gray-100 dark:bg-gray-800">
-                    <TabsTrigger value="gallery" className="flex items-center gap-2 py-3">
-                      <ImageIcon className="h-4 w-4" />
-                      <span>Galería</span>
-                    </TabsTrigger>
-                    <TabsTrigger value="camera" className="flex items-center gap-2 py-3">
-                      <Camera className="h-4 w-4" />
-                      <span>Cámara</span>
-                    </TabsTrigger>
-                  </TabsList>
+                <div className="w-full flex justify-center pt-4 pb-2">
+                  <div className="w-full max-w-md">
+                    <TabsList className="grid grid-cols-2 w-full bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-full p-1 border border-white/20">
+                      <TabsTrigger value="gallery" className="flex items-center gap-2 py-3 rounded-full data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:shadow-lg transition-all duration-300">
+                        <ImageIcon className="h-4 w-4" />
+                        <span>Galería</span>
+                      </TabsTrigger>
+                      <TabsTrigger value="camera" className="flex items-center gap-2 py-3 rounded-full data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:shadow-lg transition-all duration-300">
+                        <Camera className="h-4 w-4" />
+                        <span>Cámara</span>
+                      </TabsTrigger>
+                    </TabsList>
+                  </div>
                 </div>
                 
                 <TabsContent value="gallery" className="h-full">
-                  <ScrollArea className="h-full max-h-[60vh] p-4 sm:p-6">
-                    <div className="grid gap-4">
+                  <ScrollArea className="h-full max-h-[60vh] p-6">
+                    <div className="grid gap-6">
                       {insufficientCredits && (
-                        <Alert variant="destructive" className="mb-2">
+                        <Alert variant="destructive" className="mb-2 bg-red-500/10 backdrop-blur-sm border-red-500/20">
                           <AlertCircle className="h-4 w-4 mr-2" />
                           <AlertDescription>
                             No tienes suficientes créditos. Se requieren {REQUIRED_CREDITS} créditos.
                           </AlertDescription>
                         </Alert>
                       )}
-                      <div className="space-y-2">
+                      <div className="space-y-3">
                         <Label htmlFor="image-upload" className="text-sm font-medium">Selecciona una imagen de tu galería</Label>
                         <div
-                          className={`mt-1 flex justify-center px-4 pt-4 pb-4 border-2 ${isCompressing ? 'border-yellow-300' : imagePreview ? 'border-blue-300' : 'border-gray-300 border-dashed'} rounded-md hover:border-blue-400 cursor-pointer transition-colors`}
+                          className={`mt-1 flex flex-col items-center justify-center px-6 pt-8 pb-8 border-2 ${
+                            isCompressing 
+                              ? 'border-yellow-300/50 bg-yellow-500/5' 
+                              : imagePreview 
+                                ? 'border-blue-300/50 bg-blue-500/5' 
+                                : 'border-white/20 bg-white/5'
+                          } rounded-2xl hover:border-blue-400/50 hover:bg-blue-500/5 cursor-pointer transition-all duration-300 backdrop-blur-sm min-h-[320px] relative shadow-lg`}
                           onClick={() => !isCompressing && document.getElementById('image-upload')?.click()}
+                          style={{ maxWidth: 340 }}
                         >
                           {isCompressing ? (
                             <div className="flex flex-col items-center justify-center py-4">
                               <Loader2 className="h-8 w-8 animate-spin text-yellow-500 mb-2" />
-                              <p className="text-sm text-gray-600">Comprimiendo imagen...</p>
+                              <p className="text-sm text-gray-600 dark:text-gray-300">Comprimiendo imagen...</p>
                             </div>
                           ) : imagePreview ? (
-                            <div className="flex flex-col items-center">
-                              <img src={imagePreview} alt="Previsualización" className="max-h-40 w-auto object-contain rounded" />
-                              {fileSize > 0 && (
-                                <span className="text-xs mt-2 text-gray-500">
-                                  {formatFileSize(fileSize)} {fileSize > MAX_FILE_SIZE ? '(Comprimida)' : ''}
-                                </span>
-                              )}
-                            </div>
+                            <>
+                              <div className="flex flex-col items-center w-full">
+                                <div className="relative group w-full flex justify-center">
+                                  <img 
+                                    src={imagePreview} 
+                                    alt="Previsualización" 
+                                    className="max-h-48 w-auto object-contain rounded-xl shadow-lg transition-transform duration-300 group-hover:scale-105" 
+                                    style={{ maxWidth: 220 }}
+                                  />
+                                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 rounded-xl transition-colors duration-300" />
+                                </div>
+                                {fileSize > 0 && (
+                                  <span className="text-xs mt-3 text-gray-500 dark:text-gray-400 bg-white/50 dark:bg-gray-800/50 px-3 py-1 rounded-full backdrop-blur-sm">
+                                    {formatFileSize(fileSize)} {fileSize > MAX_FILE_SIZE ? '(Comprimida)' : ''}
+                                  </span>
+                                )}
+                              </div>
+                              {/* Action buttons always visible below preview */}
+                              <div className="flex flex-col sm:flex-row gap-3 pt-5 w-full">
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  disabled={isLoading}
+                                  onClick={e => {
+                                    e.stopPropagation();
+                                    setImageFile(null);
+                                    setImagePreview(null);
+                                    setOriginalImageUrl(null);
+                                  }}
+                                  className="flex-1 border-white/20 hover:border-red-400 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-full px-6 py-2 transition-all duration-300"
+                                >
+                                  <X className="h-4 w-4 mr-2" />
+                                  Cancelar
+                                </Button>
+                                <Button
+                                  type="button"
+                                  disabled={isLoading || !imageFile || !hasEnoughCredits}
+                                  onClick={handleGenerateClick}
+                                  className={`flex-1 rounded-full px-6 py-2 shadow-lg hover:shadow-xl transition-all duration-300 ${
+                                    hasEnoughCredits 
+                                      ? "bg-gradient-to-r from-blue-500 to-cyan-400 hover:from-blue-600 hover:to-cyan-500 text-white" 
+                                      : "bg-gray-400"
+                                  }`}
+                                >
+                                  {isLoading ? (
+                                    <>
+                                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                                      Generando...
+                                    </>
+                                  ) : !hasEnoughCredits ? (
+                                    <>
+                                      <AlertCircle className="w-4 h-4 mr-2" />
+                                      Créditos insuficientes
+                                    </>
+                                  ) : (
+                                    <>
+                                      <FiImage className="w-4 h-4 mr-2" />
+                                      Generar ({REQUIRED_CREDITS} créditos)
+                                    </>
+                                  )}
+                                </Button>
+                              </div>
+                            </>
                           ) : (
-                            <div className="space-y-1 text-center">
-                              <FaCloudUploadAlt className="mx-auto h-10 w-10 text-gray-400" />
-                              <div className="flex text-sm text-gray-600">
-                                <span className="relative bg-white rounded-md font-medium text-blue-600 hover:text-blue-500">
+                            <div className="space-y-3 text-center w-full">
+                              <div className="bg-white/50 dark:bg-gray-800/50 p-4 rounded-full inline-block backdrop-blur-sm">
+                                <FaCloudUploadAlt className="h-12 w-12 text-blue-500" />
+                              </div>
+                              <div className="flex text-sm text-gray-600 dark:text-gray-300 justify-center">
+                                <span className="relative bg-white/50 dark:bg-gray-800/50 rounded-full px-4 py-2 font-medium text-blue-600 hover:text-blue-500 backdrop-blur-sm transition-all duration-300">
                                   <span>Haz clic para subir</span>
                                   <input
                                     id="image-upload"
@@ -536,71 +602,30 @@ const AddProductForm = ({ open, onOpenChange }: AddProductFormProps) => {
                                   />
                                 </span>
                               </div>
-                              <p className="text-xs text-gray-500">PNG, JPG, WEBP hasta 3MB</p>
-                              <p className="text-xs text-gray-400">(Imágenes grandes se comprimirán)</p>
+                              <p className="text-xs text-gray-500 dark:text-gray-400">PNG, JPG, WEBP hasta 3MB</p>
+                              <p className="text-xs text-gray-400 dark:text-gray-500">(Imágenes grandes se comprimirán)</p>
                             </div>
                           )}
                         </div>
                       </div>
-                      {imagePreview && !isCompressing && (
-                        <div className="flex flex-col sm:flex-row gap-2 pt-2">
-                          <Button
-                            type="button"
-                            variant="outline"
-                            disabled={isLoading}
-                            onClick={() => {
-                              setImageFile(null);
-                              setImagePreview(null);
-                              setOriginalImageUrl(null);
-                            }}
-                            className="flex-1"
-                          >
-                            <X className="h-4 w-4 mr-2" />
-                            Cancelar
-                          </Button>
-                          <Button
-                            type="button"
-                            disabled={isLoading || !imageFile || !hasEnoughCredits}
-                            onClick={handleGenerateClick}
-                            className={`${hasEnoughCredits ? "bg-gradient-to-r from-blue-500 to-cyan-400" : "bg-gray-400"} transition-all duration-500 text-white flex-1`}
-                          >
-                            {isLoading ? (
-                              <>
-                                <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                                Generando...
-                              </>
-                            ) : !hasEnoughCredits ? (
-                              <>
-                                <AlertCircle className="w-4 h-4 mr-2" />
-                                Créditos insuficientes
-                              </>
-                            ) : (
-                              <>
-                                <FiImage className="w-4 h-4 mr-2" />
-                                Generar ({REQUIRED_CREDITS} créditos)
-                              </>
-                            )}
-                          </Button>
-                        </div>
-                      )}
                     </div>
                   </ScrollArea>
                 </TabsContent>
                 
                 <TabsContent value="camera" className="h-full">
                   <div className="flex flex-col h-full">
-                    <div className="relative flex-grow flex justify-center items-center bg-black p-2">
+                    <div className="relative flex-grow flex justify-center items-center bg-black/90 p-4">
                       {cameraPermissionDenied ? (
-                        <div className="text-center p-6">
-                          <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-                          <p className="text-white text-lg mb-4">Acceso a la cámara denegado</p>
+                        <div className="text-center p-8 bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 max-w-md">
+                          <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
+                          <p className="text-white text-xl mb-4">Acceso a la cámara denegado</p>
                           <p className="text-gray-300 text-sm mb-6">Para usar esta función, por favor permite el acceso a la cámara en la configuración de tu navegador.</p>
                           <Button 
                             onClick={() => {
                               setCameraPermissionDenied(false);
                               startCamera();
                             }}
-                            className="bg-white text-black hover:bg-gray-100"
+                            className="bg-white text-black hover:bg-gray-100 rounded-full px-6 py-2 shadow-lg hover:shadow-xl transition-all duration-300"
                           >
                             Reintentar
                           </Button>
@@ -611,7 +636,7 @@ const AddProductForm = ({ open, onOpenChange }: AddProductFormProps) => {
                             ref={videoRef} 
                             autoPlay 
                             playsInline 
-                            className="h-full w-full object-cover rounded-lg"
+                            className="h-full w-full object-cover rounded-2xl shadow-2xl"
                             style={{ display: isCameraActive ? 'block' : 'none' }}
                           />
                           
@@ -621,28 +646,30 @@ const AddProductForm = ({ open, onOpenChange }: AddProductFormProps) => {
                           />
                           
                           {isCameraActive && (
-                            <div className="absolute bottom-6 left-0 right-0 flex justify-center">
+                            <div className="absolute bottom-8 left-0 right-0 flex justify-center">
                               <Button
                                 onClick={captureImage}
                                 disabled={isCapturing}
-                                className="rounded-full w-16 h-16 p-0 border-4 border-white bg-white bg-opacity-20 backdrop-blur-sm hover:bg-opacity-30 transition-all"
+                                className="rounded-full w-20 h-20 p-0 border-4 border-white/30 bg-white/10 backdrop-blur-sm hover:bg-white/20 transition-all duration-300 shadow-xl hover:shadow-2xl"
                               >
                                 {isCapturing ? (
-                                  <Loader2 className="h-8 w-8 animate-spin text-white" />
+                                  <Loader2 className="h-10 w-10 animate-spin text-white" />
                                 ) : (
-                                  <div className="rounded-full w-12 h-12 bg-white"></div>
+                                  <div className="rounded-full w-14 h-14 bg-white shadow-lg"></div>
                                 )}
                               </Button>
                             </div>
                           )}
                           
                           {!isCameraActive && !isLoading && (
-                            <div className="text-center p-8">
-                              <Camera className="h-16 w-16 text-gray-300 mx-auto mb-6" />
-                              <p className="text-gray-300 text-lg mb-8">Activa la cámara para tomar una foto</p>
+                            <div className="text-center p-8 bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 max-w-md">
+                              <div className="bg-white/20 p-4 rounded-full inline-block mb-6">
+                                <Camera className="h-16 w-16 text-white" />
+                              </div>
+                              <p className="text-white text-xl mb-8">Activa la cámara para tomar una foto</p>
                               <Button 
                                 onClick={startCamera}
-                                className="bg-gradient-to-r from-blue-500 to-cyan-400 hover:from-blue-600 hover:to-cyan-500 text-white px-6 py-3 rounded-full font-medium"
+                                className="bg-gradient-to-r from-blue-500 to-cyan-400 hover:from-blue-600 hover:to-cyan-500 text-white px-8 py-3 rounded-full font-medium shadow-lg hover:shadow-xl transition-all duration-300"
                               >
                                 <Camera className="h-5 w-5 mr-2" />
                                 Activar Cámara
@@ -651,9 +678,9 @@ const AddProductForm = ({ open, onOpenChange }: AddProductFormProps) => {
                           )}
                           
                           {isLoading && (
-                            <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex flex-col items-center justify-center z-10">
-                              <Loader2 className="h-12 w-12 animate-spin text-blue-400 mb-4" />
-                              <p className="text-lg text-white font-medium">Generando imagen...</p>
+                            <div className="absolute inset-0 bg-black/80 backdrop-blur-sm flex flex-col items-center justify-center z-10 rounded-2xl">
+                              <Loader2 className="h-16 w-16 animate-spin text-blue-400 mb-4" />
+                              <p className="text-xl text-white font-medium">Generando imagen...</p>
                               <p className="text-sm text-gray-300 mt-2">Esto puede tomar unos momentos</p>
                             </div>
                           )}
@@ -661,11 +688,11 @@ const AddProductForm = ({ open, onOpenChange }: AddProductFormProps) => {
                       )}
                     </div>
                     
-                    <div className="p-4 text-center bg-gray-50 dark:bg-gray-800">
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                    <div className="p-6 text-center bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border-t border-white/10">
+                      <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
                         La foto se procesará automáticamente después de tomarla
                       </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
                         Costo: {REQUIRED_CREDITS} créditos
                       </p>
                     </div>
@@ -674,13 +701,13 @@ const AddProductForm = ({ open, onOpenChange }: AddProductFormProps) => {
               </Tabs>
               
               {insufficientCredits && (
-                <div className="mt-3 text-sm text-center p-4 border-t border-gray-200 dark:border-gray-700">
+                <div className="mt-3 text-sm text-center p-6 border-t border-white/10 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm">
                   <p className="text-gray-600 dark:text-gray-300">
                     Necesitas {REQUIRED_CREDITS} créditos para generar una imagen.
                   </p>
                   <Button
                     variant="link"
-                    className="text-blue-500 hover:text-blue-600 p-0 mt-1"
+                    className="text-blue-500 hover:text-blue-600 p-0 mt-2"
                     onClick={() => navigate("/credits")}
                   >
                     Recargar créditos
