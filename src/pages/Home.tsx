@@ -169,7 +169,9 @@ function App() {
     if (!currentAdImageUrl) return;
 
     try {
-      const response = await fetch(currentAdImageUrl);
+      const noCacheUrl = `${currentAdImageUrl}?t=${Date.now()}`;
+      console.log("Descargando imagen:", noCacheUrl);
+      const response = await fetch(noCacheUrl);
       if (!response.ok) {
         throw new Error(`Network response was not ok: ${response.statusText}`);
       }
