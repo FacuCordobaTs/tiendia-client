@@ -62,7 +62,7 @@ export default function AdminSidebar() {
                 }
               >
                 <CreditCard className="h-5 w-5" />
-                Créditos
+                Comprar imágenes
               </NavLink>
               
               <NavLink
@@ -130,7 +130,7 @@ export default function AdminSidebar() {
             }
           >
             <CreditCard className="h-5 w-5" />
-            Créditos
+            Comprar imágenes
           </NavLink>
           
           <NavLink

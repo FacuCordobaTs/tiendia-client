@@ -375,7 +375,7 @@ const AddProductForm = ({ open, onOpenChange }: AddProductFormProps) => {
                   <Alert variant="destructive" className="mb-2">
                     <AlertCircle className="h-4 w-4 mr-2" />
                     <AlertDescription>
-                      No tienes suficientes créditos. Se requieren {REQUIRED_CREDITS} créditos.
+                      No tienes suficientes imágenes.
                     </AlertDescription>
                   </Alert>
                 )}
@@ -476,6 +476,7 @@ const AddProductForm = ({ open, onOpenChange }: AddProductFormProps) => {
                           accept="image/png, image/jpeg, image/webp"
                           onChange={handleFileChange}
                           disabled={isCompressing}
+                          // multiple 
                         />
                       </div>
                     </div>
@@ -525,12 +526,12 @@ const AddProductForm = ({ open, onOpenChange }: AddProductFormProps) => {
                       ) : !hasEnoughCredits ? (
                         <>
                           <AlertCircle className="w-4 h-4 mr-2" />
-                          Créditos insuficientes
+                          No te quedan imágenes disponibles
                         </>
                       ) : (
                         <>
                           <FiImage className="w-4 h-4 mr-2" />
-                          Generar ({REQUIRED_CREDITS} créditos)
+                          Generar (1 imagen)
                         </>
                       )}
                     </Button>
@@ -539,14 +540,14 @@ const AddProductForm = ({ open, onOpenChange }: AddProductFormProps) => {
                 {insufficientCredits && (
                   <div className="mt-3 text-sm text-center">
                     <p className="text-gray-600">
-                      Necesitas {REQUIRED_CREDITS} créditos para generar una imagen.
+                      Necesitas comprar imágenes para generar una.
                     </p>
                     <Button
                       variant="link"
                       className="text-blue-500 hover:text-blue-600 p-0 mt-1"
                       onClick={() => navigate("/credits")}
                     >
-                      Recargar créditos
+                      Recargar imágenes
                     </Button>
                   </div>
                 )}
