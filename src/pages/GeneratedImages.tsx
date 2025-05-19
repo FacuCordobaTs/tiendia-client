@@ -447,7 +447,7 @@ function GeneratedImagesPage() {
                                             className="min-h-[80px] bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 focus:ring-blue-500 focus:border-blue-500"
                                             disabled={isModifying}
                                         />
-                                        <p className="text-xs text-muted-foreground dark:text-gray-400">Costo de modificación: 50 créditos.</p>
+                                        <p className="text-xs text-muted-foreground dark:text-gray-400">Costo de modificación: 1 imágen.</p>
                                     </div>
 
                                     {/* Botones */}

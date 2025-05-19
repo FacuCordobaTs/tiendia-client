@@ -51,7 +51,7 @@ function App() {
 
   const handleGenerateAd = async (id: number, includeModel: boolean, originalUrl: string | null) => {
     if (!user || user.credits < 50) {
-      toast.error('Créditos insuficientes para generar la imagen.');
+      toast.error('No te quedan imágenes disponibles.');
       return;
     }
 
@@ -196,7 +196,7 @@ function App() {
 
   const handleRegenerateImage = async () => {
     if (!currentProductId || !user || user.credits < 50) {
-      toast.error('Créditos insuficientes para regenerar la imagen.');
+      toast.error('No te quedan imágenes disponibles.');
       return;
     }
 
@@ -288,7 +288,7 @@ function App() {
           <div className="flex items-center bg-white dark:bg-gray-800 shadow-sm rounded-lg px-3 py-1.5 border border-gray-200 dark:border-gray-700">
             <Sparkles className="h-4 w-4 text-yellow-500 mr-2" />
             <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
-              {user?.credits != null ? user.credits.toLocaleString('es-AR') : '0'} créditos
+              {user?.credits != null ? (user.credits/50).toLocaleString('es-AR') : '0'} Imagenes
             </span>
           </div>
           <Button
@@ -296,7 +296,7 @@ function App() {
             className="bg-gradient-to-r from-purple-600 to-blue-500 hover:from-purple-700 hover:to-blue-600 text-white shadow-md hover:shadow-lg transition-all duration-300 px-4 py-1.5 h-auto flex items-center gap-2 text-sm rounded-lg"
           >
             <CreditCard className="h-4 w-4" />
-            <span>Cargar Créditos</span>
+            <span>Comprar imágenes</span>
           </Button>
           <Button
             variant="outline"

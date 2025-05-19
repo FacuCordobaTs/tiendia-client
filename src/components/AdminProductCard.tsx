@@ -104,19 +104,19 @@ export default function AdminProductCard({ product, handleGenerateAd, onEdit }: 
            {/* Información de créditos */}
           <div className="mb-5 p-3 bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
               <div className="text-sm text-gray-600 dark:text-gray-300 flex justify-between items-center">
-                <span>Créditos disponibles:</span>
+                <span>Imágenes disponibles:</span>
                  <span className={`font-semibold ${hasEnoughCredits ? 'text-green-600 dark:text-green-400' : 'text-red-500 dark:text-red-400'}`}>
-                   {user?.credits ?? 0}
+                   {user?.credits != null ? (user.credits/50).toLocaleString('es-AR') : '0'}
                  </span>
               </div>
              <div className="text-xs text-gray-500 dark:text-gray-400 text-right mt-1">
-                 Necesarios para generar: {REQUIRED_CREDITS}
+                 Necesarias para generar: 1 imágen
              </div>
              {insufficientCredits && (
                <Alert variant="destructive" className="mt-3 bg-red-50 dark:bg-red-900/30 border-red-200 dark:border-red-700/50 text-red-700 dark:text-red-300">
                  <AlertCircle className="h-4 w-4" />
                  <AlertDescription className="text-xs">
-                   No tienes suficientes créditos.
+                   No tienes suficientes imágenes.
                    <Button
                      variant="link"
                      className="p-0 h-auto ml-1 text-red-700 dark:text-red-300 underline"
@@ -164,12 +164,12 @@ export default function AdminProductCard({ product, handleGenerateAd, onEdit }: 
                   ) : !hasEnoughCredits ? (
                     <>
                      <AlertCircle className="w-4 h-4" />
-                      <span>Créditos insuficientes</span>
+                      <span>No te quedan imágenes disponibles</span>
                    </>
                  ) : (
                     <>
                       <Sparkles className="w-4 h-4" /> {/* Cambiado a Sparkles */}
-                      <span>Generar ({REQUIRED_CREDITS} créd.)</span>
+                      <span>Generar (1 imágen)</span>
                     </>
                  )}
                 </Button>
