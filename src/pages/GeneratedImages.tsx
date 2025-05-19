@@ -98,13 +98,9 @@ function GeneratedImagesPage() {
 
     const handleDownloadImage = async (event: React.MouseEvent | React.MouseEvent<HTMLButtonElement>, url: string, filename: string) => { // Allow button event
         event.stopPropagation();
-        // Use currentModifyImageUrl if downloading from modify dialog, otherwise use provided url
-        // const imageUrlToDownload = isModifyDialogOpen && currentModifyImageUrl ? currentModifyImageUrl : `${url}`;
-        // const finalFilename = filename || imageUrlToDownload.split('/').pop() || `generated-image-${Date.now()}.png`;
-
         try {
-            console.log("Descargando imagen:", url);
-            const response = await fetch(url);
+            const noCacheUrl = `${url}?t=${Date.now()}`;
+            const response = await fetch(noCacheUrl);
             console.log("Respuesta:", response);
             if (!response.ok) throw new Error('Network response was not ok.');
             const blob = await response.blob();
@@ -297,8 +293,8 @@ function GeneratedImagesPage() {
                                         className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105"
                                         loading="lazy"
                                     />
-                                    {/* Overlay with buttons shown on hover */}
-                                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 dark:group-hover:bg-opacity-60 transition-opacity duration-300 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
+                                    {/* Overlay with buttons shown on hover - only on desktop */}
+                                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 dark:group-hover:bg-opacity-60 transition-opacity duration-300 hidden md:flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
                                         <Button
                                             variant="outline"
                                             size="icon"
@@ -308,7 +304,6 @@ function GeneratedImagesPage() {
                                         >
                                             <Download className="h-5 w-5" />
                                         </Button>
-                                        {/* Add Modify Button Here */}
                                         <Button
                                            variant="outline"
                                            size="icon"
@@ -338,6 +333,33 @@ function GeneratedImagesPage() {
                                             Generada: {new Date(image.createdAt).toLocaleDateString()}
                                         </p>
                                     )}
+                                    {/* Mobile buttons - shown at bottom */}
+                                    <div className="flex justify-between items-center gap-2 mt-3 md:hidden">
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            className="flex-1 bg-white hover:bg-gray-50 text-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-100"
+                                            onClick={(e) => handleDownloadImage(e, image.imageUrl, `tiendia-${image.productName || image.imageId}.png`)}
+                                        >
+                                            <Download className="h-4 w-4 mr-1" />
+                                        </Button>
+                                        <Button
+                                           variant="outline"
+                                           size="sm"
+                                           className="flex-1 bg-white hover:bg-gray-50 text-blue-600 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-blue-400"
+                                           onClick={(e) => openModifyDialog(e, image)}
+                                        >
+                                           <Wand2 className="h-4 w-4 mr-1" />
+                                        </Button>
+                                        <Button
+                                            variant="destructive"
+                                            size="sm"
+                                            className="flex-1 bg-red-500 hover:bg-red-600 text-white dark:bg-red-600 dark:hover:bg-red-700 dark:text-red-100"
+                                            onClick={(e) => openDeleteDialog(e, image.imageId)}
+                                        >
+                                            <Trash2 className="h-4 w-4 mr-1" />
+                                        </Button>
+                                    </div>
                                 </CardContent>
                             </Card>
                         ))}
