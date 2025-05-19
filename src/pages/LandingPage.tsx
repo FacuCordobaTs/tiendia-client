@@ -42,7 +42,7 @@ export default function LandingPage() {
         </Badge>
 
         <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight md:leading-snug"> {/* Ajuste de tamaño y espaciado */}
-          Transforma tus Fotos <span className="bg-gradient-to-r from-blue-500 to-cyan-400 dark:from-blue-400 dark:to-cyan-300 bg-clip-text text-transparent">en Imagenes Profesionales</span> por tan solo $50
+          Transforma tus Fotos <span className="bg-gradient-to-r from-blue-500 to-cyan-400 dark:from-blue-400 dark:to-cyan-300 bg-clip-text text-transparent">en Imagenes Profesionales</span>. ¡5 Gratis, luego desde $68 por imagen!
         </h1>
 
         <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -52,7 +52,7 @@ export default function LandingPage() {
         <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
            <Button size="lg" className="gap-2 text-lg shadow-lg hover:shadow-primary/30 transition-shadow duration-300" onClick={() => navigate(user ? "/home" : "/register")}>
              <Upload className="h-5 w-5" />
-             {user ? "Ir a tus productos" : "Comenzar por $50"}
+             {user ? "Ir a tus productos" : "5 Imágenes Gratis"}
            </Button>
            {/* <Button size="lg" variant="outline" className="gap-2 text-lg">
                Ver Ejemplo <ArrowRight className="h-5 w-5" />
@@ -95,6 +95,63 @@ export default function LandingPage() {
         </p>
       </section>
 
+      {/* --- Pricing Section --- */}
+      <section className="container py-16 md:py-24">
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
+          Packs de Imágenes
+        </h2>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+          {/* Single Image Pack */}
+          <Card className="bg-card/50 hover:border-primary/30 transition-colors duration-300 ease-in-out transform hover:-translate-y-1">
+            <CardHeader className="text-center">
+              <CardTitle className="text-2xl font-bold">1 Imagen</CardTitle>
+              <p className="text-3xl font-bold text-primary mt-2">$80</p>
+            </CardHeader>
+            <CardContent className="text-center">
+              <p className="text-sm text-muted-foreground">Ideal para probar el servicio</p>
+            </CardContent>
+          </Card>
+
+          {/* 10 Images Pack */}
+          <Card className="bg-card/50 hover:border-primary/30 transition-colors duration-300 ease-in-out transform hover:-translate-y-1">
+            <CardHeader className="text-center">
+              <CardTitle className="text-2xl font-bold">10 Imágenes</CardTitle>
+              <p className="text-3xl font-bold text-primary mt-2">$800</p>
+            </CardHeader>
+            <CardContent className="text-center">
+              <p className="text-sm text-muted-foreground">Perfecto para pequeños catálogos</p>
+            </CardContent>
+          </Card>
+
+          {/* 50 Images Pack */}
+          <Card className="bg-card/50 hover:border-primary/30 transition-colors duration-300 ease-in-out transform hover:-translate-y-1 relative">
+            <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-primary to-primary/90 text-white dark:text-black px-4 py-1 rounded-full text-xs font-medium shadow-lg">
+              Más elegido
+            </div>
+            <CardHeader className="text-center">
+              <CardTitle className="text-2xl font-bold">50 Imágenes</CardTitle>
+              <p className="text-3xl font-bold text-primary mt-2">$3,500</p>
+              <span className="text-sm text-green-600 dark:text-green-400">12.5% de ahorro</span>
+            </CardHeader>
+            <CardContent className="text-center">
+              <p className="text-sm text-muted-foreground">Ideal para tiendas medianas</p>
+            </CardContent>
+          </Card>
+
+          {/* 100 Images Pack */}
+          <Card className="bg-card/50 hover:border-primary/30 transition-colors duration-300 ease-in-out transform hover:-translate-y-1">
+            <CardHeader className="text-center">
+              <CardTitle className="text-2xl font-bold">100 Imágenes</CardTitle>
+              <p className="text-3xl font-bold text-primary mt-2">$6,800</p>
+              <span className="text-sm text-green-600 dark:text-green-400">15% de ahorro</span>
+            </CardHeader>
+            <CardContent className="text-center">
+              <p className="text-sm text-muted-foreground">Para tiendas con gran catálogo</p>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
       {/* --- Features/Benefits Section --- */}
       <section className="container py-16 md:py-24 bg-muted/30 dark:bg-slate-800/20 rounded-2xl my-16"> {/* Fondo suave para destacar */}
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
@@ -134,17 +191,17 @@ export default function LandingPage() {
         </div>
       </section>
 
-       {/* --- Simple CTA / Pricing Placeholder --- */}
+       {/* --- CTA Section --- */}
       <section className="container py-16 md:py-24 text-center space-y-6 max-w-3xl">
          <h2 className="text-3xl md:text-4xl font-bold">
            ¿Listo para Elevar tus Productos?
          </h2>
          <p className="text-lg md:text-xl text-muted-foreground">
-           Regístrate y para generar tus primeras imágenes hoy mismo.
+           Regístrate y obtén 5 imágenes gratis. Luego, elige el pack que mejor se adapte a tus necesidades.
          </p>
          <Button size="lg" className="gap-2 text-lg shadow-lg hover:shadow-primary/30 transition-shadow duration-300" onClick={() => navigate("/register")}>
              <Sparkles className="h-5 w-5" />
-             Probar Ahora
+             Obtener 5 Imágenes Gratis
          </Button>
        </section>
 
