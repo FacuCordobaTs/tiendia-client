@@ -25,6 +25,7 @@ interface ProductContextType {
   generateProductAndImage: (imageBase64: string, includeModel: boolean) => Promise<ProductAndImage>;
   updateProduct: (id: number, name: string, imageBase64?: string | null) => Promise<void>;
   deleteProduct: (id: number) => Promise<void>;
+  uploadProducts: (files: File[]) => Promise<void>;
 }
 
 const ProductContext = createContext<ProductContextType | undefined>(undefined);
@@ -114,6 +115,7 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+
   const updateProduct = async (id: number, name: string, imageBase64?: string | null) => {
     try {
       const response = await fetch(url+`/products/update`, {
@@ -170,6 +172,44 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
     }
   }
 
+  const uploadProducts = async (files: File[]) => {
+    try {
+      const formData = new FormData();
+      files.forEach((file) => {
+        formData.append('images', file);
+      });
+
+      const response = await fetch(url + '/products/upload-images', {
+        method: 'POST',
+        credentials: 'include',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Error al subir productos');
+      }
+
+      const result = await response.json();
+      
+      // Actualizar el estado de productos con los nuevos productos
+      setProducts(prevProducts => [
+        ...prevProducts,
+        ...result.products.map((p: any) => ({
+          id: p.id,
+          name: p.name,
+          imageURL: p.imageUrl,
+          createdAt: new Date(),
+          createdBy: user?.id || 0,
+        }))
+      ]);
+
+    } catch (error) {
+      console.error('Error en uploadProducts:', error);
+      throw error;
+    }
+  };
+
   return (
     <ProductContext.Provider value={{
       products,
@@ -178,6 +218,7 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
       generateProductAndImage,
       updateProduct,
       deleteProduct,
+      uploadProducts,
     }}>
       {children}
     </ProductContext.Provider>

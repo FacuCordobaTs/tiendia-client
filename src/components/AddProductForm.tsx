@@ -3,7 +3,7 @@ import { useProduct } from '@/context/ProductContext';
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Loader2, PlusCircle, AlertCircle, Wand2, Download, Camera, Image as ImageIcon } from 'lucide-react';
+import { Loader2, PlusCircle, AlertCircle, Wand2, Download, Camera, Image as ImageIcon, Upload } from 'lucide-react';
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { FiImage } from 'react-icons/fi';
 import { useAuth } from '@/context/AuthContext';
@@ -26,12 +26,11 @@ const MAX_FILE_SIZE = (3 * 1024 * 1024);
 const REQUIRED_CREDITS = 50;
 
 const AddProductForm = ({ open, onOpenChange }: AddProductFormProps) => {
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [originalImageUrl, setOriginalImageUrl] = useState<string | null>(null);
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isCompressing, setIsCompressing] = useState(false);
-  const { generateProductAndImage } = useProduct();
+  const { generateProductAndImage, uploadProducts } = useProduct();
   const [currentAdImageUrl, setCurrentAdImageUrl] = useState<string | null>(null);
   const [generatedProductName, setGeneratedProductName] = useState<string | null>(null);
   const [fileSize, setFileSize] = useState<number>(0);
@@ -132,44 +131,48 @@ const AddProductForm = ({ open, onOpenChange }: AddProductFormProps) => {
   };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target && e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setFileSize(file.size);
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => {
-        if (reader.result) {
-          setOriginalImageUrl(reader.result as string);
-          setImagePreview(reader.result as string);
-        }
-      };
-      if (file.size > MAX_FILE_SIZE) {
-        try {
-          setIsCompressing(true);
-          const compressedFile = await compressImage(file);
-          setFileSize(compressedFile.size);
-          setImageFile(compressedFile);
-          const readerCompressed = new FileReader();
-          readerCompressed.readAsDataURL(compressedFile);
-          readerCompressed.onload = () => {
-            if (readerCompressed.result) {
-              setOriginalImageUrl(readerCompressed.result as string);
-              setImagePreview(readerCompressed.result as string);
+    if (e.target && e.target.files && e.target.files.length > 0) {
+      const files = Array.from(e.target.files);
+      setFileSize(files.reduce((acc, file) => acc + file.size, 0));
+      
+      const newPreviews: string[] = [];
+      const newFiles: File[] = [];
+      
+      for (const file of files) {
+        if (file.size > MAX_FILE_SIZE) {
+          try {
+            setIsCompressing(true);
+            const compressedFile = await compressImage(file);
+            newFiles.push(compressedFile);
+            const readerCompressed = new FileReader();
+            readerCompressed.readAsDataURL(compressedFile);
+            readerCompressed.onload = () => {
+              if (readerCompressed.result) {
+                newPreviews.push(readerCompressed.result as string);
+                setImagePreviews([...newPreviews]);
+              }
+            };
+          } catch (error) {
+            console.error("Error compressing image:", error);
+          }
+        } else {
+          newFiles.push(file);
+          const reader = new FileReader();
+          reader.readAsDataURL(file);
+          reader.onload = () => {
+            if (reader.result) {
+              newPreviews.push(reader.result as string);
+              setImagePreviews([...newPreviews]);
             }
-            setIsCompressing(false);
           };
-        } catch (error) {
-          console.error("Error compressing image:", error);
-          setIsCompressing(false);
         }
-      } else {
-        setImageFile(file);
       }
+      
+      setImageFiles(newFiles);
       if (user) setInsufficientCredits(user?.credits < REQUIRED_CREDITS);
     } else {
-      setImageFile(null);
-      setImagePreview(null);
-      setOriginalImageUrl(null);
+      setImageFiles([]);
+      setImagePreviews([]);
       setFileSize(0);
       setInsufficientCredits(false);
     }
@@ -181,13 +184,13 @@ const AddProductForm = ({ open, onOpenChange }: AddProductFormProps) => {
       setInsufficientCredits(true);
       return;
     }
-    if (!imageFile) {
-      console.error("No image selected.");
+    if (!imageFiles.length) {
+      console.error("No images selected.");
       return;
     }
     setIsLoading(true);
     try {
-      const imageBase64 = await toBase64(imageFile);
+      const imageBase64 = await toBase64(imageFiles[0]);
       const result = await generateProductAndImage(imageBase64, true);
       setUser(prevUser => (prevUser ? { ...prevUser, credits: prevUser.credits - 50 } : null));
       setIsLoading(false);
@@ -202,6 +205,23 @@ const AddProductForm = ({ open, onOpenChange }: AddProductFormProps) => {
     }
   };
 
+  const handleUploadImages = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!imageFiles.length) return;
+    
+    setIsLoading(true);
+    try {
+      await uploadProducts(imageFiles);
+      toast.success('Imágenes subidas correctamente');
+      onOpenChange(false);
+      resetForm();
+    } catch (error) {
+      console.error("Error uploading images:", error);
+      toast.error("Error al subir las imágenes");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const formatFileSize = (bytes: number): string => {
     if (bytes === 0) return '0 B';
@@ -212,9 +232,8 @@ const AddProductForm = ({ open, onOpenChange }: AddProductFormProps) => {
   };
 
   const resetForm = () => {
-    setImageFile(null);
-    setImagePreview(null);
-    setOriginalImageUrl(null);
+    setImageFiles([]);
+    setImagePreviews([]);
     setIsLoading(false);
     setIsCompressing(false);
     setCurrentAdImageUrl(null);
@@ -281,15 +300,14 @@ const AddProductForm = ({ open, onOpenChange }: AddProductFormProps) => {
       if (blob) {
         const file = new File([blob], `camera_capture_${Date.now()}.jpg`, { type: 'image/jpeg' });
         setFileSize(file.size);
-        setImageFile(file);
+        setImageFiles([file]);
         
         const reader = new FileReader();
         reader.readAsDataURL(blob);
         reader.onload = () => {
           if (reader.result) {
             const dataUrl = reader.result as string;
-            setOriginalImageUrl(dataUrl);
-            setImagePreview(dataUrl);
+            setImagePreviews([dataUrl]);
             
             // Stop the camera and switch to preview
             stopCamera();
@@ -334,7 +352,7 @@ const AddProductForm = ({ open, onOpenChange }: AddProductFormProps) => {
                     <h4 className="text-center text-xs font-medium text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider">Antes</h4>
                     <div className="aspect-w-1 aspect-h-1 bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 max-h-[400px] max-w-[400px] mx-auto">
                       <img
-                        src={originalImageUrl || ''}
+                        src={imagePreviews[0] || ''}
                         alt="Imagen Original"
                         className="w-full h-full object-contain"
                       />
@@ -453,7 +471,7 @@ const AddProductForm = ({ open, onOpenChange }: AddProductFormProps) => {
                     )
                     
                   ) : (
-                    !imagePreview &&
+                    !imagePreviews.length &&
                     <div className="grid grid-cols-2 gap-4">
                       <div
                         className="aspect-[4/3] bg-gray-50 dark:bg-gray-800 rounded-lg overflow-hidden cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex flex-col items-center justify-center p-4"
@@ -476,65 +494,79 @@ const AddProductForm = ({ open, onOpenChange }: AddProductFormProps) => {
                           accept="image/png, image/jpeg, image/webp"
                           onChange={handleFileChange}
                           disabled={isCompressing}
-                          // multiple 
+                          multiple
                         />
                       </div>
                     </div>
                   )}
-                  {imagePreview && !isCameraActive && (
+                  {imagePreviews.length > 0 && !isCameraActive && (
                     <div className="mt-4">
-                      <div className="relative aspect-[4/3] bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden max-h-[400px] max-w-[600px] mx-auto">
-                        <img
-                          src={imagePreview}
-                          alt="Previsualización"
-                          className="w-full h-full object-contain"
-                        />
-                        {fileSize > 0 && (
-                          <div className="absolute bottom-2 left-2 right-2 bg-black/60 backdrop-blur-sm text-white text-xs py-1 px-2 rounded-full text-center">
-                            {formatFileSize(fileSize)} {fileSize > MAX_FILE_SIZE ? '(Comprimida)' : ''}
-                          </div>
-                        )}
-                      </div>
+                      <ScrollArea className={`${imagePreviews.length === 1 ? '' : 'max-h-[400px]'}`}>
+                        <div className={`grid ${imagePreviews.length === 1 ? 'grid-cols-1 max-w-[600px] mx-auto' : 'grid-cols-2 sm:grid-cols-3'} gap-4 p-1`}>
+                          {imagePreviews.map((preview, index) => (
+                            <div key={index} className="relative aspect-[4/3] bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden max-h-[400px]">
+                              <img
+                                src={preview}
+                                alt={`Previsualización ${index + 1}`}
+                                className="w-full h-full object-contain max-h-[400px]"
+                              />
+                              {fileSize > 0 && index === 0 && (
+                                <div className="absolute bottom-2 left-2 right-2 bg-black/60 backdrop-blur-sm text-white text-xs py-1 px-2 rounded-full text-center">
+                                  {formatFileSize(fileSize)} {fileSize > MAX_FILE_SIZE ? '(Comprimida)' : ''}
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </ScrollArea>
                     </div>
                   )}
                 </div>
-                {imagePreview && !isCameraActive && (
+                {imagePreviews.length > 0 && !isCameraActive && (
                   <div className="flex flex-col sm:flex-row gap-2 pt-2">
                     <Button
                       type="button"
-                      variant="outline"
                       disabled={isLoading}
-                      onClick={() => {
-                        onOpenChange(false);
-                        resetForm();
-                      }}
-                      className="flex-1"
-                    >
-                      Cancelar
-                    </Button>
-                    <Button
-                      type="button"
-                      disabled={isLoading || !imageFile || !hasEnoughCredits}
-                      onClick={handleGenerateClick}
-                      className={`${hasEnoughCredits ? "bg-gradient-to-r from-blue-500 to-cyan-400" : "bg-gray-400"} transition-all duration-500 text-white flex-1`}
+                      onClick={handleUploadImages}
+                      className=" flex-1"
                     >
                       {isLoading ? (
                         <>
                           <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                          Generando...
-                        </>
-                      ) : !hasEnoughCredits ? (
-                        <>
-                          <AlertCircle className="w-4 h-4 mr-2" />
-                          No te quedan imágenes disponibles
+                          Subiendo...
                         </>
                       ) : (
                         <>
-                          <FiImage className="w-4 h-4 mr-2" />
-                          Generar (1 imagen)
+                          <Upload className="w-4 h-4 mr-2" />
+                          Subir {imagePreviews.length} {imagePreviews.length === 1 ? 'imagen' : 'imágenes'}
                         </>
                       )}
                     </Button>
+                    {imagePreviews.length === 1 && (
+                      <Button
+                        type="button"
+                        disabled={isLoading || !imageFiles[0] || !hasEnoughCredits}
+                        onClick={handleGenerateClick}
+                        className={`${hasEnoughCredits ? "bg-gradient-to-r from-blue-500 to-cyan-400" : "bg-gray-400"} transition-all duration-500 text-white flex-1`}
+                      >
+                        {isLoading ? (
+                          <>
+                            <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                            Generando...
+                          </>
+                        ) : !hasEnoughCredits ? (
+                          <>
+                            <AlertCircle className="w-4 h-4 mr-2" />
+                            No te quedan imágenes disponibles
+                          </>
+                        ) : (
+                          <>
+                            <FiImage className="w-4 h-4 mr-2" />
+                            Generar (1 imagen)
+                          </>
+                        )}
+                      </Button>
+                    )}
                   </div>
                 )}
                 {insufficientCredits && (
@@ -547,7 +579,7 @@ const AddProductForm = ({ open, onOpenChange }: AddProductFormProps) => {
                       className="text-blue-500 hover:text-blue-600 p-0 mt-1"
                       onClick={() => navigate("/credits")}
                     >
-                      Recargar imágenes
+                      Comprar imágenes
                     </Button>
                   </div>
                 )}
