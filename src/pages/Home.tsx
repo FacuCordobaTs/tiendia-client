@@ -35,7 +35,7 @@ function App() {
   const [isAddProductDialogOpen, setIsAddProductDialogOpen] = useState(false);
   const [isAdDialogOpen, setIsAdDialogOpen] = useState(false);
   const [currentAdImageUrl, setCurrentAdImageUrl] = useState<string | null>(null);
-  const [originalImageUrl, setOriginalImageUrl] = useState<string | null>(null); // Estado para imagen original
+  const [originalImageUrl, setOriginalImageUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -49,62 +49,87 @@ function App() {
   const navigate = useNavigate();
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
 
-  const handleGenerateAd = async (id: number, includeModel: boolean, originalUrl: string | null) => {
-    if (!user || user.credits < 50) {
+  // Add new function to update generated image
+  const updateGeneratedImage = (imageUrl: string) => {
+    console.log('🖼️ Updating generated image URL:', imageUrl);
+    setCurrentAdImageUrl(imageUrl);
+    setLoading(false);
+  };
+
+  const handleGenerateAd = async (id: number, includeModel: boolean, originalUrl: string | null, isPro: boolean) => {
+    console.log('🔄 Starting handleGenerateAd:', { id, includeModel, isPro });
+
+    if (!user || (isPro ? user.credits < 100 : user.credits < 50)) {
+      console.log('❌ Insufficient credits:', { 
+        userCredits: user?.credits, 
+        required: isPro ? 100 : 50 
+      });
       toast.error('No te quedan imágenes disponibles.');
       return;
     }
 
+    console.log('📱 Setting up UI state for generation');
     setLoading(true);
     setIsAdDialogOpen(true);
     setCurrentAdImageUrl(null);
     setOriginalImageUrl(originalUrl);
-    // setModificationPrompt('');
-    // setCurrentImageId(null);
     setCurrentProductId(id);
 
-    try {
-      const response = await fetch(`https://api.tiendia.app/api/products/generate-ad/${id}`, {
-        method: "POST",
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ includeModel })
-      });
+    if (!isPro) {
+      console.log('🚀 Starting standard generation process');
+      try {
+        console.log('📤 Sending generation request to API');
+        const response = await fetch(`https://api.tiendia.app/api/products/generate-ad/${id}`, {
+          method: "POST",
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ includeModel })
+        });
 
-      if (!response.ok) {
-        let errorMessage = `Error: ${response.status} ${response.statusText}`;
-        try {
-          const errorBody = await response.json();
-          errorMessage = errorBody.error || errorBody.message || errorMessage;
-        } catch (e) {
-          console.error("Could not parse error response body:", e);
+        if (!response.ok) {
+          let errorMessage = `Error: ${response.status} ${response.statusText}`;
+          try {
+            const errorBody = await response.json();
+            errorMessage = errorBody.error || errorBody.message || errorMessage;
+            console.error('❌ API error response:', errorBody);
+          } catch (e) {
+            console.error("❌ Could not parse error response body:", e);
+          }
+          const rawError = await response.text().catch(() => "");
+          console.error("❌ Raw error details:", rawError);
+          toast.error(`Error al generar: ${errorMessage}`);
+          throw new Error(errorMessage);
         }
-        const rawError = await response.text().catch(() => "");
-        console.error("Detalles del error:", rawError);
-        toast.error(`Error al generar: ${errorMessage}`);
-        throw new Error(errorMessage);
-      }
 
-      const result = await response.json();
+        console.log('📥 Received successful response from API');
+        const result = await response.json();
+        console.log('📦 Processing API response:', result);
 
-      if (result && result.adImageUrl && result.imageId) {
-        setUser(prevUser => (
-          prevUser ? { ...prevUser, credits: prevUser.credits - 50 } : null
-        ));
-        setCurrentAdImageUrl(result.adImageUrl);
-        // setCurrentImageId(result.imageId);
-        toast.success('¡Imagen generada con éxito!');
-      } else {
-        console.error("Respuesta inesperada de la API:", result);
-        toast.error('Error al obtener la imagen generada.');
+        if (result && result.adImageUrl && result.imageId) {
+          console.log('✅ Generation successful, updating UI and credits');
+          setUser(prevUser => (
+            prevUser ? { ...prevUser, credits: prevUser.credits - 50 } : null
+          ));
+          setCurrentAdImageUrl(result.adImageUrl);
+          toast.success('¡Imagen generada con éxito!');
+        } else {
+          console.error('❌ Unexpected API response format:', result);
+          toast.error('Error al obtener la imagen generada.');
+        }
+      } catch (error: any) {
+        console.error('❌ Error in handleGenerateAd:', error);
+        toast.error(error.message || 'Ocurrió un error inesperado.', { id: 'error-toast' });
+      } finally {
+        console.log('🏁 Finishing generation process');
+        setLoading(false);
       }
-    } catch (error: any) {
-      console.error("Error en handleGenerateAd:", error);
-      toast.error(error.message || 'Ocurrió un error inesperado.', { id: 'error-toast' });
-    } finally {
-      setLoading(false);
+    } else {
+      console.log('🚀 Starting Pro generation process');
+      // For Pro generation, we don't need to do anything here as the SSE connection
+      // in AdminProductCard will handle the image updates
+      // We just need to keep the dialog open and show the loading state
     }
   };
 
@@ -343,6 +368,7 @@ function App() {
                     setEditingProduct(product);
                     setIsDialogOpen(true);
                   }}
+                  updateGeneratedImage={updateGeneratedImage}
                 />
               ))}
             </div>

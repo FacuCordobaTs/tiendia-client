@@ -42,7 +42,7 @@ export default function LandingPage() {
         </Badge>
 
         <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight md:leading-snug"> {/* Ajuste de tamaño y espaciado */}
-          Transforma tus Fotos <span className="bg-gradient-to-r from-blue-500 to-cyan-400 dark:from-blue-400 dark:to-cyan-300 bg-clip-text text-transparent">en Imagenes Profesionales</span>. ¡5 Gratis, luego desde $68 por imagen!
+          Transforma tus Fotos <span className="bg-gradient-to-r from-blue-500 to-cyan-400 dark:from-blue-400 dark:to-cyan-300 bg-clip-text text-transparent">en Imagenes Profesionales</span>. ¡desde $68 por imagen!
         </h1>
 
         <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -52,7 +52,7 @@ export default function LandingPage() {
         <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
            <Button size="lg" className="gap-2 text-lg shadow-lg hover:shadow-primary/30 transition-shadow duration-300" onClick={() => navigate(user ? "/home" : "/register")}>
              <Upload className="h-5 w-5" />
-             {user ? "Ir a tus productos" : "5 Imágenes Gratis"}
+             {user ? "Ir a tus productos" : "Comenzar ahora"}
            </Button>
            {/* <Button size="lg" variant="outline" className="gap-2 text-lg">
                Ver Ejemplo <ArrowRight className="h-5 w-5" />
@@ -197,11 +197,11 @@ export default function LandingPage() {
            ¿Listo para Elevar tus Productos?
          </h2>
          <p className="text-lg md:text-xl text-muted-foreground">
-           Regístrate y obtén 5 imágenes gratis. Luego, elige el pack que mejor se adapte a tus necesidades.
+           Regístrate y comienza a generar imágenes profesionales para tu tienda.
          </p>
          <Button size="lg" className="gap-2 text-lg shadow-lg hover:shadow-primary/30 transition-shadow duration-300" onClick={() => navigate("/register")}>
              <Sparkles className="h-5 w-5" />
-             Obtener 5 Imágenes Gratis
+             Comenzar ahora
          </Button>
        </section>
 
