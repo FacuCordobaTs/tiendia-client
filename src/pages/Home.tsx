@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dialog";
 // Importar Check si es necesario (no se usa en el código final actual) o quitar si no se usa.
 // import { Download, CreditCard, Sparkles, HelpCircle, Wand2, Image as ImageIcon, Check } from 'lucide-react';
-import { Download, CreditCard, Sparkles, HelpCircle, Wand2, Image as ImageIcon, RefreshCw, X } from 'lucide-react'; // Asegurarse de que ImageIcon esté importado
+import { Download, CreditCard, Sparkles, HelpCircle, Wand2, Image as ImageIcon, RefreshCw, X, Instagram, MessageCircle } from 'lucide-react'; // Asegurarse de que ImageIcon esté importado
 import { ScrollArea } from '@/components/ui/scroll-area';
 import AdminProductCard from '@/components/AdminProductCard';
 import { Button } from '@/components/ui/button';
@@ -22,6 +22,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useNavigate } from 'react-router';
 import TutorialDialog from '@/components/TutorialDialog';
 import toast from 'react-hot-toast';
+import { FaTiktok } from 'react-icons/fa';
 // Quitar Separator si ya no se usa en el nuevo layout
 // import { Separator } from '@/components/ui/separator';
 
@@ -331,6 +332,32 @@ function App() {
             <HelpCircle className="h-4 w-4" />
             <span>Ayuda</span>
           </Button>
+          <div className="flex gap-2 ml-auto">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="rounded-full hover:bg-pink-100 dark:hover:bg-pink-900/30"
+              onClick={() => window.open('https://instagram.com/tiendia.app', '_blank')}
+            >
+              <Instagram className="h-5 w-5 text-pink-500" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="rounded-full hover:bg-black/10 dark:hover:bg-white/10"
+              onClick={() => window.open('https://tiktok.com/@tiendia.app', '_blank')}
+            >
+              <FaTiktok className="h-5 w-5" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="rounded-full hover:bg-green-100 dark:hover:bg-green-900/30"
+              onClick={() => window.open('https://wa.me/543408681915', '_blank')}
+            >
+              <MessageCircle className="h-5 w-5 text-green-500" />
+            </Button>
+          </div>
         </div>
       </header>
 

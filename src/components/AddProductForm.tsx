@@ -22,7 +22,7 @@ export interface AddProductFormProps {
   onOpenChange: (open: boolean) => void;
 }
 
-const MAX_FILE_SIZE = (3 * 1024 * 1024);
+const MAX_FILE_SIZE = (1 * 1024 * 1024);
 const REQUIRED_CREDITS = 50;
 
 const AddProductForm = ({ open, onOpenChange }: AddProductFormProps) => {
