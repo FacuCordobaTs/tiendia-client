@@ -10,7 +10,7 @@ import { FiEdit  } from "react-icons/fi";
 import { Card } from "./ui/card";
 import { AspectRatio } from "./ui/aspect-ratio";
 import { useState } from "react";
-import { AlertCircle, Sparkles, Crown, Loader2 } from "lucide-react";
+import { AlertCircle, Sparkles,  Loader2 } from "lucide-react";
 import { Alert, AlertDescription } from "./ui/alert";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "react-hot-toast";
@@ -224,36 +224,6 @@ export default function AdminProductCard({ product, handleGenerateAd, onEdit, up
                    }`}>Estándar (1 imagen)</span>
                  </div>
                </Button>
-
-               {user?.email === "facucordoba200@gmail.com" && <Button
-                 variant="outline"
-                 className={`w-full rounded-lg transition-all px-4 py-3 h-auto flex items-center justify-between text-left border ${
-                   selectedOption === 'pro' 
-                     ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20' 
-                     : 'border-gray-300 dark:border-gray-600'
-                 }`}
-                 onClick={() => setSelectedOption('pro')}
-               >
-                 <div className="flex items-center">
-                   <div className={`w-5 h-5 rounded-full flex items-center justify-center mr-3 transition-colors ${
-                     selectedOption === 'pro' ? 'bg-purple-500' : 'bg-gray-200 dark:bg-gray-700'
-                   }`}>
-                     {selectedOption === 'pro' && (
-                       <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                       </svg>
-                     )}
-                   </div>
-                   <div className="flex items-center">
-                     <span className={`font-medium text-sm ${
-                       selectedOption === 'pro' 
-                         ? 'text-purple-800 dark:text-purple-200' 
-                         : 'text-gray-700 dark:text-gray-300'
-                     }`}>Pro (2 imágenes)</span>
-                     <Crown className="w-4 h-4 ml-2 text-yellow-500" />
-                   </div>
-                 </div>
-               </Button>}
              </div>
            </div>
 
