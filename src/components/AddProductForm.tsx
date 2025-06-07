@@ -545,9 +545,9 @@ const AddProductForm = ({ open, onOpenChange }: AddProductFormProps) => {
                     {imagePreviews.length === 1 && (
                       <Button
                         type="button"
-                        disabled={isLoading || !imageFiles[0] || !hasEnoughCredits}
-                        onClick={handleGenerateClick}
-                        className={`${hasEnoughCredits ? "bg-gradient-to-r from-blue-500 to-cyan-400" : "bg-gray-400"} transition-all duration-500 text-white flex-1`}
+                        disabled={isLoading || !imageFiles[0]}
+                        onClick={hasEnoughCredits ? handleGenerateClick : () => navigate('/credits')}
+                        className={`bg-gradient-to-r from-blue-500 to-cyan-400 transition-all duration-500 text-white flex-1`}
                       >
                         {isLoading ? (
                           <>
@@ -556,8 +556,8 @@ const AddProductForm = ({ open, onOpenChange }: AddProductFormProps) => {
                           </>
                         ) : !hasEnoughCredits ? (
                           <>
-                            <AlertCircle className="w-4 h-4 mr-2" />
-                            No te quedan imágenes disponibles
+                          <FiImage className="w-4 h-4 mr-2" />
+                          Generar (1 imagen)
                           </>
                         ) : (
                           <>

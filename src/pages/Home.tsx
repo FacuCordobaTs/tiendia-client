@@ -308,7 +308,10 @@ function App() {
 
       <header className="py-6 md:py-8 px-2 md:px-4">
         <h1 className="text-3xl md:text-4xl font-bold text-gray-800 dark:text-gray-100 pl-0 md:pl-4">
-          Tiendia.app <span role="img" aria-label="store">🏪</span>
+          <div className="flex items-center gap-2">
+            <img src="/logoblanco.png" alt="tiendia.app logo" className="h-8 w-8" />
+            <span>tiendia.app</span>
+          </div>
         </h1>
         <div className="flex flex-wrap gap-3 mt-4 items-center pl-0 md:pl-4">
           <div className="flex items-center bg-white dark:bg-gray-800 shadow-sm rounded-lg px-3 py-1.5 border border-gray-200 dark:border-gray-700">
@@ -396,6 +399,11 @@ function App() {
                     setIsDialogOpen(true);
                   }}
                   updateGeneratedImage={updateGeneratedImage}
+                  setIsAdDialogOpen={setIsAdDialogOpen}
+                  setCurrentAdImageUrl={setCurrentAdImageUrl}
+                  setOriginalImageUrl={setOriginalImageUrl}
+                  setCurrentProductId={setCurrentProductId}
+                  setLoading={setLoading}
                 />
               ))}
             </div>
@@ -458,7 +466,7 @@ function App() {
                   </div>
                 ) : (
                   // Comparison View
-                  <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                  <div className="grid grid-cols-2 gap-3 sm:gap-4 ">
                     {/* Columna "Antes" */}
                     <div className="w-full">
                       <h3 className="text-center text-xs font-medium text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider">Antes</h3>
@@ -522,8 +530,16 @@ function App() {
                   
                   {currentAdImageUrl && (
                     <Button
-                      onClick={handleRegenerateImage}
-                      disabled={loading || isModifying || (user?.credits ?? 0) < 50}
+                      onClick={() =>{ 
+                        if ((user?.credits ?? 0) < 50) {
+                          navigate('/credits')
+                        }
+                        else {
+                          handleRegenerateImage()
+                        }
+                      
+                      }}
+                      disabled={loading || isModifying }
                       className="w-full sm:w-auto bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-all hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <RefreshCw className="mr-1 h-4 w-4" />
