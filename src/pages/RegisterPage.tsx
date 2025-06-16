@@ -77,7 +77,6 @@ export default function RegisterPage() {
             <p className="text-muted-foreground">
               Genera imágenes profesionales para tus productos con IA.
             </p>
-          </div>
 
           <div className="space-y-4">
             <Button 
@@ -90,6 +89,16 @@ export default function RegisterPage() {
               Continuar con Google
             </Button>
           
+          </div>
+          
+          <div className="pt-4 text-sm text-muted-foreground/80">
+              <p className="flex items-center justify-center gap-1.5">
+                <span>👋</span> Soy Facundo, estudiante de la UTN y creador de tiendia
+              </p>
+              <p className="mt-1">Te ayudo a tener fotos más lindas para tu tienda</p>
+
+              <p className="mt-1">Si tienes alguna duda, puedes contactarme en mi <a href="https://wa.me/3408681915" className="text-primary underline">WhatsApp</a></p>
+            </div>
           </div>
         </div>
       </div>
