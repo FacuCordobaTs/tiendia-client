@@ -320,13 +320,31 @@ function App() {
               {user?.credits != null ? (user.credits/50).toLocaleString('es-AR') : '0'} Imagenes
             </span>
           </div>
-          <Button
-            onClick={navigateToCredits}
-            className="bg-gradient-to-r from-purple-600 to-blue-500 hover:from-purple-700 hover:to-blue-600 text-white shadow-md hover:shadow-lg transition-all duration-300 px-4 py-1.5 h-auto flex items-center gap-2 text-sm rounded-lg"
-          >
-            <CreditCard className="h-4 w-4" />
-            <span>Comprar imágenes</span>
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              onClick={navigateToCredits}
+              className="bg-gradient-to-r from-purple-600 to-blue-500 hover:from-purple-700 hover:to-blue-600 text-white shadow-md hover:shadow-lg transition-all duration-300 px-4 py-1.5 h-auto flex items-center gap-2 text-sm rounded-lg"
+            >
+              <CreditCard className="h-4 w-4" />
+              <span>Comprar imágenes</span>
+            </Button>
+            <div className="hidden md:flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+              <span className="flex items-center gap-1">
+                <Sparkles className="h-3 w-3 text-yellow-500" />
+                Ahorra hasta 15%
+              </span>
+              <span>•</span>
+              <span className="flex items-center gap-1">
+                <CreditCard className="h-3 w-3 text-green-500" />
+                Pago seguro
+              </span>
+              <span>•</span>
+              <span className="flex items-center gap-1">
+                <Wand2 className="h-3 w-3 text-purple-500" />
+                Mejores resultados
+              </span>
+            </div>
+          </div>
           <Button
             variant="outline"
             onClick={() => setIsTutorialOpen(true)}
@@ -365,6 +383,37 @@ function App() {
       </header>
 
       <main className="p-2 md:p-4 flex-grow">
+        <div className="mb-6 pl-0 md:pl-4">
+          <div className="bg-gradient-to-r from-purple-600 to-blue-500 rounded-xl p-4 md:p-6 shadow-lg">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+              <div className="flex-1 text-center md:text-left">
+                <h2 className="text-xl md:text-2xl font-bold text-white mb-2 flex items-center justify-center md:justify-start gap-2">
+                  <Sparkles className="h-5 w-5" />
+                  ¡Mejora tus fotos de productos!
+                </h2>
+                <p className="text-white/90 text-sm md:text-base">
+                  Te ayudamos a tener fotos más lindas para tu tienda, desde $80 por imagen
+                </p>
+              </div>
+              <div className="flex flex-col sm:flex-row items-center gap-3">
+                <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-lg px-3 py-2">
+                  <CreditCard className="h-5 w-5 text-white" />
+                  <div className="text-white">
+                    <p className="text-xs font-medium">Ahorra hasta</p>
+                    <p className="text-lg font-bold">15%</p>
+                  </div>
+                </div>
+                <Button
+                  onClick={navigateToCredits}
+                  className="bg-white text-purple-600 hover:bg-white/90 px-6 py-2 rounded-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300"
+                >
+                  Comprar imágenes
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <p className="text-base text-gray-600 dark:text-gray-400 mb-6 pl-0 md:pl-4">
           Sube tus productos y genera imágenes profesionales en segundos ✨
         </p>

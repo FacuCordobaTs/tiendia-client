@@ -88,12 +88,39 @@ function CreditsPage() {
                 </div>
             </header>
 
+            <div className="max-w-4xl mx-auto px-4 mb-8">
+                <Card className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-0 shadow-lg">
+                    <CardContent className="pt-6">
+                        <div className="prose dark:prose-invert max-w-none">
+                            <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
+                                <span>✨</span> ¿Por qué cobramos por las imágenes?
+                            </h2>
+                            <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+                                Esta app fue creada por un estudiante de la UTN con el objetivo de que todas las tiendas de ropa puedan tener acceso a imágenes profesionales de sus productos de forma accesible. 🎓
+                            </p>
+                            <p className="text-gray-600 dark:text-gray-300 leading-relaxed mt-4">
+                                La generación de imágenes tiene un costo asociado, y el monto que solicitamos por las imágenes es lo necesario para mantener la aplicación funcionando y seguir mejorando. 💫
+                            </p>
+                            <p className="text-gray-600 dark:text-gray-300 leading-relaxed mt-4">
+                                Los pagos se realizan de forma segura a través de Mercado Pago, fuera de la aplicación. Al utilizar Tiendia, no solo obtienes acceso a imágenes profesionales de tus productos a un precio accesible, sino que también contribuyes a mejorar la aplicación para que puedas obtener imágenes aún mejores en el futuro. 🤝
+                            </p>
+                            <p className="text-gray-600 dark:text-gray-300 leading-relaxed mt-4">
+                                ¡Muchas gracias por tu apoyo! 🙏
+                            </p>
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+
             <main className="p-4 flex-grow flex items-center justify-center">
                 <Card className="w-full max-w-4xl shadow-xl transition-all duration-500 ease-in-out bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-0">
                     <CardHeader className="pb-8">
                         <CardTitle className="text-2xl text-center font-medium text-gray-900 dark:text-gray-50">
                             Packs de imágenes
                         </CardTitle>
+                        <p className="text-center text-gray-600 dark:text-gray-400 mt-2">
+                            Presiona la opción que prefieras
+                        </p>
                     </CardHeader>
                     <CardContent className="flex flex-col items-center justify-center">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-6 w-full px-2 md:px-4">

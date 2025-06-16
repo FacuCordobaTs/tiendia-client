@@ -41,6 +41,13 @@ export default function LandingPage() {
           <Sparkles className="h-3 w-3 mr-2" /> Fotos de Producto con IA
         </Badge>
 
+        <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+          <div className="flex items-center gap-1.5 bg-muted/50 px-3 py-1.5 rounded-full">
+            <TrendingUp className="h-4 w-4 text-primary" />
+            <span>Unete a <span className="font-semibold text-foreground">+150 tiendas</span> creando imágenes profesionales</span>
+          </div>
+        </div>
+
         <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight md:leading-snug"> {/* Ajuste de tamaño y espaciado */}
           Transforma tus Fotos <span className="bg-gradient-to-r from-blue-500 to-cyan-400 dark:from-blue-400 dark:to-cyan-300 bg-clip-text text-transparent">en Imagenes Profesionales</span>. ¡desde $68 por imagen!
         </h1>
@@ -57,6 +64,35 @@ export default function LandingPage() {
            {/* <Button size="lg" variant="outline" className="gap-2 text-lg">
                Ver Ejemplo <ArrowRight className="h-5 w-5" />
            </Button> */}
+        </div>
+      </section>
+
+      {/* About Us Section */}
+      <section className="container py-16 md:py-24">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12">
+            <div className="w-48 h-48 md:w-64 md:h-64 rounded-full overflow-hidden border-4 border-primary/20 shadow-xl">
+              <img
+                src="/me.jpg"
+                alt="Facundo Cordoba - Creador de tiendia.app"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div className="flex-1 text-center md:text-left">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4 flex items-center justify-center md:justify-start gap-2">
+                <span>👋</span> Sobre nosotros
+              </h2>
+              <p className="text-lg text-muted-foreground mb-4">
+                ¡Hola! Soy Facundo Cordoba, estudiante de la UTN y creador de tiendia.app ✨
+              </p>
+              <p className="text-muted-foreground mb-4">
+                Creé esta aplicación con un objetivo simple: ayudar a las tiendas de ropa a tener imágenes profesionales de sus productos a un precio accesible. Como estudiante, entiendo la importancia de mantener los costos bajos mientras se busca la mejor calidad posible 🎓
+              </p>
+              <p className="text-muted-foreground">
+                Cada imagen que generas no solo mejora tu tienda, sino que también me ayuda a seguir mejorando la aplicación para ofrecerte mejores resultados. ¡Gracias por ser parte de este proyecto! 🤝
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 
