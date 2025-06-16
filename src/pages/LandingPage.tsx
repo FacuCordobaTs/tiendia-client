@@ -80,7 +80,7 @@ export default function LandingPage() {
             </div>
             <div className="flex-1 text-center md:text-left">
               <h2 className="text-3xl md:text-4xl font-bold mb-4 flex items-center justify-center md:justify-start gap-2">
-                <span>👋</span> Sobre nosotros
+                <span>👋</span> Sobre mi
               </h2>
               <p className="text-lg text-muted-foreground mb-4">
                 ¡Hola! Soy Facundo Cordoba, estudiante de la UTN y creador de tiendia.app ✨
