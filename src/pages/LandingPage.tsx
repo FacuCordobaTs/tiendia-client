@@ -49,7 +49,7 @@ export default function LandingPage() {
         </div>
 
         <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight md:leading-snug"> {/* Ajuste de tamaño y espaciado */}
-          Transforma tus Fotos <span className="bg-gradient-to-r from-blue-500 to-cyan-400 dark:from-blue-400 dark:to-cyan-300 bg-clip-text text-transparent">en Imagenes Profesionales</span>. ¡desde $68 por imagen!
+          Transforma tus Fotos <span className="bg-gradient-to-r from-blue-500 to-cyan-400 dark:from-blue-400 dark:to-cyan-300 bg-clip-text text-transparent">en Imagenes Profesionales</span>. ¡desde $150 pesos por imagen!
         </h1>
 
         <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -141,7 +141,7 @@ export default function LandingPage() {
           <Card className="bg-card/50 hover:border-primary/30 transition-colors duration-300 ease-in-out transform hover:-translate-y-1">
             <CardHeader className="text-center">
               <CardTitle className="text-2xl font-bold">1 Imagen</CardTitle>
-              <p className="text-3xl font-bold text-primary mt-2">$80</p>
+              <p className="text-3xl font-bold text-primary mt-2">$150</p>
             </CardHeader>
             <CardContent className="text-center">
               <p className="text-sm text-muted-foreground">Ideal para probar el servicio</p>
@@ -152,7 +152,7 @@ export default function LandingPage() {
           <Card className="bg-card/50 hover:border-primary/30 transition-colors duration-300 ease-in-out transform hover:-translate-y-1">
             <CardHeader className="text-center">
               <CardTitle className="text-2xl font-bold">10 Imágenes</CardTitle>
-              <p className="text-3xl font-bold text-primary mt-2">$800</p>
+              <p className="text-3xl font-bold text-primary mt-2">$1500</p>
             </CardHeader>
             <CardContent className="text-center">
               <p className="text-sm text-muted-foreground">Perfecto para pequeños catálogos</p>
@@ -166,7 +166,7 @@ export default function LandingPage() {
             </div>
             <CardHeader className="text-center">
               <CardTitle className="text-2xl font-bold">50 Imágenes</CardTitle>
-              <p className="text-3xl font-bold text-primary mt-2">$3,500</p>
+              <p className="text-3xl font-bold text-primary mt-2">$6600</p>
               <span className="text-sm text-green-600 dark:text-green-400">12.5% de ahorro</span>
             </CardHeader>
             <CardContent className="text-center">
@@ -178,7 +178,7 @@ export default function LandingPage() {
           <Card className="bg-card/50 hover:border-primary/30 transition-colors duration-300 ease-in-out transform hover:-translate-y-1">
             <CardHeader className="text-center">
               <CardTitle className="text-2xl font-bold">100 Imágenes</CardTitle>
-              <p className="text-3xl font-bold text-primary mt-2">$6,800</p>
+              <p className="text-3xl font-bold text-primary mt-2">$12,750</p>
               <span className="text-sm text-green-600 dark:text-green-400">15% de ahorro</span>
             </CardHeader>
             <CardContent className="text-center">
