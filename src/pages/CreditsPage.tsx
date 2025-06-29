@@ -8,10 +8,10 @@ import { AlertCircle, Loader2, Sparkles } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
 const IMAGE_PACKS = [
-    { id: 1, images: 1, price: 80, credits: 80 },
-    { id: 2, images: 10, price: 800, credits: 800 },
-    { id: 3, images: 50, price: 3500, credits: 3500, discount: 12.5 },
-    { id: 4, images: 100, price: 6800, credits: 6800, discount: 15 }
+    { id: 1, images: 1, price: 150, credits: 150 },
+    { id: 2, images: 10, price: 1500, credits: 1500 },
+    { id: 3, images: 50, price: 6600, credits: 6600, discount: 12.5 },
+    { id: 4, images: 100, price: 12750, credits: 12750, discount: 15 }
 ];
 
 function CreditsPage() {
@@ -84,6 +84,9 @@ function CreditsPage() {
                     </h1>
                     <p className="text-center text-gray-600 dark:text-gray-400 mt-4 text-lg">
                         Selecciona el pack que mejor se adapte a tus necesidades
+                    </p>
+                    <p className="text-center text-gray-600 dark:text-gray-400 mt-2 text-lg flex items-center justify-center gap-2">
+                        🇦🇷 Precios en Pesos Argentinos
                     </p>
                 </div>
             </header>
