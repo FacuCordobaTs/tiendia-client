@@ -1,11 +1,19 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useAuth } from "@/context/AuthContext";
 import { FaGoogle } from "react-icons/fa";
-import { useNavigate, useSearchParams } from "react-router"; // Asegúrate de importar desde react-router-dom
-import { Image as ImageIcon, Clock, DollarSign, TrendingUp, Sparkles } from "lucide-react";
+import { useNavigate, useSearchParams } from "react-router";
+import { Image as ImageIcon, Clock, DollarSign, TrendingUp, Sparkles, Loader2 } from "lucide-react";
+
 export default function RegisterPage() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { loginOrRegister } = useAuth();
   const [searchParams] = useSearchParams();
 
   useEffect(() => {
@@ -21,8 +29,22 @@ export default function RegisterPage() {
     }
   }, [searchParams, navigate]);
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true); 
+    setError(null); 
+    try {
+      await loginOrRegister(email, password);
+      navigate('/home');
+    } catch (err: any) {
+      setError(err.message || 'Credenciales incorrectas o error del servidor. Inténtalo de nuevo.');
+    } finally {
+      setIsLoading(false); 
+    }
+  };
 
   const handleGoogleLogin = () => {
+    setError(null);
     setIsLoading(true); 
     window.location.href = 'https://api.tiendia.app/api/auth/google'; 
   };
@@ -77,6 +99,7 @@ export default function RegisterPage() {
             <p className="text-muted-foreground">
               Genera imágenes profesionales para tus productos con IA.
             </p>
+          </div>
 
           <div className="space-y-4">
             <Button 
@@ -88,7 +111,58 @@ export default function RegisterPage() {
               <FaGoogle className="h-4 w-4" />
               Continuar con Google
             </Button>
-          
+
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">
+                  O ingresa con email
+                </span>
+              </div>
+            </div>
+
+            <form className="space-y-4" onSubmit={handleSubmit}>
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="tu@email.com"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={isLoading}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="password">Contraseña</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  required
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  disabled={isLoading}
+                />
+              </div>
+
+              {error && (
+                <p className="text-sm text-red-600 dark:text-red-500 text-center">
+                  {error}
+                </p>
+              )}
+
+              <Button className="w-full" type="submit" disabled={isLoading}>
+                {isLoading ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : null}
+                {isLoading ? 'Entrando...' : 'Entrar'}
+              </Button>
+            </form>
           </div>
           
           <div className="pt-4 text-sm text-muted-foreground/80">
@@ -99,7 +173,6 @@ export default function RegisterPage() {
 
               <p className="mt-1">Si tienes alguna duda, puedes contactarme en mi <a href="https://wa.me/3408681915" className="text-primary underline">WhatsApp</a></p>
             </div>
-          </div>
         </div>
       </div>
     </div>

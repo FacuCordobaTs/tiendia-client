@@ -13,7 +13,7 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null); 
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { login } = useAuth(); 
+  const { loginOrRegister } = useAuth(); 
   const [searchParams] = useSearchParams();
 
   useEffect(() => {
@@ -34,9 +34,8 @@ export default function LoginPage() {
     setIsLoading(true); 
     setError(null); 
     try {
-      await login(email, password);
+      await loginOrRegister(email, password);
       navigate('/home');
-
     } catch (err: any) {
       setError(err.message || 'Credenciales incorrectas o error del servidor. Inténtalo de nuevo.');
     } finally {
@@ -134,12 +133,12 @@ export default function LoginPage() {
                 <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
-                  type="email" // Añadir type="email"
+                  type="email"
                   placeholder="tu@email.com"
-                  required // Añadir validación básica HTML
+                  required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  disabled={isLoading} // Deshabilitar durante carga
+                  disabled={isLoading}
                 />
               </div>
 
@@ -148,40 +147,27 @@ export default function LoginPage() {
                 <Input
                   id="password"
                   type="password"
-                  required // Añadir validación básica HTML
-                  placeholder="••••••••" // Placeholder para contraseña
+                  required
+                  placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  disabled={isLoading} // Deshabilitar durante carga
+                  disabled={isLoading}
                 />
               </div>
 
-              {/* Mostrar mensaje de error */}
               {error && (
                 <p className="text-sm text-red-600 dark:text-red-500 text-center">
                   {error}
                 </p>
               )}
 
-              {/* Botón de submit con estado de carga */}
               <Button className="w-full" type="submit" disabled={isLoading}>
                 {isLoading ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : null}
-                {isLoading ? 'Iniciando sesión...' : 'Iniciar sesión'}
+                {isLoading ? 'Entrando...' : 'Entrar'}
               </Button>
             </form>
-
-            <div className="text-center text-sm"> {/* Ajuste de tamaño */}
-              <Button
-                variant="link"
-                className="text-xs" // Ajuste de tamaño
-                onClick={() => navigate('/register')}
-                disabled={isLoading} // Deshabilitar durante carga
-              >
-                ¿No tienes cuenta? Regístrate
-              </Button>
-            </div>
           </div>
         </div>
       </div>

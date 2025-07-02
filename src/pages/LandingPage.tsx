@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"; // Importa subcomponentes de Card
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, Image as ImageIcon, Check, Clock, DollarSign, TrendingUp, Upload } from "lucide-react"; // Iconos más relevantes
+import { Sparkles, Image as ImageIcon, Check, Clock, DollarSign, TrendingUp, Upload, Globe } from "lucide-react"; // Iconos más relevantes
 import { useNavigate } from "react-router";
 import { useAuth } from "@/context/AuthContext";
 
@@ -49,12 +49,24 @@ export default function LandingPage() {
         </div>
 
         <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight md:leading-snug"> {/* Ajuste de tamaño y espaciado */}
-          Transforma tus Fotos <span className="bg-gradient-to-r from-blue-500 to-cyan-400 dark:from-blue-400 dark:to-cyan-300 bg-clip-text text-transparent">en Imagenes Profesionales</span>. ¡desde $150 pesos por imagen!
+          Transforma tus Fotos <span className="bg-gradient-to-r from-blue-500 to-cyan-400 dark:from-blue-400 dark:to-cyan-300 bg-clip-text text-transparent">en Imagenes Profesionales</span>. ¡Desde $0.125 USD por imagen!
         </h1>
 
         <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
           Sube la foto de tu producto y deja que nuestra IA genere imágenes profesionales de alta calidad en segundos. ¡Sin necesidad de estudio ni fotógrafo!
         </p>
+
+        {/* Currency Conversion Message */}
+        <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4 max-w-2xl mx-auto">
+          <div className="flex items-center gap-2 text-blue-700 dark:text-blue-300 mb-2">
+            <Globe className="h-4 w-4" />
+            <span className="font-medium">Pago Internacional Disponible</span>
+          </div>
+          <p className="text-sm text-blue-600 dark:text-blue-400">
+            No necesitas tener dólares para pagar. La conversión a tu moneda local se realiza automáticamente al momento del pago. 
+            Aceptamos pagos desde cualquier país del mundo.
+          </p>
+        </div>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
            <Button size="lg" className="gap-2 text-lg shadow-lg hover:shadow-primary/30 transition-shadow duration-300" onClick={() => navigate(user ? "/home" : "/register")}>
@@ -133,15 +145,31 @@ export default function LandingPage() {
 
       {/* --- Pricing Section --- */}
       <section className="container py-16 md:py-24">
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
           Packs de Imágenes
         </h2>
+        <p className="text-center text-muted-foreground mb-4 flex items-center justify-center gap-2">
+          💰 Precios en Dólares Estadounidenses (USD)
+        </p>
+        
+        {/* Currency Conversion Message for Pricing */}
+        <div className="bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-lg p-4 max-w-3xl mx-auto mb-8">
+          <div className="flex items-center gap-2 text-green-700 dark:text-green-300 mb-2">
+            <Globe className="h-4 w-4" />
+            <span className="font-medium">Conversión Automática de Moneda</span>
+          </div>
+          <p className="text-sm text-green-600 dark:text-green-400 text-center">
+            Los precios se muestran en USD, pero puedes pagar en tu moneda local. 
+            La conversión se realiza automáticamente al momento del pago con la tasa de cambio actual.
+          </p>
+        </div>
+
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
           {/* Single Image Pack */}
           <Card className="bg-card/50 hover:border-primary/30 transition-colors duration-300 ease-in-out transform hover:-translate-y-1">
             <CardHeader className="text-center">
               <CardTitle className="text-2xl font-bold">1 Imagen</CardTitle>
-              <p className="text-3xl font-bold text-primary mt-2">$150</p>
+              <p className="text-3xl font-bold text-primary mt-2">$0.125</p>
             </CardHeader>
             <CardContent className="text-center">
               <p className="text-sm text-muted-foreground">Ideal para probar el servicio</p>
@@ -152,7 +180,7 @@ export default function LandingPage() {
           <Card className="bg-card/50 hover:border-primary/30 transition-colors duration-300 ease-in-out transform hover:-translate-y-1">
             <CardHeader className="text-center">
               <CardTitle className="text-2xl font-bold">10 Imágenes</CardTitle>
-              <p className="text-3xl font-bold text-primary mt-2">$1500</p>
+              <p className="text-3xl font-bold text-primary mt-2">$1.25</p>
             </CardHeader>
             <CardContent className="text-center">
               <p className="text-sm text-muted-foreground">Perfecto para pequeños catálogos</p>
@@ -166,7 +194,7 @@ export default function LandingPage() {
             </div>
             <CardHeader className="text-center">
               <CardTitle className="text-2xl font-bold">50 Imágenes</CardTitle>
-              <p className="text-3xl font-bold text-primary mt-2">$6600</p>
+              <p className="text-3xl font-bold text-primary mt-2">$5.50</p>
               <span className="text-sm text-green-600 dark:text-green-400">12.5% de ahorro</span>
             </CardHeader>
             <CardContent className="text-center">
@@ -178,7 +206,7 @@ export default function LandingPage() {
           <Card className="bg-card/50 hover:border-primary/30 transition-colors duration-300 ease-in-out transform hover:-translate-y-1">
             <CardHeader className="text-center">
               <CardTitle className="text-2xl font-bold">100 Imágenes</CardTitle>
-              <p className="text-3xl font-bold text-primary mt-2">$12,750</p>
+              <p className="text-3xl font-bold text-primary mt-2">$10.63</p>
               <span className="text-sm text-green-600 dark:text-green-400">15% de ahorro</span>
             </CardHeader>
             <CardContent className="text-center">

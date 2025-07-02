@@ -19,6 +19,7 @@ interface AuthContextType {
   register: (info: SignUpUserInfo) => Promise<boolean>;
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => Promise<void>;
+  loginOrRegister: (email: string, password: string) => Promise<boolean>;
   signUpInfo: SignUpUserInfo;
   setSignUpInfo: React.Dispatch<React.SetStateAction<SignUpUserInfo>>;
   showPaymentModal: boolean;
@@ -122,6 +123,30 @@ export default function AuthProvider({ children }: AuthProviderProps) {
     }
   };
 
+  const loginOrRegister = async (email: string, password: string) => {
+    setLoading(true);
+    try {
+      const response = await fetch(url + "/auth/login-or-register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+        credentials: "include",
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message);
+      }
+      const data = await response.json();
+      // The user may be in data.user or data.user[0]
+      setUser(data.user[0] || data.user);
+      return true;
+    } catch (error) {
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     const checkAuth = async () => {
       try {
@@ -159,6 +184,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
         register,
         login,
         logout,
+        loginOrRegister,
         signUpInfo,
         setSignUpInfo,
         showPaymentModal,
