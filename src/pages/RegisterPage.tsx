@@ -171,7 +171,7 @@ export default function RegisterPage() {
               </p>
               <p className="mt-1">Te ayudo a tener fotos más lindas para tu tienda</p>
 
-              <p className="mt-1">Si tienes alguna duda, puedes contactarme en mi <a href="https://wa.me/3408681915" className="text-primary underline">WhatsApp</a></p>
+              <p className="mt-1">Si tienes alguna duda, puedes contactarme en mi <a href="https://wa.me/543408681915" className="text-primary underline">WhatsApp</a></p>
             </div>
         </div>
       </div>
