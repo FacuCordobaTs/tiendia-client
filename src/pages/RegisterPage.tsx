@@ -163,6 +163,18 @@ export default function RegisterPage() {
                 {isLoading ? 'Entrando...' : 'Entrar'}
               </Button>
             </form>
+
+            <p className="text-xs text-muted-foreground text-center">
+              Al continuar, aceptas nuestros{' '}
+              <a 
+                href="/terminos-y-condiciones" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-primary hover:underline"
+              >
+                Términos y Condiciones
+              </a>
+            </p>
           </div>
           
           <div className="pt-4 text-sm text-muted-foreground/80">
