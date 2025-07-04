@@ -23,7 +23,6 @@ import { useNavigate } from 'react-router';
 import TutorialDialog from '@/components/TutorialDialog';
 import toast from 'react-hot-toast';
 import { FaTiktok } from 'react-icons/fa';
-import { Switch } from '@/components/ui/switch';
 // Quitar Separator si ya no se usa en el nuevo layout
 // import { Separator } from '@/components/ui/separator';
 
