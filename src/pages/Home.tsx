@@ -6,7 +6,6 @@ import { useProduct } from '@/context/ProductContext';
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogFooter, // Importar DialogFooter
@@ -54,16 +53,18 @@ function App() {
   } | null>(null);
   const [isPersonalizedImage, setIsPersonalizedImage] = useState(false);
   const [isDialogViewFront, setIsDialogViewFront] = useState(true);
+  const [isDialogViewAdult, setIsDialogViewAdult] = useState(true);
   const { user, setUser } = useAuth();
   const { products, getProducts } = useProduct();
   const navigate = useNavigate();
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
 
   // Add new function to update generated image
-  const updateGeneratedImage = (imageUrl: string, isFrontView: boolean = true) => {
-    console.log('🖼️ Updating generated image URL:', imageUrl, 'View:', isFrontView ? 'Front' : 'Back');
+  const updateGeneratedImage = (imageUrl: string, isFrontView: boolean = true, isAdultView: boolean = true) => {
+    console.log('🖼️ Updating generated image URL:', imageUrl, 'View:', isFrontView ? 'Front' : 'Back', 'Type:', isAdultView ? 'Adult' : 'Baby');
     setCurrentAdImageUrl(imageUrl);
     setIsDialogViewFront(isFrontView);
+    setIsDialogViewAdult(isAdultView);
     setLoading(false);
   };
 
@@ -458,6 +459,7 @@ function App() {
     setCurrentPersonalization(null); // Reset personalization settings
     setIsPersonalizedImage(false); // Reset personalized image flag
     setIsDialogViewFront(true); // Reset view to front
+    setIsDialogViewAdult(true); // Reset view to adult
   };
 
   return (
@@ -654,26 +656,38 @@ function App() {
                   </div>
                   {currentAdImageUrl && (
                     <div className="flex items-center space-x-3">
-                      <span className={`text-sm font-medium transition-colors ${isDialogViewFront ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'}`}>
-                        Frente
-                      </span>
-                      <Switch
-                        checked={!isDialogViewFront}
-                        onCheckedChange={(checked) => setIsDialogViewFront(!checked)}
-                        className="data-[state=checked]:bg-blue-600"
-                      />
-                      <span className={`text-sm font-medium transition-colors ${!isDialogViewFront ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'}`}>
-                        Detrás
-                      </span>
+                      <div className="flex items-center space-x-2">
+                        <span className={`text-sm font-medium transition-colors ${isDialogViewFront ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'}`}>
+                          Frente
+                        </span>
+                        <Switch
+                          checked={!isDialogViewFront}
+                          onCheckedChange={(checked) => setIsDialogViewFront(!checked)}
+                          className="data-[state=checked]:bg-blue-600"
+                        />
+                        <span className={`text-sm font-medium transition-colors ${!isDialogViewFront ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'}`}>
+                          Detrás
+                        </span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <span className={`text-sm font-medium transition-colors ${isDialogViewAdult ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'}`}>
+                          Adulto
+                        </span>
+                        <Switch
+                          checked={!isDialogViewAdult}
+                          onCheckedChange={(checked) => setIsDialogViewAdult(!checked)}
+                          className="data-[state=checked]:bg-blue-600"
+                        />
+                        <span className={`text-sm font-medium transition-colors ${!isDialogViewAdult ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'}`}>
+                          Bebé
+                        </span>
+                      </div>
                     </div>
                   )}
                 </DialogTitle>
-                <DialogDescription className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
-                  Compara el antes y el después.
-                </DialogDescription>
               </DialogHeader>
 
-              {/* Área Principal con Scroll */}
+              {/* Contenido del Diálogo */}
               <ScrollArea className="flex-1 overflow-y-auto p-4 sm:p-6">
                 {isFullscreen ? (
                   // Fullscreen Image View
@@ -752,13 +766,9 @@ function App() {
                     </div>
                   </div>
                 )}
-
-                {/* Sección de Modificación */}
-               
               </ScrollArea>
 
               {/* Footer del Diálogo con Botones Principales */}
-              {/* AJUSTE: flex-col sm:flex-row y order para apilar en móvil */}
               <DialogFooter className="px-4 sm:px-6 py-3 sm:py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-3 flex-shrink-0">
                 <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto order-2 sm:order-1">
                   

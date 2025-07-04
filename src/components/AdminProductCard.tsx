@@ -50,7 +50,7 @@ export default function AdminProductCard({ product, handleGenerateAd, onEdit, up
   product: Product;
   handleGenerateAd: (id: number, includeModel: boolean, originalImageUrl: string | null, isPro: boolean) => void;
   onEdit: () => void;
-  updateGeneratedImage: (imageUrl: string, isFrontView: boolean) => void;
+  updateGeneratedImage: (imageUrl: string, isFrontView: boolean, isAdultView: boolean) => void;
   updatePersonalizationSettings: (settings: {
     gender?: string;
     age?: string;
@@ -74,6 +74,7 @@ export default function AdminProductCard({ product, handleGenerateAd, onEdit, up
   const [selectedBodyType, setSelectedBodyType] = useState<string | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [isFrontView, setIsFrontView] = useState(true);
+  const [isAdultView, setIsAdultView] = useState(true);
 
   // Obtener información del usuario actual
   const { user } = useAuth();
@@ -86,11 +87,11 @@ export default function AdminProductCard({ product, handleGenerateAd, onEdit, up
   const handleGenerateClick = async () => {
     setIsGenerating(true);
     try {
-      if (isFrontView) {
-        // Generate front view (normal generation)
+      if (isFrontView && isAdultView) {
+        // Generate front view adult (normal generation)
         await handleGenerateAd(product.id, true, product.imageURL, false);
-      } else {
-        // Generate back view using the new endpoint
+      } else if (!isFrontView && isAdultView) {
+        // Generate back view adult
         // Show dialog and loading state, set up comparison view
         setIsAdDialogOpen(true);
         setCurrentAdImageUrl(null);
@@ -110,10 +111,62 @@ export default function AdminProductCard({ product, handleGenerateAd, onEdit, up
         const data = await res.json();
         if (res.ok && data.backImageUrl) {
           if (typeof updateGeneratedImage === 'function') {
-            updateGeneratedImage(data.backImageUrl, false);
+            updateGeneratedImage(data.backImageUrl, false, false);
           }
         } else {
           alert(data.message || 'Error al generar la imagen de vista trasera');
+        }
+      } else if (isFrontView && !isAdultView) {
+        // Generate front view baby
+        // Show dialog and loading state, set up comparison view
+        setIsAdDialogOpen(true);
+        setCurrentAdImageUrl(null);
+        setOriginalImageUrl(product.imageURL);
+        setCurrentProductId(product.id);
+        setLoading(true);
+        
+        const res = await fetch(`https://api.tiendia.app/api/products/baby-image/${product.id}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify({}), // Empty payload for default baby view
+        });
+        
+        const data = await res.json();
+        if (res.ok && data.babyImageUrl) {
+          if (typeof updateGeneratedImage === 'function') {
+            updateGeneratedImage(data.babyImageUrl, true, false);
+          }
+        } else {
+          alert(data.message || 'Error al generar la imagen de bebé');
+        }
+      } else {
+        // Generate back view baby
+        // Show dialog and loading state, set up comparison view
+        setIsAdDialogOpen(true);
+        setCurrentAdImageUrl(null);
+        setOriginalImageUrl(product.imageURL);
+        setCurrentProductId(product.id);
+        setLoading(true);
+        
+        const res = await fetch(`https://api.tiendia.app/api/products/baby-image/${product.id}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify({}), // Empty payload for default baby view
+        });
+        
+        const data = await res.json();
+        if (res.ok && data.babyImageUrl) {
+          if (typeof updateGeneratedImage === 'function') {
+            updateGeneratedImage(data.babyImageUrl, false, false);
+          }
+        } else {
+          alert(data.message || 'Error al generar la imagen de bebé');
         }
       }
     } finally {
@@ -245,9 +298,14 @@ export default function AdminProductCard({ product, handleGenerateAd, onEdit, up
 
                       try {
                         setIsGenerating(true);
-                        const endpoint = isFrontView 
-                          ? `https://api.tiendia.app/api/products/personalize/${product.id}`
-                          : `https://api.tiendia.app/api/products/back-image/${product.id}`;
+                        let endpoint;
+                        if (isFrontView && isAdultView) {
+                          endpoint = `https://api.tiendia.app/api/products/personalize/${product.id}`;
+                        } else if (!isFrontView && isAdultView) {
+                          endpoint = `https://api.tiendia.app/api/products/back-image/${product.id}`;
+                        } else {
+                          endpoint = `https://api.tiendia.app/api/products/baby-image/${product.id}`;
+                        }
                         
                         const res = await fetch(endpoint, {
                           method: 'POST',
@@ -259,11 +317,18 @@ export default function AdminProductCard({ product, handleGenerateAd, onEdit, up
                         });
                         const data = await res.json();
                         
-                        const imageUrl = isFrontView ? data.personalizedImageUrl : data.backImageUrl;
+                        let imageUrl;
+                        if (isFrontView && isAdultView) {
+                          imageUrl = data.personalizedImageUrl;
+                        } else if (!isFrontView && isAdultView) {
+                          imageUrl = data.backImageUrl;
+                        } else {
+                          imageUrl = data.babyImageUrl;
+                        }
                         
                         if (res.ok && imageUrl) {
                           if (typeof updateGeneratedImage === 'function') {
-                            updateGeneratedImage(imageUrl, isFrontView);
+                            updateGeneratedImage(imageUrl, isFrontView, isAdultView);
                           }
                           setPersonalizedImageFlag(true);
                         } else {
@@ -316,6 +381,20 @@ export default function AdminProductCard({ product, handleGenerateAd, onEdit, up
                />
                <span className={`text-sm font-medium transition-colors ${!isFrontView ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'}`}>
                  Detrás
+               </span>
+             </div>
+
+             <div className="flex items-center justify-center space-x-4 mb-4">
+               <span className={`text-sm font-medium transition-colors ${isAdultView ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'}`}>
+                 Adulto
+               </span>
+               <Switch
+                 checked={!isAdultView}
+                 onCheckedChange={(checked) => setIsAdultView(!checked)}
+                 className="data-[state=checked]:bg-blue-600"
+               />
+               <span className={`text-sm font-medium transition-colors ${!isAdultView ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'}`}>
+                 Bebé
                </span>
              </div>
 
