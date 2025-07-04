@@ -506,7 +506,7 @@ function App() {
                   ¡Mejora tus fotos de productos!
                 </h2>
                 <p className="text-white/90 text-sm md:text-base">
-                  Te ayudamos a tener fotos más lindas para tu tienda, desde $100 por imagen
+                  Te ayudamos a tener fotos más lindas para tu tienda, desde 100 pesos argentinos por imagen
                 </p>
               </div>
               <div className="flex flex-col sm:flex-row items-center gap-3">
