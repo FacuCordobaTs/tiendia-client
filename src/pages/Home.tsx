@@ -261,9 +261,14 @@ function App() {
     try {
       // If we have personalization settings, use the appropriate endpoint based on view
       if (currentPersonalization && Object.keys(currentPersonalization).length > 0) {
-        const endpoint = isDialogViewFront 
-          ? `https://api.tiendia.app/api/products/personalize/${currentProductId}`
-          : `https://api.tiendia.app/api/products/back-image/${currentProductId}`;
+        let endpoint;
+        if (isDialogViewFront && isDialogViewAdult) {
+          endpoint = `https://api.tiendia.app/api/products/personalize/${currentProductId}`;
+        } else if (!isDialogViewFront && isDialogViewAdult) {
+          endpoint = `https://api.tiendia.app/api/products/back-image/${currentProductId}`;
+        } else {
+          endpoint = `https://api.tiendia.app/api/products/baby-image/${currentProductId}`;
+        }
         
         const response = await fetch(endpoint, {
           method: "POST",
@@ -287,7 +292,14 @@ function App() {
         }
 
         const result = await response.json();
-        const imageUrl = isDialogViewFront ? result.personalizedImageUrl : result.backImageUrl;
+        let imageUrl;
+        if (isDialogViewFront && isDialogViewAdult) {
+          imageUrl = result.personalizedImageUrl;
+        } else if (!isDialogViewFront && isDialogViewAdult) {
+          imageUrl = result.backImageUrl;
+        } else {
+          imageUrl = result.babyImageUrl;
+        }
 
         if (result && imageUrl) {
           setUser(prevUser => (
@@ -301,7 +313,7 @@ function App() {
         }
       } else {
         // Use the standard generation endpoint based on view
-        if (isDialogViewFront) {
+        if (isDialogViewFront && isDialogViewAdult) {
           // Use the standard generation endpoint
           const response = await fetch(`https://api.tiendia.app/api/products/generate-ad/${currentProductId}`, {
             method: "POST",
@@ -336,7 +348,7 @@ function App() {
             console.error("Respuesta inesperada de la API:", result);
             toast.error('Error al obtener la imagen regenerada.');
           }
-        } else {
+        } else if (!isDialogViewFront && isDialogViewAdult) {
           // Use the back-image endpoint
           const response = await fetch(`https://api.tiendia.app/api/products/back-image/${currentProductId}`, {
             method: "POST",
@@ -371,6 +383,41 @@ function App() {
             console.error("Respuesta inesperada de la API:", result);
             toast.error('Error al obtener la imagen regenerada.');
           }
+        } else {
+          // Use the baby-image endpoint
+          const response = await fetch(`https://api.tiendia.app/api/products/baby-image/${currentProductId}`, {
+            method: "POST",
+            credentials: 'include',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({})
+          });
+
+          if (!response.ok) {
+            let errorMessage = `Error: ${response.status} ${response.statusText}`;
+            try {
+              const errorBody = await response.json();
+              errorMessage = errorBody.error || errorBody.message || errorMessage;
+            } catch (e) {
+              console.error("Could not parse error response body:", e);
+            }
+            toast.error(`Error al regenerar: ${errorMessage}`);
+            throw new Error(errorMessage);
+          }
+
+          const result = await response.json();
+
+          if (result && result.babyImageUrl) {
+            setUser(prevUser => (
+              prevUser ? { ...prevUser, credits: prevUser.credits - 50 } : null
+            ));
+            setCurrentAdImageUrl(result.babyImageUrl);
+            toast.success('¡Imagen regenerada con éxito!');
+          } else {
+            console.error("Respuesta inesperada de la API:", result);
+            toast.error('Error al obtener la imagen regenerada.');
+          }
         }
       }
     } catch (error: any) {
@@ -390,9 +437,14 @@ function App() {
 
     setLoading(true);
     try {
-      const endpoint = isDialogViewFront 
-        ? `https://api.tiendia.app/api/products/personalize/${currentProductId}`
-        : `https://api.tiendia.app/api/products/back-image/${currentProductId}`;
+      let endpoint;
+      if (isDialogViewFront && isDialogViewAdult) {
+        endpoint = `https://api.tiendia.app/api/products/personalize/${currentProductId}`;
+      } else if (!isDialogViewFront && isDialogViewAdult) {
+        endpoint = `https://api.tiendia.app/api/products/back-image/${currentProductId}`;
+      } else {
+        endpoint = `https://api.tiendia.app/api/products/baby-image/${currentProductId}`;
+      }
       
       const response = await fetch(endpoint, {
         method: "POST",
@@ -416,7 +468,14 @@ function App() {
       }
 
       const result = await response.json();
-      const imageUrl = isDialogViewFront ? result.personalizedImageUrl : result.backImageUrl;
+      let imageUrl;
+      if (isDialogViewFront && isDialogViewAdult) {
+        imageUrl = result.personalizedImageUrl;
+      } else if (!isDialogViewFront && isDialogViewAdult) {
+        imageUrl = result.backImageUrl;
+      } else {
+        imageUrl = result.babyImageUrl;
+      }
 
       if (result && imageUrl) {
         setUser(prevUser => (
