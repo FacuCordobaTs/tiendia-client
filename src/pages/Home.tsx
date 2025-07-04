@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dialog";
 // Importar Check si es necesario (no se usa en el código final actual) o quitar si no se usa.
 // import { Download, CreditCard, Sparkles, HelpCircle, Wand2, Image as ImageIcon, Check } from 'lucide-react';
-import { Download, CreditCard, Sparkles, HelpCircle, Wand2, Image as ImageIcon, RefreshCw, X, Instagram, MessageCircle } from 'lucide-react'; // Asegurarse de que ImageIcon esté importado
+import { Download, CreditCard, Sparkles, HelpCircle, Wand2, Image as ImageIcon, RefreshCw, X, Instagram, MessageCircle, Pencil } from 'lucide-react'; // Asegurarse de que ImageIcon esté importado
 import { ScrollArea } from '@/components/ui/scroll-area';
 import AdminProductCard from '@/components/AdminProductCard';
 import { Button } from '@/components/ui/button';
@@ -45,6 +45,13 @@ function App() {
   const [isModifying, setIsModifying] = useState<boolean>(false);
   // const [currentImageId, setCurrentImageId] = useState<number | null>(null);
   const [currentProductId, setCurrentProductId] = useState<number | null>(null);
+  const [currentPersonalization, setCurrentPersonalization] = useState<{
+    gender?: string;
+    age?: string;
+    skinTone?: string;
+    bodyType?: string;
+  } | null>(null);
+  const [isPersonalizedImage, setIsPersonalizedImage] = useState(false);
   const { user, setUser } = useAuth();
   const { products, getProducts } = useProduct();
   const navigate = useNavigate();
@@ -55,6 +62,19 @@ function App() {
     console.log('🖼️ Updating generated image URL:', imageUrl);
     setCurrentAdImageUrl(imageUrl);
     setLoading(false);
+  };
+
+  const updatePersonalizationSettings = (settings: {
+    gender?: string;
+    age?: string;
+    skinTone?: string;
+    bodyType?: string;
+  } | null) => {
+    setCurrentPersonalization(settings);
+  };
+
+  const setPersonalizedImageFlag = (isPersonalized: boolean) => {
+    setIsPersonalizedImage(isPersonalized);
   };
 
   const handleGenerateAd = async (id: number, includeModel: boolean, originalUrl: string | null, isPro: boolean) => {
@@ -223,18 +243,113 @@ function App() {
   const handleRegenerateImage = async () => {
     if (!currentProductId || !user || user.credits < 50) {
       toast.error('No te quedan imágenes disponibles.');
+      navigate('/credits');
+      return;
+    }
+
+    // If we know this was a personalized image, always use personalization
+    if (isPersonalizedImage && currentPersonalization) {
+      await regeneratePersonalizedImage();
       return;
     }
 
     setLoading(true);
     try {
-      const response = await fetch(`https://api.tiendia.app/api/products/generate-ad/${currentProductId}`, {
+      // If we have personalization settings, use the personalize endpoint
+      if (currentPersonalization && Object.keys(currentPersonalization).length > 0) {
+        const response = await fetch(`https://api.tiendia.app/api/products/personalize/${currentProductId}`, {
+          method: "POST",
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(currentPersonalization),
+        });
+
+        if (!response.ok) {
+          let errorMessage = `Error: ${response.status} ${response.statusText}`;
+          try {
+            const errorBody = await response.json();
+            errorMessage = errorBody.error || errorBody.message || errorMessage;
+          } catch (e) {
+            console.error("Could not parse error response body:", e);
+          }
+          toast.error(`Error al regenerar: ${errorMessage}`);
+          throw new Error(errorMessage);
+        }
+
+        const result = await response.json();
+
+        if (result && result.personalizedImageUrl) {
+          setUser(prevUser => (
+            prevUser ? { ...prevUser, credits: prevUser.credits - 50 } : null
+          ));
+          setCurrentAdImageUrl(result.personalizedImageUrl);
+          toast.success('¡Imagen regenerada con éxito!');
+        } else {
+          console.error("Respuesta inesperada de la API:", result);
+          toast.error('Error al obtener la imagen regenerada.');
+        }
+      } else {
+        // Use the standard generation endpoint
+        const response = await fetch(`https://api.tiendia.app/api/products/generate-ad/${currentProductId}`, {
+          method: "POST",
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ includeModel: true })
+        });
+
+        if (!response.ok) {
+          let errorMessage = `Error: ${response.status} ${response.statusText}`;
+          try {
+            const errorBody = await response.json();
+            errorMessage = errorBody.error || errorBody.message || errorMessage;
+          } catch (e) {
+            console.error("Could not parse error response body:", e);
+          }
+          toast.error(`Error al regenerar: ${errorMessage}`);
+          throw new Error(errorMessage);
+        }
+
+        const result = await response.json();
+
+        if (result && result.adImageUrl && result.imageId) {
+          setUser(prevUser => (
+            prevUser ? { ...prevUser, credits: prevUser.credits - 50 } : null
+          ));
+          setCurrentAdImageUrl(result.adImageUrl);
+          toast.success('¡Imagen regenerada con éxito!');
+        } else {
+          console.error("Respuesta inesperada de la API:", result);
+          toast.error('Error al obtener la imagen regenerada.');
+        }
+      }
+    } catch (error: any) {
+      console.error("Error en handleRegenerateImage:", error);
+      toast.error(error.message || 'Ocurrió un error inesperado.', { id: 'regenerate-error-toast' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const regeneratePersonalizedImage = async () => {
+    if (!currentProductId || !user || user.credits < 50) {
+      toast.error('No te quedan imágenes disponibles.');
+      navigate('/credits');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await fetch(`https://api.tiendia.app/api/products/personalize/${currentProductId}`, {
         method: "POST",
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ includeModel: true })
+        body: JSON.stringify(currentPersonalization),
       });
 
       if (!response.ok) {
@@ -251,19 +366,18 @@ function App() {
 
       const result = await response.json();
 
-      if (result && result.adImageUrl && result.imageId) {
+      if (result && result.personalizedImageUrl) {
         setUser(prevUser => (
           prevUser ? { ...prevUser, credits: prevUser.credits - 50 } : null
         ));
-        setCurrentAdImageUrl(result.adImageUrl);
-        // setCurrentImageId(result.imageId);
+        setCurrentAdImageUrl(result.personalizedImageUrl);
         toast.success('¡Imagen regenerada con éxito!');
       } else {
         console.error("Respuesta inesperada de la API:", result);
         toast.error('Error al obtener la imagen regenerada.');
       }
     } catch (error: any) {
-      console.error("Error en handleRegenerateImage:", error);
+      console.error("Error en regeneratePersonalizedImage:", error);
       toast.error(error.message || 'Ocurrió un error inesperado.', { id: 'regenerate-error-toast' });
     } finally {
       setLoading(false);
@@ -289,9 +403,9 @@ function App() {
     setIsModifying(false);
     setCurrentAdImageUrl(null);
     setOriginalImageUrl(null);
-    // setCurrentImageId(null);
     setCurrentProductId(null);
-    // setModificationPrompt('');
+    setCurrentPersonalization(null); // Reset personalization settings
+    setIsPersonalizedImage(false); // Reset personalized image flag
   };
 
   return (
@@ -448,6 +562,8 @@ function App() {
                     setIsDialogOpen(true);
                   }}
                   updateGeneratedImage={updateGeneratedImage}
+                  updatePersonalizationSettings={updatePersonalizationSettings}
+                  setPersonalizedImageFlag={setPersonalizedImageFlag}
                   setIsAdDialogOpen={setIsAdDialogOpen}
                   setCurrentAdImageUrl={setCurrentAdImageUrl}
                   setOriginalImageUrl={setOriginalImageUrl}
@@ -578,22 +694,22 @@ function App() {
                 <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto order-2 sm:order-1">
                   
                   {currentAdImageUrl && (
-                    <Button
-                      onClick={() =>{ 
-                        if ((user?.credits ?? 0) < 50) {
-                          navigate('/credits')
-                        }
-                        else {
-                          handleRegenerateImage()
-                        }
-                      
-                      }}
-                      disabled={loading || isModifying }
-                      className="w-full sm:w-auto bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-all hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <RefreshCw className="mr-1 h-4 w-4" />
-                      Regenerar
-                    </Button>
+                    <div className="flex flex-col gap-2">
+                      {currentPersonalization && Object.keys(currentPersonalization).length > 0 && (
+                        <div className="flex items-center gap-2 text-xs text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 py-1 rounded-md">
+                          <Pencil className="w-3 h-3" />
+                          <span>Personalización activa</span>
+                        </div>
+                      )}
+                      <Button
+                        onClick={handleRegenerateImage}
+                        disabled={loading || isModifying}
+                        className="w-full sm:w-auto bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-all hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        <RefreshCw className="mr-1 h-4 w-4" />
+                        Regenerar
+                      </Button>
+                    </div>
                   )}
                 </div>
                 {currentAdImageUrl && (

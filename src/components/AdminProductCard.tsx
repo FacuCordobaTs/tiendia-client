@@ -45,11 +45,18 @@ const bodyTypeOptions = [
   { value: 'curvy', label: 'Curvy', icon: '✴️' },
 ];
 
-export default function AdminProductCard({ product, handleGenerateAd, onEdit, updateGeneratedImage, setIsAdDialogOpen, setCurrentAdImageUrl, setOriginalImageUrl, setCurrentProductId, setLoading }: {
+export default function AdminProductCard({ product, handleGenerateAd, onEdit, updateGeneratedImage, updatePersonalizationSettings, setPersonalizedImageFlag, setIsAdDialogOpen, setCurrentAdImageUrl, setOriginalImageUrl, setCurrentProductId, setLoading }: {
   product: Product;
   handleGenerateAd: (id: number, includeModel: boolean, originalImageUrl: string | null, isPro: boolean) => void;
   onEdit: () => void;
   updateGeneratedImage: (imageUrl: string) => void;
+  updatePersonalizationSettings: (settings: {
+    gender?: string;
+    age?: string;
+    skinTone?: string;
+    bodyType?: string;
+  } | null) => void;
+  setPersonalizedImageFlag: (isPersonalized: boolean) => void;
   setIsAdDialogOpen: (open: boolean) => void;
   setCurrentAdImageUrl: (url: string | null) => void;
   setOriginalImageUrl: (url: string | null) => void;
@@ -86,8 +93,12 @@ export default function AdminProductCard({ product, handleGenerateAd, onEdit, up
   return (
     <Drawer open={drawerOpen} onOpenChange={(open) => { 
       setDrawerOpen(open); 
-      if (!open) setInsufficientCredits(false);
-      if (!open) setPersonalizing(false);
+      if (!open) {
+        setInsufficientCredits(false);
+        setPersonalizing(false);
+        // Reset personalization settings when drawer is closed
+        updatePersonalizationSettings(null);
+      }
     }}>
       <DrawerTrigger asChild>
         <Card className="group relative overflow-hidden transition-all hover:shadow-xl hover:scale-[1.02] h-full hover:cursor-pointer w-full md:max-w-[280px] bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700" onClick={() => setDrawerOpen(true)}>
@@ -197,6 +208,9 @@ export default function AdminProductCard({ product, handleGenerateAd, onEdit, up
                       setLoading(true);
                       setPersonalizing(false);
 
+                      // Update personalization settings in parent component
+                      updatePersonalizationSettings(payload);
+
                       try {
                         setIsGenerating(true);
                         const res = await fetch(`https://api.tiendia.app/api/products/personalize/${product.id}`, {
@@ -212,6 +226,7 @@ export default function AdminProductCard({ product, handleGenerateAd, onEdit, up
                           if (typeof updateGeneratedImage === 'function') {
                             updateGeneratedImage(data.personalizedImageUrl);
                           }
+                          setPersonalizedImageFlag(true);
                         } else {
                           alert(data.message || 'Error al generar la imagen personalizada');
                         }
