@@ -6,6 +6,7 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { Button } from "./ui/button";
+import { Switch } from "./ui/switch";
 import { FiEdit  } from "react-icons/fi";
 import { Card } from "./ui/card";
 import { AspectRatio } from "./ui/aspect-ratio";
@@ -49,7 +50,7 @@ export default function AdminProductCard({ product, handleGenerateAd, onEdit, up
   product: Product;
   handleGenerateAd: (id: number, includeModel: boolean, originalImageUrl: string | null, isPro: boolean) => void;
   onEdit: () => void;
-  updateGeneratedImage: (imageUrl: string) => void;
+  updateGeneratedImage: (imageUrl: string, isFrontView: boolean) => void;
   updatePersonalizationSettings: (settings: {
     gender?: string;
     age?: string;
@@ -72,6 +73,7 @@ export default function AdminProductCard({ product, handleGenerateAd, onEdit, up
   const [selectedSkinTone, setSelectedSkinTone] = useState<string | null>(null);
   const [selectedBodyType, setSelectedBodyType] = useState<string | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [isFrontView, setIsFrontView] = useState(true);
 
   // Obtener información del usuario actual
   const { user } = useAuth();
@@ -84,9 +86,39 @@ export default function AdminProductCard({ product, handleGenerateAd, onEdit, up
   const handleGenerateClick = async () => {
     setIsGenerating(true);
     try {
-      await handleGenerateAd(product.id, true, product.imageURL, false);
+      if (isFrontView) {
+        // Generate front view (normal generation)
+        await handleGenerateAd(product.id, true, product.imageURL, false);
+      } else {
+        // Generate back view using the new endpoint
+        // Show dialog and loading state, set up comparison view
+        setIsAdDialogOpen(true);
+        setCurrentAdImageUrl(null);
+        setOriginalImageUrl(product.imageURL);
+        setCurrentProductId(product.id);
+        setLoading(true);
+        
+        const res = await fetch(`https://api.tiendia.app/api/products/back-image/${product.id}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify({}), // Empty payload for default back view
+        });
+        
+        const data = await res.json();
+        if (res.ok && data.backImageUrl) {
+          if (typeof updateGeneratedImage === 'function') {
+            updateGeneratedImage(data.backImageUrl, false);
+          }
+        } else {
+          alert(data.message || 'Error al generar la imagen de vista trasera');
+        }
+      }
     } finally {
       setIsGenerating(false);
+      setLoading(false);
     }
   };
 
@@ -213,7 +245,11 @@ export default function AdminProductCard({ product, handleGenerateAd, onEdit, up
 
                       try {
                         setIsGenerating(true);
-                        const res = await fetch(`https://api.tiendia.app/api/products/personalize/${product.id}`, {
+                        const endpoint = isFrontView 
+                          ? `https://api.tiendia.app/api/products/personalize/${product.id}`
+                          : `https://api.tiendia.app/api/products/back-image/${product.id}`;
+                        
+                        const res = await fetch(endpoint, {
                           method: 'POST',
                           headers: {
                             'Content-Type': 'application/json',
@@ -222,16 +258,19 @@ export default function AdminProductCard({ product, handleGenerateAd, onEdit, up
                           body: JSON.stringify(payload),
                         });
                         const data = await res.json();
-                        if (res.ok && data.personalizedImageUrl) {
+                        
+                        const imageUrl = isFrontView ? data.personalizedImageUrl : data.backImageUrl;
+                        
+                        if (res.ok && imageUrl) {
                           if (typeof updateGeneratedImage === 'function') {
-                            updateGeneratedImage(data.personalizedImageUrl);
+                            updateGeneratedImage(imageUrl, isFrontView);
                           }
                           setPersonalizedImageFlag(true);
                         } else {
-                          alert(data.message || 'Error al generar la imagen personalizada');
+                          alert(data.message || `Error al generar la imagen ${isFrontView ? 'personalizada' : 'de vista trasera'}`);
                         }
                       } catch (err) {
-                        alert('Error de red al generar la imagen personalizada');
+                        alert(`Error de red al generar la imagen ${isFrontView ? 'personalizada' : 'de vista trasera'}`);
                       } finally {
                         setIsGenerating(false);
                         setLoading(false);
@@ -264,6 +303,20 @@ export default function AdminProductCard({ product, handleGenerateAd, onEdit, up
                 <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-50">
                   {product.name}
                 </h2>
+             </div>
+
+             <div className="flex items-center justify-center space-x-4 mb-4">
+               <span className={`text-sm font-medium transition-colors ${isFrontView ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'}`}>
+                 Frente
+               </span>
+               <Switch
+                 checked={!isFrontView}
+                 onCheckedChange={(checked) => setIsFrontView(!checked)}
+                 className="data-[state=checked]:bg-blue-600"
+               />
+               <span className={`text-sm font-medium transition-colors ${!isFrontView ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'}`}>
+                 Detrás
+               </span>
              </div>
 
            <div className="mb-5 p-3 bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">

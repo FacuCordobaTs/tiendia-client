@@ -23,6 +23,7 @@ import { useNavigate } from 'react-router';
 import TutorialDialog from '@/components/TutorialDialog';
 import toast from 'react-hot-toast';
 import { FaTiktok } from 'react-icons/fa';
+import { Switch } from '@/components/ui/switch';
 // Quitar Separator si ya no se usa en el nuevo layout
 // import { Separator } from '@/components/ui/separator';
 
@@ -52,15 +53,17 @@ function App() {
     bodyType?: string;
   } | null>(null);
   const [isPersonalizedImage, setIsPersonalizedImage] = useState(false);
+  const [isDialogViewFront, setIsDialogViewFront] = useState(true);
   const { user, setUser } = useAuth();
   const { products, getProducts } = useProduct();
   const navigate = useNavigate();
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
 
   // Add new function to update generated image
-  const updateGeneratedImage = (imageUrl: string) => {
-    console.log('🖼️ Updating generated image URL:', imageUrl);
+  const updateGeneratedImage = (imageUrl: string, isFrontView: boolean = true) => {
+    console.log('🖼️ Updating generated image URL:', imageUrl, 'View:', isFrontView ? 'Front' : 'Back');
     setCurrentAdImageUrl(imageUrl);
+    setIsDialogViewFront(isFrontView);
     setLoading(false);
   };
 
@@ -255,9 +258,13 @@ function App() {
 
     setLoading(true);
     try {
-      // If we have personalization settings, use the personalize endpoint
+      // If we have personalization settings, use the appropriate endpoint based on view
       if (currentPersonalization && Object.keys(currentPersonalization).length > 0) {
-        const response = await fetch(`https://api.tiendia.app/api/products/personalize/${currentProductId}`, {
+        const endpoint = isDialogViewFront 
+          ? `https://api.tiendia.app/api/products/personalize/${currentProductId}`
+          : `https://api.tiendia.app/api/products/back-image/${currentProductId}`;
+        
+        const response = await fetch(endpoint, {
           method: "POST",
           credentials: 'include',
           headers: {
@@ -279,51 +286,90 @@ function App() {
         }
 
         const result = await response.json();
+        const imageUrl = isDialogViewFront ? result.personalizedImageUrl : result.backImageUrl;
 
-        if (result && result.personalizedImageUrl) {
+        if (result && imageUrl) {
           setUser(prevUser => (
             prevUser ? { ...prevUser, credits: prevUser.credits - 50 } : null
           ));
-          setCurrentAdImageUrl(result.personalizedImageUrl);
+          setCurrentAdImageUrl(imageUrl);
           toast.success('¡Imagen regenerada con éxito!');
         } else {
           console.error("Respuesta inesperada de la API:", result);
           toast.error('Error al obtener la imagen regenerada.');
         }
       } else {
-        // Use the standard generation endpoint
-        const response = await fetch(`https://api.tiendia.app/api/products/generate-ad/${currentProductId}`, {
-          method: "POST",
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ includeModel: true })
-        });
+        // Use the standard generation endpoint based on view
+        if (isDialogViewFront) {
+          // Use the standard generation endpoint
+          const response = await fetch(`https://api.tiendia.app/api/products/generate-ad/${currentProductId}`, {
+            method: "POST",
+            credentials: 'include',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ includeModel: true })
+          });
 
-        if (!response.ok) {
-          let errorMessage = `Error: ${response.status} ${response.statusText}`;
-          try {
-            const errorBody = await response.json();
-            errorMessage = errorBody.error || errorBody.message || errorMessage;
-          } catch (e) {
-            console.error("Could not parse error response body:", e);
+          if (!response.ok) {
+            let errorMessage = `Error: ${response.status} ${response.statusText}`;
+            try {
+              const errorBody = await response.json();
+              errorMessage = errorBody.error || errorBody.message || errorMessage;
+            } catch (e) {
+              console.error("Could not parse error response body:", e);
+            }
+            toast.error(`Error al regenerar: ${errorMessage}`);
+            throw new Error(errorMessage);
           }
-          toast.error(`Error al regenerar: ${errorMessage}`);
-          throw new Error(errorMessage);
-        }
 
-        const result = await response.json();
+          const result = await response.json();
 
-        if (result && result.adImageUrl && result.imageId) {
-          setUser(prevUser => (
-            prevUser ? { ...prevUser, credits: prevUser.credits - 50 } : null
-          ));
-          setCurrentAdImageUrl(result.adImageUrl);
-          toast.success('¡Imagen regenerada con éxito!');
+          if (result && result.adImageUrl && result.imageId) {
+            setUser(prevUser => (
+              prevUser ? { ...prevUser, credits: prevUser.credits - 50 } : null
+            ));
+            setCurrentAdImageUrl(result.adImageUrl);
+            toast.success('¡Imagen regenerada con éxito!');
+          } else {
+            console.error("Respuesta inesperada de la API:", result);
+            toast.error('Error al obtener la imagen regenerada.');
+          }
         } else {
-          console.error("Respuesta inesperada de la API:", result);
-          toast.error('Error al obtener la imagen regenerada.');
+          // Use the back-image endpoint
+          const response = await fetch(`https://api.tiendia.app/api/products/back-image/${currentProductId}`, {
+            method: "POST",
+            credentials: 'include',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({})
+          });
+
+          if (!response.ok) {
+            let errorMessage = `Error: ${response.status} ${response.statusText}`;
+            try {
+              const errorBody = await response.json();
+              errorMessage = errorBody.error || errorBody.message || errorMessage;
+            } catch (e) {
+              console.error("Could not parse error response body:", e);
+            }
+            toast.error(`Error al regenerar: ${errorMessage}`);
+            throw new Error(errorMessage);
+          }
+
+          const result = await response.json();
+
+          if (result && result.backImageUrl) {
+            setUser(prevUser => (
+              prevUser ? { ...prevUser, credits: prevUser.credits - 50 } : null
+            ));
+            setCurrentAdImageUrl(result.backImageUrl);
+            toast.success('¡Imagen regenerada con éxito!');
+          } else {
+            console.error("Respuesta inesperada de la API:", result);
+            toast.error('Error al obtener la imagen regenerada.');
+          }
         }
       }
     } catch (error: any) {
@@ -343,7 +389,11 @@ function App() {
 
     setLoading(true);
     try {
-      const response = await fetch(`https://api.tiendia.app/api/products/personalize/${currentProductId}`, {
+      const endpoint = isDialogViewFront 
+        ? `https://api.tiendia.app/api/products/personalize/${currentProductId}`
+        : `https://api.tiendia.app/api/products/back-image/${currentProductId}`;
+      
+      const response = await fetch(endpoint, {
         method: "POST",
         credentials: 'include',
         headers: {
@@ -365,12 +415,13 @@ function App() {
       }
 
       const result = await response.json();
+      const imageUrl = isDialogViewFront ? result.personalizedImageUrl : result.backImageUrl;
 
-      if (result && result.personalizedImageUrl) {
+      if (result && imageUrl) {
         setUser(prevUser => (
           prevUser ? { ...prevUser, credits: prevUser.credits - 50 } : null
         ));
-        setCurrentAdImageUrl(result.personalizedImageUrl);
+        setCurrentAdImageUrl(imageUrl);
         toast.success('¡Imagen regenerada con éxito!');
       } else {
         console.error("Respuesta inesperada de la API:", result);
@@ -406,6 +457,7 @@ function App() {
     setCurrentProductId(null);
     setCurrentPersonalization(null); // Reset personalization settings
     setIsPersonalizedImage(false); // Reset personalized image flag
+    setIsDialogViewFront(true); // Reset view to front
   };
 
   return (
@@ -595,9 +647,26 @@ function App() {
             <>
               {/* Encabezado del Diálogo */}
               <DialogHeader className="px-4 sm:px-6 pt-5 pb-4 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
-                <DialogTitle className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-gray-50 flex items-center">
-                  <Wand2 className="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3 text-purple-500" />
-                  Imagen Generada
+                <DialogTitle className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-gray-50 flex items-center justify-between">
+                  <div className="flex items-center">
+                    <Wand2 className="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3 text-purple-500" />
+                    Imagen Generada
+                  </div>
+                  {currentAdImageUrl && (
+                    <div className="flex items-center space-x-3">
+                      <span className={`text-sm font-medium transition-colors ${isDialogViewFront ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'}`}>
+                        Frente
+                      </span>
+                      <Switch
+                        checked={!isDialogViewFront}
+                        onCheckedChange={(checked) => setIsDialogViewFront(!checked)}
+                        className="data-[state=checked]:bg-blue-600"
+                      />
+                      <span className={`text-sm font-medium transition-colors ${!isDialogViewFront ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'}`}>
+                        Detrás
+                      </span>
+                    </div>
+                  )}
                 </DialogTitle>
                 <DialogDescription className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
                   Compara el antes y el después.
