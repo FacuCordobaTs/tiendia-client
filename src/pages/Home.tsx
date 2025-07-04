@@ -9,6 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter, // Importar DialogFooter
+  DialogDescription,
 } from "@/components/ui/dialog";
 // Importar Check si es necesario (no se usa en el código final actual) o quitar si no se usa.
 // import { Download, CreditCard, Sparkles, HelpCircle, Wand2, Image as ImageIcon, Check } from 'lucide-react';
@@ -713,37 +714,10 @@ function App() {
                     <Wand2 className="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3 text-purple-500" />
                     Imagen Generada
                   </div>
-                  {currentAdImageUrl && (
-                    <div className="flex items-center space-x-3">
-                      <div className="flex items-center space-x-2">
-                        <span className={`text-sm font-medium transition-colors ${isDialogViewFront ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'}`}>
-                          Frente
-                        </span>
-                        <Switch
-                          checked={!isDialogViewFront}
-                          onCheckedChange={(checked) => setIsDialogViewFront(!checked)}
-                          className="data-[state=checked]:bg-blue-600"
-                        />
-                        <span className={`text-sm font-medium transition-colors ${!isDialogViewFront ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'}`}>
-                          Detrás
-                        </span>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <span className={`text-sm font-medium transition-colors ${isDialogViewAdult ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'}`}>
-                          Adulto
-                        </span>
-                        <Switch
-                          checked={!isDialogViewAdult}
-                          onCheckedChange={(checked) => setIsDialogViewAdult(!checked)}
-                          className="data-[state=checked]:bg-blue-600"
-                        />
-                        <span className={`text-sm font-medium transition-colors ${!isDialogViewAdult ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'}`}>
-                          Bebé
-                        </span>
-                      </div>
-                    </div>
-                  )}
                 </DialogTitle>
+                <DialogDescription className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
+                  Compara el antes y el después.
+                </DialogDescription>
               </DialogHeader>
 
               {/* Contenido del Diálogo */}
