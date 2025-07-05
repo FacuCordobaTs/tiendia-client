@@ -111,7 +111,7 @@ export default function AdminProductCard({ product, handleGenerateAd, onEdit, up
         const data = await res.json();
         if (res.ok && data.backImageUrl) {
           if (typeof updateGeneratedImage === 'function') {
-            updateGeneratedImage(data.backImageUrl, false, false);
+            updateGeneratedImage(data.backImageUrl, false, true);
           }
         } else {
           alert(data.message || 'Error al generar la imagen de vista trasera');
