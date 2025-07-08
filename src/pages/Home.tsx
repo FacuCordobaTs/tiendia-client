@@ -58,7 +58,7 @@ function App() {
   const { products, getProducts } = useProduct();
   const navigate = useNavigate();
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
-  const [maintenance, setMaintenance] = useState(true); // Siempre en mantenimiento
+  const maintenance = true;
 
   // Add new function to update generated image
   const updateGeneratedImage = (imageUrl: string, isFrontView: boolean = true, isAdultView: boolean = true) => {
