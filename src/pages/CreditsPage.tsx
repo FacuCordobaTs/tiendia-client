@@ -16,11 +16,11 @@ const BASE_PACKS = [
 ];
 
 const ARG_PACKS = [
-    { id: 1, images: 1, price: 120, credits: 50 },
-    { id: 2, images: 10, price: 1200, credits: 500 },
-    { id: 3, images: 50, price: 5280, credits: 2500, discount: 12.5 },
-    { id: 4, images: 100, price: 10000, credits: 5000, discount: 16 }
-]
+    { id: 1, images: 1, priceUSD: 0.09, price: 120, credits: 50 },
+    { id: 2, images: 10, priceUSD: 0.9, price: 1200, credits: 500 },
+    { id: 3, images: 50, priceUSD: 3.96, price: 5280, credits: 2500, discount: 12.5 },
+    { id: 4, images: 100, priceUSD: 7.5, price: 10000, credits: 5000, discount: 16 }
+];
 
 // Exchange rates from USD to other currencies
 const EXCHANGE_RATES = [
@@ -86,6 +86,17 @@ const CURRENCY_INFO: { [key: string]: { symbol: string, locale: string, flag: st
     'EUR': { symbol: '€', locale: 'de-DE', flag: '🇪🇺' }
 };
 
+const LIMITED_PACK_COUNTRIES = [
+    'CO', // Colombia
+    'EC', // Ecuador
+    'GT', // Guatemala
+    'MX', // Mexico
+    'PA', // Panama
+    'PE', // Peru
+    'PY', // Paraguay
+    'UY', // Uruguay
+];
+
 function CreditsPage() {
     const { user } = useAuth();
     const [selectedPack, setSelectedPack] = useState<any>(null);
@@ -124,30 +135,25 @@ function CreditsPage() {
 
     const convertPacksToCurrency = (currency: string) => {
         const exchangeRate = EXCHANGE_RATES.find(rate => rate.target_currency === currency);
-        
+        let packsToUse = BASE_PACKS;
+        if (userCountry === 'AR') {
+            packsToUse = ARG_PACKS;
+        }
+        // Filter packs for limited countries
+        if (userCountry && LIMITED_PACK_COUNTRIES.includes(userCountry)) {
+            packsToUse = packsToUse.filter(pack => pack.id === 3 || pack.id === 4);
+        }
         if (!exchangeRate && currency !== 'USD') {
-            console.log(`No exchange rate found for ${currency}, using USD`);
-            if (userCountry === 'AR') {
-                setConvertedPacks(ARG_PACKS);
-            } else {
-                setConvertedPacks(BASE_PACKS);
-            }
+            setConvertedPacks(packsToUse);
             return;
         }
-
         const rate = exchangeRate ? exchangeRate.value : 1;
-        
-        const converted = BASE_PACKS.map(pack => ({
+        const converted = packsToUse.map(pack => ({
             ...pack,
-            price: Math.round(pack.priceUSD * rate * 100) / 100, // Round to 2 decimal places
+            price: 'price' in pack ? pack.price : Math.round(pack.priceUSD * rate * 100) / 100,
             originalPriceUSD: pack.priceUSD
         }));
-
-        if (userCountry === 'AR') {
-            setConvertedPacks(ARG_PACKS);
-        } else {
-            setConvertedPacks(converted);
-        }
+        setConvertedPacks(converted);
     };
 
     const formatPrice = (price: number, currency: string) => {
