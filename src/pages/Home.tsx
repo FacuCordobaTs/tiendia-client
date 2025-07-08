@@ -58,7 +58,7 @@ function App() {
   const { products, getProducts } = useProduct();
   const navigate = useNavigate();
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
-  const maintenance = true;
+  const maintenance = false;
 
   // Add new function to update generated image
   const updateGeneratedImage = (imageUrl: string, isFrontView: boolean = true, isAdultView: boolean = true) => {
@@ -125,7 +125,7 @@ function App() {
           }
           const rawError = await response.text().catch(() => "");
           console.error("❌ Raw error details:", rawError);
-          toast.error(`Error al generar: ${errorMessage}`);
+          toast.error(`Error al generar la imagen`);
           throw new Error(errorMessage);
         }
 
@@ -146,7 +146,7 @@ function App() {
         }
       } catch (error: any) {
         console.error('❌ Error in handleGenerateAd:', error);
-        toast.error(error.message || 'Ocurrió un error inesperado.', { id: 'error-toast' });
+        toast.error('Ocurrió un error inesperado.');
       } finally {
         console.log('🏁 Finishing generation process');
         setLoading(false);
@@ -288,7 +288,8 @@ function App() {
           } catch (e) {
             console.error("Could not parse error response body:", e);
           }
-          toast.error(`Error al regenerar: ${errorMessage}`);
+          toast.error(`Error al regenerar`);
+          console.error(errorMessage);
           throw new Error(errorMessage);
         }
 
@@ -333,7 +334,8 @@ function App() {
             } catch (e) {
               console.error("Could not parse error response body:", e);
             }
-            toast.error(`Error al regenerar: ${errorMessage}`);
+            toast.error(`Error al regenerar`);
+            console.error(errorMessage);
             throw new Error(errorMessage);
           }
 
@@ -368,7 +370,8 @@ function App() {
             } catch (e) {
               console.error("Could not parse error response body:", e);
             }
-            toast.error(`Error al regenerar: ${errorMessage}`);
+            toast.error(`Error al regenerar`);
+            console.error(errorMessage);
             throw new Error(errorMessage);
           }
 
@@ -403,7 +406,8 @@ function App() {
             } catch (e) {
               console.error("Could not parse error response body:", e);
             }
-            toast.error(`Error al regenerar: ${errorMessage}`);
+            toast.error(`Error al regenerar`);
+            console.error(errorMessage);
             throw new Error(errorMessage);
           }
 
@@ -423,7 +427,7 @@ function App() {
       }
     } catch (error: any) {
       console.error("Error en handleRegenerateImage:", error);
-      toast.error(error.message || 'Ocurrió un error inesperado.', { id: 'regenerate-error-toast' });
+      toast.error('Ocurrió un error inesperado.');
     } finally {
       setLoading(false);
     }
@@ -464,7 +468,8 @@ function App() {
         } catch (e) {
           console.error("Could not parse error response body:", e);
         }
-        toast.error(`Error al regenerar: ${errorMessage}`);
+        toast.error(`Error al regenerar`);
+        console.error(errorMessage);
         throw new Error(errorMessage);
       }
 
@@ -490,7 +495,7 @@ function App() {
       }
     } catch (error: any) {
       console.error("Error en regeneratePersonalizedImage:", error);
-      toast.error(error.message || 'Ocurrió un error inesperado.', { id: 'regenerate-error-toast' });
+      toast.error('Ocurrió un error inesperado.');
     } finally {
       setLoading(false);
     }
