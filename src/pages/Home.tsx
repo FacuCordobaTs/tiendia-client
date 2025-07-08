@@ -58,6 +58,7 @@ function App() {
   const { products, getProducts } = useProduct();
   const navigate = useNavigate();
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
+  const [maintenance, setMaintenance] = useState(true); // Siempre en mantenimiento
 
   // Add new function to update generated image
   const updateGeneratedImage = (imageUrl: string, isFrontView: boolean = true, isAdultView: boolean = true) => {
@@ -523,6 +524,14 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-950 md:pt-6 md:pl-72 pt-16 px-4 flex flex-col">
+      {/* MODAL DE MANTENIMIENTO */}
+      <Dialog open={maintenance}>
+        <DialogContent className="max-w-md text-center flex flex-col items-center justify-center">
+          <DialogTitle className="text-2xl font-bold mb-2">Sitio en mantenimiento</DialogTitle>
+          <p className="text-base text-gray-700 dark:text-gray-200 mb-4">La generación de imágenes está temporalmente deshabilitada.<br/>Estamos trabajando para restablecer el servicio.<br/></p>
+        </DialogContent>
+      </Dialog>
+      {/* RESTO DE LA UI (queda bloqueada por el modal) */}
       <AdminSidebar />
       {isDialogOpen && editingProduct && (
         <EditProductForm
