@@ -554,6 +554,9 @@ function App() {
             <span>tiendia.app</span>
           </div>
         </h1>
+        <p className="text-sm text-gray-600 dark:text-gray-400 mt-2 pl-0 md:pl-4">
+          {user?.email}
+        </p>
         <div className="flex flex-wrap gap-3 mt-4 items-center pl-0 md:pl-4">
           <div className="flex items-center bg-white dark:bg-gray-800 shadow-sm rounded-lg px-3 py-1.5 border border-gray-200 dark:border-gray-700">
             <Sparkles className="h-4 w-4 text-yellow-500 mr-2" />
