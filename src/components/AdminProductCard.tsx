@@ -77,7 +77,7 @@ export default function AdminProductCard({ product, handleGenerateAd, onEdit, up
   const [isAdultView, setIsAdultView] = useState(true);
 
   // Obtener información del usuario actual
-  const { user } = useAuth();
+  const { user, setUser } = useAuth();
 
   const navigate = useNavigate();
 
@@ -113,6 +113,10 @@ export default function AdminProductCard({ product, handleGenerateAd, onEdit, up
           if (typeof updateGeneratedImage === 'function') {
             updateGeneratedImage(data.backImageUrl, false, true);
           }
+          // Descontar 50 créditos por imagen de espalda
+          setUser(prevUser => (
+            prevUser ? { ...prevUser, credits: prevUser.credits - 50 } : null
+          ));
         } else {
           alert(data.message || 'Error al generar la imagen de vista trasera');
         }
@@ -139,6 +143,10 @@ export default function AdminProductCard({ product, handleGenerateAd, onEdit, up
           if (typeof updateGeneratedImage === 'function') {
             updateGeneratedImage(data.babyImageUrl, true, false);
           }
+          // Descontar 50 créditos por imagen de bebé
+          setUser(prevUser => (
+            prevUser ? { ...prevUser, credits: prevUser.credits - 50 } : null
+          ));
         } else {
           alert(data.message || 'Error al generar la imagen de bebé');
         }
@@ -165,6 +173,10 @@ export default function AdminProductCard({ product, handleGenerateAd, onEdit, up
           if (typeof updateGeneratedImage === 'function') {
             updateGeneratedImage(data.babyImageUrl, false, false);
           }
+          // Descontar 50 créditos por imagen de bebé
+          setUser(prevUser => (
+            prevUser ? { ...prevUser, credits: prevUser.credits - 50 } : null
+          ));
         } else {
           alert(data.message || 'Error al generar la imagen de bebé');
         }
@@ -331,6 +343,10 @@ export default function AdminProductCard({ product, handleGenerateAd, onEdit, up
                             updateGeneratedImage(imageUrl, isFrontView, isAdultView);
                           }
                           setPersonalizedImageFlag(true);
+                          // Descontar 50 créditos por imagen personalizada
+                          setUser(prevUser => (
+                            prevUser ? { ...prevUser, credits: prevUser.credits - 50 } : null
+                          ));
                         } else {
                           alert(data.message || `Error al generar la imagen ${isFrontView ? 'personalizada' : 'de vista trasera'}`);
                         }

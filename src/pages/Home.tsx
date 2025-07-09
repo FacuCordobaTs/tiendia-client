@@ -13,7 +13,8 @@ import {
 } from "@/components/ui/dialog";
 // Importar Check si es necesario (no se usa en el código final actual) o quitar si no se usa.
 // import { Download, CreditCard, Sparkles, HelpCircle, Wand2, Image as ImageIcon, Check } from 'lucide-react';
-import { Download, CreditCard, Sparkles, HelpCircle, Wand2, Image as ImageIcon, RefreshCw, X, Instagram, MessageCircle, Pencil } from 'lucide-react'; // Asegurarse de que ImageIcon esté importado
+import { Download, CreditCard, Sparkles, HelpCircle, Wand2, Image as ImageIcon, RefreshCw, X, Instagram, MessageCircle, Pencil } from 'lucide-react'; 
+// import { Download, CreditCard, Sparkles, HelpCircle, Wand2, Image as ImageIcon, RefreshCw, X, Instagram, MessageCircle, Pencil, Store, DollarSign } from 'lucide-react'; // Asegurarse de que ImageIcon esté importado
 import { ScrollArea } from '@/components/ui/scroll-area';
 import AdminProductCard from '@/components/AdminProductCard';
 import { Button } from '@/components/ui/button';
@@ -341,10 +342,11 @@ function App() {
 
           const result = await response.json();
 
+          setUser(prevUser => (
+            prevUser ? { ...prevUser, credits: prevUser.credits - 50 } : null
+          ));
+
           if (result && result.adImageUrl && result.imageId) {
-            setUser(prevUser => (
-              prevUser ? { ...prevUser, credits: prevUser.credits - 50 } : null
-            ));
             setCurrentAdImageUrl(result.adImageUrl);
             toast.success('¡Imagen regenerada con éxito!');
           } else {
@@ -377,10 +379,10 @@ function App() {
 
           const result = await response.json();
 
+          setUser(prevUser => (
+            prevUser ? { ...prevUser, credits: prevUser.credits - 50 } : null
+          ));
           if (result && result.backImageUrl) {
-            setUser(prevUser => (
-              prevUser ? { ...prevUser, credits: prevUser.credits - 50 } : null
-            ));
             setCurrentAdImageUrl(result.backImageUrl);
             toast.success('¡Imagen regenerada con éxito!');
           } else {
@@ -413,10 +415,11 @@ function App() {
 
           const result = await response.json();
 
+          setUser(prevUser => (
+            prevUser ? { ...prevUser, credits: prevUser.credits - 50 } : null
+          ));
+
           if (result && result.babyImageUrl) {
-            setUser(prevUser => (
-              prevUser ? { ...prevUser, credits: prevUser.credits - 50 } : null
-            ));
             setCurrentAdImageUrl(result.babyImageUrl);
             toast.success('¡Imagen regenerada con éxito!');
           } else {
@@ -483,10 +486,10 @@ function App() {
         imageUrl = result.babyImageUrl;
       }
 
+      setUser(prevUser => (
+        prevUser ? { ...prevUser, credits: prevUser.credits - 50 } : null
+      ));
       if (result && imageUrl) {
-        setUser(prevUser => (
-          prevUser ? { ...prevUser, credits: prevUser.credits - 50 } : null
-        ));
         setCurrentAdImageUrl(imageUrl);
         toast.success('¡Imagen regenerada con éxito!');
       } else {
@@ -504,6 +507,14 @@ function App() {
   const navigateToCredits = () => {
     navigate('/credits');
   };
+
+  // const navigateToMiTiendia = () => {
+  //   navigate('/mi-tiendia');
+  // };
+
+  // const navigateToPricing = () => {
+  //   navigate('/product-pricing');
+  // };
 
   useEffect(() => {
     getProducts();
@@ -661,6 +672,73 @@ function App() {
         <p className="text-base text-gray-600 dark:text-gray-400 mb-6 pl-0 md:pl-4">
           Sube tus productos y genera imágenes profesionales en segundos ✨
         </p>
+{/*         
+        <div className="mb-8 pl-0 md:pl-4">
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-4 md:p-6 shadow-lg border border-gray-200 dark:border-gray-700">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+              <div className="flex-1 text-center md:text-left">
+                <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2 flex items-center justify-center md:justify-start gap-2">
+                  <Store className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                  ¡Prueba Mi Tiendia!
+                </h2>
+                <p className="text-gray-700 dark:text-gray-300 text-sm md:text-base">
+                  Vende tus productos online con una tienda virtual basada en los artículos que ya subiste. Recibe pedidos directamente por WhatsApp.
+                </p>
+              </div>
+              <div className="flex flex-col sm:flex-row items-center gap-3">
+                <div className="flex items-center gap-2 bg-blue-50 dark:bg-blue-900/30 rounded-lg px-3 py-2">
+                  <MessageCircle className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                  <div className="text-gray-900 dark:text-gray-100">
+                    <p className="text-xs font-medium">Pedidos por</p>
+                    <p className="text-lg font-bold">WhatsApp</p>
+                  </div>
+                </div>
+                <div className="flex flex-col gap-2">
+                  <Button
+                    onClick={navigateToMiTiendia}
+                    className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-2 rounded-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300"
+                  >
+                    <Store className="mr-2 h-4 w-4" />
+                    Crear Ahora
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div className="mb-8 pl-0 md:pl-4">
+          <div className="bg-gradient-to-r from-green-600 to-emerald-500 rounded-xl p-4 md:p-6 shadow-lg">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+              <div className="flex-1 text-center md:text-left">
+                <h2 className="text-xl md:text-2xl font-bold text-white mb-2 flex items-center justify-center md:justify-start gap-2">
+                  <DollarSign className="h-5 w-5" />
+                  ¡Configura los Precios!
+                </h2>
+                <p className="text-white/90 text-sm md:text-base">
+                  Establece precios para tus productos de forma fácil e intuitiva. Organiza tu catálogo para vender mejor.
+                </p>
+              </div>
+              <div className="flex flex-col sm:flex-row items-center gap-3">
+                <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-lg px-3 py-2">
+                  <DollarSign className="h-5 w-5 text-white" />
+                  <div className="text-white">
+                    <p className="text-xs font-medium">Precios</p>
+                    <p className="text-lg font-bold">ARS</p>
+                  </div>
+                </div>
+                <Button
+                  onClick={navigateToPricing}
+                  className="bg-white text-green-600 hover:bg-white/90 px-6 py-2 rounded-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300"
+                >
+                  <DollarSign className="mr-2 h-4 w-4" />
+                  Configurar Precios
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+         */}
         <AddProductForm
           open={isAddProductDialogOpen}
           onOpenChange={setIsAddProductDialogOpen}

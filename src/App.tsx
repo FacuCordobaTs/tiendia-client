@@ -11,6 +11,8 @@ import GeneratedImagesPage from "./pages/GeneratedImages";
 import CreditsPage from "./pages/CreditsPage";
 import SettingsPage from "./pages/SettingsPage";
 import AutoChargePage from "./pages/AutoChargePage"; // Importar la nueva página
+import MiTiendiaForm from "./pages/MiTiendiaForm"; // Importar la nueva página de Mi Tiendia
+import ProductPricingPage from "./pages/ProductPricingPage"; // Importar la nueva página de precios
 
 function App() {
 
@@ -46,6 +48,16 @@ function App() {
                 <Route path="/auto-charge" element={ // Añadir la nueva ruta
                   <PrivateRoute>
                     <AutoChargePage />
+                  </PrivateRoute>
+                } />
+                <Route path="/mi-tiendia" element={ // Añadir la nueva ruta de Mi Tiendia
+                  <PrivateRoute>
+                    <MiTiendiaForm />
+                  </PrivateRoute>
+                } />
+                <Route path="/product-pricing" element={ // Añadir la nueva ruta de precios
+                  <PrivateRoute>
+                    <ProductPricingPage />
                   </PrivateRoute>
                 } />
               </Routes>
