@@ -398,7 +398,7 @@ function ProductPricingPage() {
                     </div>
                   ) : (
                     <div className="space-y-3">
-                      {product.sizes.map((size, index) => (
+                      {product.sizes.map((size) => (
                         <div key={size.id} className="group relative p-4 bg-gradient-to-r from-gray-50 to-white dark:from-gray-700/50 dark:to-gray-800/50 rounded-2xl border border-gray-200 dark:border-gray-600 hover:border-purple-300 dark:hover:border-purple-600 transition-all duration-200 shadow-sm hover:shadow-md">
                           <div className="flex items-center gap-3">
                             <div className="flex-1">
