@@ -1,14 +1,16 @@
 import { Button } from "@/components/ui/button";
-import { Menu, Package2, Settings, HelpCircle, Mail, Image, CreditCard } from "lucide-react";
+import { Menu, Package2, Settings, HelpCircle, Mail, Image, CreditCard, Store } from "lucide-react";
 import { NavLink } from "react-router";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "./ui/drawer";
 import { ScrollArea } from "./ui/scroll-area";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "./ui/dialog";
 import { FaWhatsapp } from "react-icons/fa";
+import { useAuth } from "@/context/AuthContext";
 
 export default function AdminSidebar() {
   const [isHelpOpen, setIsHelpOpen] = useState(false);
+  const { user } = useAuth();
 
   return (
     <>
@@ -54,6 +56,20 @@ export default function AdminSidebar() {
               </NavLink>
 
               <NavLink
+                to="/mi-tiendia-admin"
+                className={({ isActive }) =>
+                  `flex items-center gap-2 rounded-lg px-3 py-2 transition-all ${
+                    isActive ? 'bg-muted text-foreground' : 'text-muted-foreground hover:text-foreground'
+                  }`
+                }
+              >
+                <Store className="h-5 w-5" />
+                Mi Tiendia
+              </NavLink>
+              
+              {
+                user?.username &&
+                <NavLink
                 to="/credits"
                 className={({ isActive }) =>
                   `flex items-center gap-2 rounded-lg px-3 py-2 transition-all ${
@@ -64,6 +80,7 @@ export default function AdminSidebar() {
                 <CreditCard className="h-5 w-5" />
                 Comprar imágenes
               </NavLink>
+              }
               
               <NavLink
                 to="/settings"
@@ -120,6 +137,22 @@ export default function AdminSidebar() {
             <Image className="h-5 w-5" />
             Imagenes
           </NavLink>
+
+          {
+            // user?.username && (
+            // <NavLink
+            //   to="/mi-tiendia-admin"
+            //   className={({ isActive }) =>
+            //     `flex items-center gap-2 rounded-lg px-3 py-2 transition-all ${
+            //       isActive ? 'bg-muted text-foreground' : 'text-muted-foreground hover:text-foreground'
+            //     }`
+            //   }
+            // >
+            //   <Store className="h-5 w-5" />
+            //   Mi Tiendia
+            // </NavLink>
+            // )
+          }
 
           <NavLink
             to="/credits"

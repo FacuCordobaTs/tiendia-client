@@ -5,6 +5,12 @@ interface User {
   email: string;
   password: string;
   credits: number;
+  name?: string;
+  username?: string;
+  phone?: string;
+  imageUrl?: string;
+  paidMiTienda?: boolean;
+  paidMiTiendaDate?: string;
 }
 
 interface SignUpUserInfo {
@@ -64,7 +70,18 @@ export default function AuthProvider({ children }: AuthProviderProps) {
       }
 
       const data = await response.json();
-      setUser(data.user[0]);
+      setUser({
+        id: data.user[0].id,
+        email: data.user[0].email,
+        password: data.user[0].password,
+        credits: data.user[0].credits,
+        name: data.user[0].name,
+        username: data.user[0].username,
+        phone: data.user[0].phone,
+        imageUrl: data.user[0].imageUrl,
+        paidMiTienda: data.user[0].paidMiTienda,
+        paidMiTiendaDate: data.user[0].paidMiTiendaDate,
+      });
       return true;
     } catch (error) {
       console.error("Login error:", error);
@@ -91,7 +108,18 @@ export default function AuthProvider({ children }: AuthProviderProps) {
       }
 
       const data = await response.json();
-      setUser(data.user[0]);
+      setUser({
+        id: data.user[0].id,
+        email: data.user[0].email,
+        password: data.user[0].password,
+        credits: data.user[0].credits,
+        name: data.user[0].name,
+        username: data.user[0].username,
+        phone: data.user[0].phone,
+        imageUrl: data.user[0].imageUrl,
+        paidMiTienda: data.user[0].paidMiTienda,
+        paidMiTiendaDate: data.user[0].paidMiTiendaDate,
+      });
       return true;
     } catch (error) {
       console.error("Register error:", error);
@@ -138,7 +166,19 @@ export default function AuthProvider({ children }: AuthProviderProps) {
       }
       const data = await response.json();
       // The user may be in data.user or data.user[0]
-      setUser(data.user[0] || data.user);
+      const userData = data.user[0] || data.user;
+      setUser({
+        id: userData.id,
+        email: userData.email,
+        password: userData.password,
+        credits: userData.credits,
+        name: userData.name,
+        username: userData.username,
+        phone: userData.phone,
+        imageUrl: userData.imageUrl,
+        paidMiTienda: userData.paidMiTienda,
+        paidMiTiendaDate: userData.paidMiTiendaDate,
+      });
       return true;
     } catch (error) {
       throw error;
@@ -160,6 +200,12 @@ export default function AuthProvider({ children }: AuthProviderProps) {
             email: data.user[0].email,
             password: data.user[0].password,
             credits: data.user[0].credits,
+            name: data.user[0].name,
+            username: data.user[0].username,
+            phone: data.user[0].phone,
+            imageUrl: data.user[0].imageUrl,
+            paidMiTienda: data.user[0].paidMiTienda,
+            paidMiTiendaDate: data.user[0].paidMiTiendaDate,
           });
         } else {
           setUser(null);

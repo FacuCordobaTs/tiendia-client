@@ -4,9 +4,12 @@ import { useAuth } from "./AuthContext";
 interface Product {
   id: number;
   name: string;
-  imageURL: string ;
+  imageURL: string;
   createdAt: Date;
   createdBy: number;
+  price?: number;
+  sizes?: string; // JSON string from database
+  stock?: number;
 }
 interface ProductAndImage {
   id: number;
@@ -48,9 +51,15 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
         const data = await response.json();
         if (data.products.length > 1) 
           setProducts(data.products.map((p: any) => ({
-            ...p
+            ...p,
+            price: p.price ?? undefined, // Convert null to undefined
+            createdAt: new Date(p.createdAt)
           })));
-        else setProducts(data.products)
+        else setProducts(data.products.map((p: any) => ({
+          ...p,
+          price: p.price ?? undefined, // Convert null to undefined
+          createdAt: new Date(p.createdAt)
+        })))
       }
     } catch (error) {
       console.error("Error fetching products:", error);

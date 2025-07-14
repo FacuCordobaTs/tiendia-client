@@ -13,8 +13,7 @@ import {
 } from "@/components/ui/dialog";
 // Importar Check si es necesario (no se usa en el código final actual) o quitar si no se usa.
 // import { Download, CreditCard, Sparkles, HelpCircle, Wand2, Image as ImageIcon, Check } from 'lucide-react';
-import { Download, CreditCard, Sparkles, HelpCircle, Wand2, Image as ImageIcon, RefreshCw, X, Instagram, MessageCircle, Pencil } from 'lucide-react'; 
-// import { Download, CreditCard, Sparkles, HelpCircle, Wand2, Image as ImageIcon, RefreshCw, X, Instagram, MessageCircle, Pencil, Store, DollarSign } from 'lucide-react'; // Asegurarse de que ImageIcon esté importado
+import { Download, CreditCard, Sparkles, HelpCircle, Wand2, Image as ImageIcon, RefreshCw, X, Instagram, MessageCircle, Pencil  } from 'lucide-react'; // Asegurarse de que ImageIcon esté importado
 import { ScrollArea } from '@/components/ui/scroll-area';
 import AdminProductCard from '@/components/AdminProductCard';
 import { Button } from '@/components/ui/button';
@@ -60,7 +59,6 @@ function App() {
   const navigate = useNavigate();
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
   const maintenance = false;
-
   // Add new function to update generated image
   const updateGeneratedImage = (imageUrl: string, isFrontView: boolean = true, isAdultView: boolean = true) => {
     console.log('🖼️ Updating generated image URL:', imageUrl, 'View:', isFrontView ? 'Front' : 'Back', 'Type:', isAdultView ? 'Adult' : 'Baby');
@@ -152,70 +150,8 @@ function App() {
         console.log('🏁 Finishing generation process');
         setLoading(false);
       }
-    } else {
-      console.log('🚀 Starting Pro generation process');
-      // For Pro generation, we don't need to do anything here as the SSE connection
-      // in AdminProductCard will handle the image updates
-      // We just need to keep the dialog open and show the loading state
     }
   };
-
-  // const handleModifyImage = async () => {
-  //   if (!currentImageId || !modificationPrompt) {
-  //     toast.error('Ingresa las instrucciones para modificar.');
-  //     return;
-  //   }
-  //   if (!user || user.credits < 50) {
-  //     toast.error('Créditos insuficientes para modificar la imagen.');
-  //     return;
-  //   }
-
-  //   setIsModifying(true);
-  //   try {
-  //     const response = await fetch(`https://api.tiendia.app/api/products/images/modify/${currentImageId}`, {
-  //       method: "POST",
-  //       credentials: 'include',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify({ prompt: modificationPrompt }),
-  //     });
-
-  //     if (!response.ok) {
-  //       let errorMessage = `Error: ${response.status} ${response.statusText}`;
-  //       try {
-  //         const errorBody = await response.json();
-  //         errorMessage = errorBody.error || errorBody.message || errorMessage;
-  //       } catch (e) {
-  //         console.error("Could not parse error response body:", e);
-  //       }
-  //       const rawError = await response.text().catch(() => "");
-  //       console.error("Detalles del error de modificación:", rawError);
-  //       toast.error(`Error al modificar: ${errorMessage}`);
-  //       throw new Error(errorMessage);
-  //     }
-
-  //     const result = await response.json();
-
-  //     if (result && result.modifiedImageUrl && result.imageId) {
-  //       setUser(prevUser => (
-  //         prevUser ? { ...prevUser, credits: prevUser.credits - 50 } : null
-  //       ));
-  //       setCurrentAdImageUrl(result.modifiedImageUrl);
-  //       setCurrentImageId(result.imageId);
-  //       toast.success('¡Imagen modificada con éxito!');
-  //       setModificationPrompt('');
-  //     } else {
-  //       console.error("Respuesta inesperada de la API (modificación):", result);
-  //       toast.error('Error al obtener la imagen modificada.');
-  //     }
-  //   } catch (error: any) {
-  //     console.error("Error en handleModifyImage:", error);
-  //     toast.error(error.message || 'Ocurrió un error al modificar.', { id: 'modify-error-toast' });
-  //   } finally {
-  //     setIsModifying(false);
-  //   }
-  // };
 
   const handleDownloadImage = async () => {
     if (!currentAdImageUrl) return;
@@ -246,221 +182,47 @@ function App() {
     }
   };
 
-  const handleRegenerateImage = async () => {
+const handleRegenerateImage = async () => {
     if (!currentProductId || !user || user.credits < 50) {
       toast.error('No te quedan imágenes disponibles.');
-      navigate('/credits');
-      return;
-    }
-
-    // If we know this was a personalized image, always use personalization
-    if (isPersonalizedImage && currentPersonalization) {
-      await regeneratePersonalizedImage();
-      return;
-    }
-
-    setLoading(true);
-    try {
-      // If we have personalization settings, use the appropriate endpoint based on view
-      if (currentPersonalization && Object.keys(currentPersonalization).length > 0) {
-        let endpoint;
-        if (isDialogViewFront && isDialogViewAdult) {
-          endpoint = `https://api.tiendia.app/api/products/personalize/${currentProductId}`;
-        } else if (!isDialogViewFront && isDialogViewAdult) {
-          endpoint = `https://api.tiendia.app/api/products/back-image/${currentProductId}`;
-        } else {
-          endpoint = `https://api.tiendia.app/api/products/baby-image/${currentProductId}`;
-        }
-        
-        const response = await fetch(endpoint, {
-          method: "POST",
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(currentPersonalization),
-        });
-
-        if (!response.ok) {
-          let errorMessage = `Error: ${response.status} ${response.statusText}`;
-          try {
-            const errorBody = await response.json();
-            errorMessage = errorBody.error || errorBody.message || errorMessage;
-          } catch (e) {
-            console.error("Could not parse error response body:", e);
-          }
-          toast.error(`Error al regenerar`);
-          console.error(errorMessage);
-          throw new Error(errorMessage);
-        }
-
-        const result = await response.json();
-        let imageUrl;
-        if (isDialogViewFront && isDialogViewAdult) {
-          imageUrl = result.personalizedImageUrl;
-        } else if (!isDialogViewFront && isDialogViewAdult) {
-          imageUrl = result.backImageUrl;
-        } else {
-          imageUrl = result.babyImageUrl;
-        }
-
-        if (result && imageUrl) {
-          setUser(prevUser => (
-            prevUser ? { ...prevUser, credits: prevUser.credits - 50 } : null
-          ));
-          setCurrentAdImageUrl(imageUrl);
-          toast.success('¡Imagen regenerada con éxito!');
-        } else {
-          console.error("Respuesta inesperada de la API:", result);
-          toast.error('Error al obtener la imagen regenerada.');
-        }
-      } else {
-        // Use the standard generation endpoint based on view
-        if (isDialogViewFront && isDialogViewAdult) {
-          // Use the standard generation endpoint
-          const response = await fetch(`https://api.tiendia.app/api/products/generate-ad/${currentProductId}`, {
-            method: "POST",
-            credentials: 'include',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ includeModel: true })
-          });
-
-          if (!response.ok) {
-            let errorMessage = `Error: ${response.status} ${response.statusText}`;
-            try {
-              const errorBody = await response.json();
-              errorMessage = errorBody.error || errorBody.message || errorMessage;
-            } catch (e) {
-              console.error("Could not parse error response body:", e);
-            }
-            toast.error(`Error al regenerar`);
-            console.error(errorMessage);
-            throw new Error(errorMessage);
-          }
-
-          const result = await response.json();
-
-          setUser(prevUser => (
-            prevUser ? { ...prevUser, credits: prevUser.credits - 50 } : null
-          ));
-
-          if (result && result.adImageUrl && result.imageId) {
-            setCurrentAdImageUrl(result.adImageUrl);
-            toast.success('¡Imagen regenerada con éxito!');
-          } else {
-            console.error("Respuesta inesperada de la API:", result);
-            toast.error('Error al obtener la imagen regenerada.');
-          }
-        } else if (!isDialogViewFront && isDialogViewAdult) {
-          // Use the back-image endpoint
-          const response = await fetch(`https://api.tiendia.app/api/products/back-image/${currentProductId}`, {
-            method: "POST",
-            credentials: 'include',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({})
-          });
-
-          if (!response.ok) {
-            let errorMessage = `Error: ${response.status} ${response.statusText}`;
-            try {
-              const errorBody = await response.json();
-              errorMessage = errorBody.error || errorBody.message || errorMessage;
-            } catch (e) {
-              console.error("Could not parse error response body:", e);
-            }
-            toast.error(`Error al regenerar`);
-            console.error(errorMessage);
-            throw new Error(errorMessage);
-          }
-
-          const result = await response.json();
-
-          setUser(prevUser => (
-            prevUser ? { ...prevUser, credits: prevUser.credits - 50 } : null
-          ));
-          if (result && result.backImageUrl) {
-            setCurrentAdImageUrl(result.backImageUrl);
-            toast.success('¡Imagen regenerada con éxito!');
-          } else {
-            console.error("Respuesta inesperada de la API:", result);
-            toast.error('Error al obtener la imagen regenerada.');
-          }
-        } else {
-          // Use the baby-image endpoint
-          const response = await fetch(`https://api.tiendia.app/api/products/baby-image/${currentProductId}`, {
-            method: "POST",
-            credentials: 'include',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({})
-          });
-
-          if (!response.ok) {
-            let errorMessage = `Error: ${response.status} ${response.statusText}`;
-            try {
-              const errorBody = await response.json();
-              errorMessage = errorBody.error || errorBody.message || errorMessage;
-            } catch (e) {
-              console.error("Could not parse error response body:", e);
-            }
-            toast.error(`Error al regenerar`);
-            console.error(errorMessage);
-            throw new Error(errorMessage);
-          }
-
-          const result = await response.json();
-
-          setUser(prevUser => (
-            prevUser ? { ...prevUser, credits: prevUser.credits - 50 } : null
-          ));
-
-          if (result && result.babyImageUrl) {
-            setCurrentAdImageUrl(result.babyImageUrl);
-            toast.success('¡Imagen regenerada con éxito!');
-          } else {
-            console.error("Respuesta inesperada de la API:", result);
-            toast.error('Error al obtener la imagen regenerada.');
-          }
-        }
+      if (user && user.credits < 50) {
+        navigate('/credits');
       }
-    } catch (error: any) {
-      console.error("Error en handleRegenerateImage:", error);
-      toast.error('Ocurrió un error inesperado.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const regeneratePersonalizedImage = async () => {
-    if (!currentProductId || !user || user.credits < 50) {
-      toast.error('No te quedan imágenes disponibles.');
-      navigate('/credits');
       return;
     }
 
     setLoading(true);
+
     try {
-      let endpoint;
+      const isPersonalized = currentPersonalization && Object.keys(currentPersonalization).length > 0;
+      let endpoint = '';
+      let body: object = isPersonalized ? currentPersonalization : {};
+
+      // 1. Determinar el endpoint y el cuerpo de la petición correctos
       if (isDialogViewFront && isDialogViewAdult) {
-        endpoint = `https://api.tiendia.app/api/products/personalize/${currentProductId}`;
+        // Vista frontal de adulto: puede ser estándar o personalizada
+        if (isPersonalized) {
+          endpoint = `https://api.tiendia.app/api/products/personalize/${currentProductId}`;
+        } else {
+          endpoint = `https://api.tiendia.app/api/products/generate-ad/${currentProductId}`;
+          body = { includeModel: true }; // La generación estándar usa un body diferente
+        }
       } else if (!isDialogViewFront && isDialogViewAdult) {
+        // Vista de espalda de adulto: puede ser personalizada
         endpoint = `https://api.tiendia.app/api/products/back-image/${currentProductId}`;
       } else {
+        // Vista de bebé: puede ser personalizada
         endpoint = `https://api.tiendia.app/api/products/baby-image/${currentProductId}`;
       }
       
+      // 2. Realizar la llamada a la API
       const response = await fetch(endpoint, {
         method: "POST",
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(currentPersonalization),
+        body: JSON.stringify(body),
       });
 
       if (!response.ok) {
@@ -472,37 +234,43 @@ function App() {
           console.error("Could not parse error response body:", e);
         }
         toast.error(`Error al regenerar`);
-        console.error(errorMessage);
         throw new Error(errorMessage);
       }
 
       const result = await response.json();
+      
+      // 3. Extraer la URL de la imagen de la respuesta
       let imageUrl;
       if (isDialogViewFront && isDialogViewAdult) {
-        imageUrl = result.personalizedImageUrl;
+        imageUrl = result.personalizedImageUrl || result.adImageUrl;
       } else if (!isDialogViewFront && isDialogViewAdult) {
         imageUrl = result.backImageUrl;
       } else {
         imageUrl = result.babyImageUrl;
       }
-
-      setUser(prevUser => (
-        prevUser ? { ...prevUser, credits: prevUser.credits - 50 } : null
-      ));
+      
+      // 4. Actualizar el estado si la operación fue exitosa
       if (result && imageUrl) {
+        setUser(prevUser => (
+          prevUser ? { ...prevUser, credits: prevUser.credits - 50 } : null
+        ));
         setCurrentAdImageUrl(imageUrl);
         toast.success('¡Imagen regenerada con éxito!');
       } else {
         console.error("Respuesta inesperada de la API:", result);
         toast.error('Error al obtener la imagen regenerada.');
       }
+
     } catch (error: any) {
-      console.error("Error en regeneratePersonalizedImage:", error);
+      console.error("Error en handleRegenerateImage:", error);
       toast.error('Ocurrió un error inesperado.');
     } finally {
       setLoading(false);
     }
   };
+
+
+
 
   const navigateToCredits = () => {
     navigate('/credits');
@@ -511,11 +279,7 @@ function App() {
   // const navigateToMiTiendia = () => {
   //   navigate('/mi-tiendia');
   // };
-
-  // const navigateToPricing = () => {
-  //   navigate('/product-pricing');
-  // };
-
+  
   useEffect(() => {
     getProducts();
     const tutorialSeen = localStorage.getItem('tutorialSeen');
@@ -534,6 +298,7 @@ function App() {
     setCurrentProductId(null);
     setCurrentPersonalization(null); // Reset personalization settings
     setIsPersonalizedImage(false); // Reset personalized image flag
+    console.log(isPersonalizedImage)
     setIsDialogViewFront(true); // Reset view to front
     setIsDialogViewAdult(true); // Reset view to adult
   };
@@ -673,71 +438,63 @@ function App() {
           Sube tus productos y genera imágenes profesionales en segundos ✨
         </p>
 {/*         
-        <div className="mb-8 pl-0 md:pl-4">
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-4 md:p-6 shadow-lg border border-gray-200 dark:border-gray-700">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-              <div className="flex-1 text-center md:text-left">
-                <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2 flex items-center justify-center md:justify-start gap-2">
-                  <Store className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                  ¡Prueba Mi Tiendia!
-                </h2>
-                <p className="text-gray-700 dark:text-gray-300 text-sm md:text-base">
-                  Vende tus productos online con una tienda virtual basada en los artículos que ya subiste. Recibe pedidos directamente por WhatsApp.
-                </p>
-              </div>
-              <div className="flex flex-col sm:flex-row items-center gap-3">
-                <div className="flex items-center gap-2 bg-blue-50 dark:bg-blue-900/30 rounded-lg px-3 py-2">
-                  <MessageCircle className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                  <div className="text-gray-900 dark:text-gray-100">
-                    <p className="text-xs font-medium">Pedidos por</p>
-                    <p className="text-lg font-bold">WhatsApp</p>
-                  </div>
-                </div>
-                <div className="flex flex-col gap-2">
-                  <Button
-                    onClick={navigateToMiTiendia}
-                    className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-2 rounded-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300"
-                  >
-                    <Store className="mr-2 h-4 w-4" />
-                    Crear Ahora
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div className="mb-8 pl-0 md:pl-4">
-          <div className="bg-gradient-to-r from-green-600 to-emerald-500 rounded-xl p-4 md:p-6 shadow-lg">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-              <div className="flex-1 text-center md:text-left">
+        {
+          user?.username ? (
+            <div className="mb-6 pl-0 md:pl-4">
+              <div className="bg-gradient-to-r from-purple-600 to-blue-500 rounded-xl p-4 md:p-6 shadow-lg">
                 <h2 className="text-xl md:text-2xl font-bold text-white mb-2 flex items-center justify-center md:justify-start gap-2">
-                  <DollarSign className="h-5 w-5" />
-                  ¡Configura los Precios!
+                  <Sparkles className="h-5 w-5" />
+                  ¡Bienvenido de nuevo, {user.name}!
                 </h2>
                 <p className="text-white/90 text-sm md:text-base">
-                  Establece precios para tus productos de forma fácil e intuitiva. Organiza tu catálogo para vender mejor.
+                  Tu tienda virtual está lista para que puedas empezar a vender.
                 </p>
-              </div>
-              <div className="flex flex-col sm:flex-row items-center gap-3">
-                <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-lg px-3 py-2">
-                  <DollarSign className="h-5 w-5 text-white" />
-                  <div className="text-white">
-                    <p className="text-xs font-medium">Precios</p>
-                    <p className="text-lg font-bold">ARS</p>
-                  </div>
-                </div>
                 <Button
-                  onClick={navigateToPricing}
-                  className="bg-white text-green-600 hover:bg-white/90 px-6 py-2 rounded-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300"
+                  onClick={() => navigate('/mi-tiendia-admin')}
+                  className="bg-white text-purple-600 hover:bg-white/90 px-6 py-2 rounded-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300"
                 >
-                  <DollarSign className="mr-2 h-4 w-4" />
-                  Configurar Precios
+                  Ir a Tu Tiendia
                 </Button>
               </div>
             </div>
+          ):
+          (
+
+            <div className="mb-8 pl-0 md:pl-4">
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-4 md:p-6 shadow-lg border border-gray-200 dark:border-gray-700">
+              <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                <div className="flex-1 text-center md:text-left">
+                  <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2 flex items-center justify-center md:justify-start gap-2">
+                    <Store className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                    ¡Prueba Mi Tiendia!
+                  </h2>
+                  <p className="text-gray-700 dark:text-gray-300 text-sm md:text-base">
+                    Vende tus productos online con una tienda virtual basada en los artículos que ya subiste. Recibe pedidos directamente por WhatsApp.
+                  </p>
+                </div>
+                <div className="flex flex-col sm:flex-row items-center gap-3">
+                  <div className="flex items-center gap-2 bg-blue-50 dark:bg-blue-900/30 rounded-lg px-3 py-2">
+                    <MessageCircle className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                    <div className="text-gray-900 dark:text-gray-100">
+                      <p className="text-xs font-medium">Pedidos por</p>
+                      <p className="text-lg font-bold">WhatsApp</p>
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <Button
+                      onClick={navigateToMiTiendia}
+                      className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-2 rounded-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300"
+                    >
+                      <Store className="mr-2 h-4 w-4" />
+                      Crear Ahora
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
+          )
+        }
          */}
         <AddProductForm
           open={isAddProductDialogOpen}

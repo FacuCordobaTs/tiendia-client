@@ -194,7 +194,7 @@ export default function AdminProductCard({ product, handleGenerateAd, onEdit, up
         setInsufficientCredits(false);
         setPersonalizing(false);
         // Reset personalization settings when drawer is closed
-        updatePersonalizationSettings(null);
+        // updatePersonalizationSettings(null); // <--- COMENTA O ELIMINA ESTA LÍNEA
       }
     }}>
       <DrawerTrigger asChild>

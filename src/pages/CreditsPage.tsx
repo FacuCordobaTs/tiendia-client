@@ -16,10 +16,10 @@ const BASE_PACKS = [
 ];
 
 const ARG_PACKS = [
-    { id: 1, images: 1, priceUSD: 0.09, price: 120, credits: 50 },
-    { id: 2, images: 10, priceUSD: 0.9, price: 1200, credits: 500 },
-    { id: 3, images: 50, priceUSD: 3.96, price: 5280, credits: 2500, discount: 12.5 },
-    { id: 4, images: 100, priceUSD: 7.5, price: 10000, credits: 5000, discount: 16 }
+    { id: 1, images: 1, priceUSD: 0.125, price: 120, credits: 50 },
+    { id: 2, images: 10, priceUSD: 1.25, price: 1200, credits: 500 },
+    { id: 3, images: 50, priceUSD: 5.5, price: 5280, credits: 2500, discount: 12.5 },
+    { id: 4, images: 100, priceUSD: 10.625, price: 10000, credits: 5000, discount: 16 }
 ];
 
 // Exchange rates from USD to other currencies
