@@ -139,19 +139,19 @@ export default function AdminSidebar() {
           </NavLink>
 
           {
-            // user?.username && (
-            // <NavLink
-            //   to="/mi-tiendia-admin"
-            //   className={({ isActive }) =>
-            //     `flex items-center gap-2 rounded-lg px-3 py-2 transition-all ${
-            //       isActive ? 'bg-muted text-foreground' : 'text-muted-foreground hover:text-foreground'
-            //     }`
-            //   }
-            // >
-            //   <Store className="h-5 w-5" />
-            //   Mi Tiendia
-            // </NavLink>
-            // )
+            user?.username && (
+            <NavLink
+              to="/mi-tiendia-admin"
+              className={({ isActive }) =>
+                `flex items-center gap-2 rounded-lg px-3 py-2 transition-all ${
+                  isActive ? 'bg-muted text-foreground' : 'text-muted-foreground hover:text-foreground'
+                }`
+              }
+            >
+              <Store className="h-5 w-5" />
+              Mi Tiendia
+            </NavLink>
+            )
           }
 
           <NavLink

@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dialog";
 // Importar Check si es necesario (no se usa en el código final actual) o quitar si no se usa.
 // import { Download, CreditCard, Sparkles, HelpCircle, Wand2, Image as ImageIcon, Check } from 'lucide-react';
-import { Download, CreditCard, Sparkles, HelpCircle, Wand2, Image as ImageIcon, RefreshCw, X, Instagram, MessageCircle, Pencil  } from 'lucide-react'; // Asegurarse de que ImageIcon esté importado
+import { Download, CreditCard, Sparkles, HelpCircle, Wand2, Image as ImageIcon, RefreshCw, X, Instagram, MessageCircle, Pencil, Store  } from 'lucide-react'; // Asegurarse de que ImageIcon esté importado
 import { ScrollArea } from '@/components/ui/scroll-area';
 import AdminProductCard from '@/components/AdminProductCard';
 import { Button } from '@/components/ui/button';
@@ -276,9 +276,9 @@ const handleRegenerateImage = async () => {
     navigate('/credits');
   };
 
-  // const navigateToMiTiendia = () => {
-  //   navigate('/mi-tiendia');
-  // };
+  const navigateToMiTiendia = () => {
+    navigate('/mi-tiendia');
+  };
   
   useEffect(() => {
     getProducts();
@@ -437,7 +437,7 @@ const handleRegenerateImage = async () => {
         <p className="text-base text-gray-600 dark:text-gray-400 mb-6 pl-0 md:pl-4">
           Sube tus productos y genera imágenes profesionales en segundos ✨
         </p>
-{/*         
+        
         {
           user?.username ? (
             <div className="mb-6 pl-0 md:pl-4">
@@ -495,7 +495,7 @@ const handleRegenerateImage = async () => {
           </div>
           )
         }
-         */}
+        
         <AddProductForm
           open={isAddProductDialogOpen}
           onOpenChange={setIsAddProductDialogOpen}

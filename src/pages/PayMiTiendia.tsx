@@ -6,6 +6,7 @@ import { ArrowLeft, Store, CheckCircle, Smartphone, Package, MessageCircle, Link
 import { useAuth } from '@/context/AuthContext';
 import { useProduct } from '@/context/ProductContext';
 import toast from 'react-hot-toast';
+import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from '@/components/ui/carousel';
 
 // Exchange rates and currency info (same as CreditsPage)
 const EXCHANGE_RATES = [
@@ -274,13 +275,41 @@ function PayMiTiendia() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {products.map((product) => (
                     <div key={product.id} className="bg-white dark:bg-gray-700 rounded-2xl p-4 border border-gray-200 dark:border-gray-600 shadow-sm">
-                      <div className="aspect-square bg-gray-100 dark:bg-gray-600 rounded-xl overflow-hidden mb-3">
-                        <img
-                          src={product.imageURL}
-                          alt={product.name}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
+                      {/* Carousel for product images */}
+                      {(() => {
+                        let imageUrls: string[] = [];
+                        try {
+                          imageUrls = 'storeImageURLs' in product && (product as any).storeImageURLs ? JSON.parse((product as any).storeImageURLs) : [];
+                        } catch (e) {
+                          imageUrls = [];
+                        }
+                        if (imageUrls.length === 0) {
+                          imageUrls = [product.imageURL];
+                        }
+                        return (
+                          <Carousel className="aspect-square bg-gray-100 dark:bg-gray-600 rounded-xl overflow-hidden mb-3 group">
+                            <CarouselContent>
+                              {imageUrls.map((url, index) => (
+                                <CarouselItem key={index}>
+                                  <div className="aspect-square w-full">
+                                    <img
+                                      src={url}
+                                      alt={`${product.name} ${index + 1}`}
+                                      className="w-full h-full object-cover"
+                                    />
+                                  </div>
+                                </CarouselItem>
+                              ))}
+                            </CarouselContent>
+                            {imageUrls.length > 1 && (
+                              <>
+                                <CarouselPrevious className="absolute left-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                <CarouselNext className="absolute right-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                              </>
+                            )}
+                          </Carousel>
+                        );
+                      })()}
                       <h3 className="font-semibold text-gray-900 dark:text-gray-100 text-sm mb-2">
                         {product.name}
                       </h3>
@@ -481,7 +510,7 @@ function PayMiTiendia() {
                 <div className="space-y-4">
                   <div className="flex items-center gap-3">
                     <CheckCircle className="h-5 w-5 text-green-600" />
-                    <span className="text-gray-700 dark:text-gray-300">Tienda virtual personalizada</span>
+                    <span className="text-gray-700 dark:text-gray-300">Tienda virtual</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <CheckCircle className="h-5 w-5 text-green-600" />
@@ -497,7 +526,7 @@ function PayMiTiendia() {
                   </div>
                   <div className="flex items-center gap-3">
                     <CheckCircle className="h-5 w-5 text-green-600" />
-                    <span className="text-gray-700 dark:text-gray-300">Diseño responsive</span>
+                    <span className="text-gray-700 dark:text-gray-300">Diseño adaptado a celulares</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <CheckCircle className="h-5 w-5 text-green-600" />
