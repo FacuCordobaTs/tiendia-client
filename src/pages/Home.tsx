@@ -54,17 +54,21 @@ function App() {
   const [isPersonalizedImage, setIsPersonalizedImage] = useState(false);
   const [isDialogViewFront, setIsDialogViewFront] = useState(true);
   const [isDialogViewAdult, setIsDialogViewAdult] = useState(true);
+  const [isDialogViewBaby, setIsDialogViewBaby] = useState(false);
+  const [isDialogViewKid, setIsDialogViewKid] = useState(false);
   const { user, setUser } = useAuth();
   const { products, getProducts } = useProduct();
   const navigate = useNavigate();
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
   const maintenance = false;
   // Add new function to update generated image
-  const updateGeneratedImage = (imageUrl: string, isFrontView: boolean = true, isAdultView: boolean = true) => {
+  const updateGeneratedImage = (imageUrl: string, isFrontView: boolean = true, isAdultView: boolean = true, isBabyView: boolean = false, isKidView: boolean = false) => {
     console.log('🖼️ Updating generated image URL:', imageUrl, 'View:', isFrontView ? 'Front' : 'Back', 'Type:', isAdultView ? 'Adult' : 'Baby');
     setCurrentAdImageUrl(imageUrl);
     setIsDialogViewFront(isFrontView);
     setIsDialogViewAdult(isAdultView);
+    setIsDialogViewBaby(isBabyView);
+    setIsDialogViewKid(isKidView);
     setLoading(false);
   };
 
@@ -197,25 +201,24 @@ const handleRegenerateImage = async () => {
       const isPersonalized = currentPersonalization && Object.keys(currentPersonalization).length > 0;
       let endpoint = '';
       let body: object = isPersonalized ? currentPersonalization : {};
-
-      // 1. Determinar el endpoint y el cuerpo de la petición correctos
-      if (isDialogViewFront && isDialogViewAdult) {
-        // Vista frontal de adulto: puede ser estándar o personalizada
-        if (isPersonalized) {
-          endpoint = `https://api.tiendia.app/api/products/personalize/${currentProductId}`;
-        } else {
-          endpoint = `https://api.tiendia.app/api/products/generate-ad/${currentProductId}`;
-          body = { includeModel: true }; // La generación estándar usa un body diferente
-        }
+    
+      if (isPersonalized) {
+        endpoint = `https://api.tiendia.app/api/products/personalize/${currentProductId}`;
+      } else if (isDialogViewFront && isDialogViewAdult) {
+        endpoint = `https://api.tiendia.app/api/products/generate-ad/${currentProductId}`;
+        body = { includeModel: true };
       } else if (!isDialogViewFront && isDialogViewAdult) {
-        // Vista de espalda de adulto: puede ser personalizada
+
         endpoint = `https://api.tiendia.app/api/products/back-image/${currentProductId}`;
-      } else {
-        // Vista de bebé: puede ser personalizada
+      } else if (isDialogViewBaby) {
+
         endpoint = `https://api.tiendia.app/api/products/baby-image/${currentProductId}`;
+      } else if (isDialogViewKid) {
+
+        endpoint = `https://api.tiendia.app/api/products/kid-image/${currentProductId}`;
       }
       
-      // 2. Realizar la llamada a la API
+
       const response = await fetch(endpoint, {
         method: "POST",
         credentials: 'include',
@@ -245,8 +248,10 @@ const handleRegenerateImage = async () => {
         imageUrl = result.personalizedImageUrl || result.adImageUrl;
       } else if (!isDialogViewFront && isDialogViewAdult) {
         imageUrl = result.backImageUrl;
-      } else {
+      } else if (isDialogViewBaby) {
         imageUrl = result.babyImageUrl;
+      } else if (isDialogViewKid) {
+        imageUrl = result.kidImageUrl;
       }
       
       // 4. Actualizar el estado si la operación fue exitosa

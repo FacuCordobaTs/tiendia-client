@@ -14,6 +14,7 @@ import { useState } from "react";
 import { AlertCircle, Sparkles,  Loader2, Pencil, ChevronRight } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "react-router";
+import toast from "react-hot-toast";
 
 interface Product {
   id: number;
@@ -49,7 +50,7 @@ export default function AdminProductCard({ product, handleGenerateAd, onEdit, up
   product: Product;
   handleGenerateAd: (id: number, includeModel: boolean, originalImageUrl: string | null, isPro: boolean) => void;
   onEdit: () => void;
-  updateGeneratedImage: (imageUrl: string, isFrontView: boolean, isAdultView: boolean) => void;
+  updateGeneratedImage: (imageUrl: string, isFrontView: boolean, isAdultView: boolean, isBabyView: boolean, isKidView: boolean) => void;
   updatePersonalizationSettings: (settings: {
     gender?: string;
     age?: string;
@@ -73,8 +74,8 @@ export default function AdminProductCard({ product, handleGenerateAd, onEdit, up
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [isFrontView, setIsFrontView] = useState(true);
   const [isAdultView, setIsAdultView] = useState(true);
-  const [isKidView, setIsKidView] = useState<boolean | null>(null);
-  const [isBabyView, setIsBabyView] = useState<boolean | null>(null);
+  const [isKidView, setIsKidView] = useState<boolean>(false);
+  const [isBabyView, setIsBabyView] = useState<boolean>(false);
 
   // Obtener información del usuario actual
   const { user, setUser } = useAuth();
@@ -86,7 +87,6 @@ export default function AdminProductCard({ product, handleGenerateAd, onEdit, up
   
   const handleGenerateClick = async () => {
     setIsGenerating(true);
-    console.log(isAdultView, isBabyView, isKidView);
     try {
       if (isFrontView && isAdultView) {
         // Generate front view adult (normal generation)
@@ -112,7 +112,7 @@ export default function AdminProductCard({ product, handleGenerateAd, onEdit, up
         const data = await res.json();
         if (res.ok && data.backImageUrl) {
           if (typeof updateGeneratedImage === 'function') {
-            updateGeneratedImage(data.backImageUrl, false, true);
+            updateGeneratedImage(data.backImageUrl, false, true, false, false);
           }
           // Descontar 50 créditos por imagen de espalda
           setUser(prevUser => (
@@ -142,7 +142,7 @@ export default function AdminProductCard({ product, handleGenerateAd, onEdit, up
         const data = await res.json();
         if (res.ok && data.babyImageUrl) {
           if (typeof updateGeneratedImage === 'function') {
-            updateGeneratedImage(data.babyImageUrl, true, false);
+            updateGeneratedImage(data.babyImageUrl, true, false, true, false);
           }
           // Descontar 50 créditos por imagen de bebé
           setUser(prevUser => (
@@ -170,7 +170,7 @@ export default function AdminProductCard({ product, handleGenerateAd, onEdit, up
         const data = await res.json();
         if (res.ok && data.kidImageUrl) {
           if (typeof updateGeneratedImage === 'function') {
-            updateGeneratedImage(data.kidImageUrl, false, false);
+            updateGeneratedImage(data.kidImageUrl, false, false, false, true);
           }
           // Descontar 50 créditos por imagen de niño
           setUser(prevUser => (
@@ -306,14 +306,7 @@ export default function AdminProductCard({ product, handleGenerateAd, onEdit, up
 
                       try {
                         setIsGenerating(true);
-                        let endpoint;
-                        if (isFrontView && isAdultView) {
-                          endpoint = `https://api.tiendia.app/api/products/personalize/${product.id}`;
-                        } else if (!isFrontView && isAdultView) {
-                          endpoint = `https://api.tiendia.app/api/products/back-image/${product.id}`;
-                        } else {
-                          endpoint = `https://api.tiendia.app/api/products/baby-image/${product.id}`;
-                        }
+                        let endpoint = `https://api.tiendia.app/api/products/personalize/${product.id}`;
                         
                         const res = await fetch(endpoint, {
                           method: 'POST',
@@ -325,18 +318,11 @@ export default function AdminProductCard({ product, handleGenerateAd, onEdit, up
                         });
                         const data = await res.json();
                         
-                        let imageUrl;
-                        if (isFrontView && isAdultView) {
-                          imageUrl = data.personalizedImageUrl;
-                        } else if (!isFrontView && isAdultView) {
-                          imageUrl = data.backImageUrl;
-                        } else {
-                          imageUrl = data.babyImageUrl;
-                        }
+                        let imageUrl = data.personalizedImageUrl;
                         
                         if (res.ok && imageUrl) {
                           if (typeof updateGeneratedImage === 'function') {
-                            updateGeneratedImage(imageUrl, isFrontView, isAdultView);
+                            updateGeneratedImage(imageUrl, isFrontView, isAdultView, isBabyView, isKidView);
                           }
                           setPersonalizedImageFlag(true);
                           // Descontar 50 créditos por imagen personalizada
@@ -344,10 +330,10 @@ export default function AdminProductCard({ product, handleGenerateAd, onEdit, up
                             prevUser ? { ...prevUser, credits: prevUser.credits - 50 } : null
                           ));
                         } else {
-                          alert(data.message || `Error al generar la imagen ${isFrontView ? 'personalizada' : 'de vista trasera'}`);
+                          toast.error(`Error al generar la imagen personalizada`);
                         }
                       } catch (err) {
-                        alert(`Error de red al generar la imagen ${isFrontView ? 'personalizada' : 'de vista trasera'}`);
+                        toast.error(`Error de red al generar la imagen personalizada`);
                       } finally {
                         setIsGenerating(false);
                         setLoading(false);
