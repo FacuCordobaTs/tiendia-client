@@ -466,7 +466,7 @@ const handleRegenerateImage = async () => {
                 <div className="flex-1 text-center md:text-left">
                   <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2 flex items-center justify-center md:justify-start gap-2">
                     <Store className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                    ¡Prueba Mi Tiendia!
+                    ¡Prueba Tu Tiendia!
                   </h2>
                   <p className="text-gray-700 dark:text-gray-300 text-sm md:text-base">
                     Vende tus productos online con una tienda virtual basada en los artículos que ya subiste. Recibe pedidos directamente por WhatsApp.

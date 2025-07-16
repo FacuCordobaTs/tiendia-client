@@ -12,7 +12,6 @@ import { Card } from "./ui/card";
 import { AspectRatio } from "./ui/aspect-ratio";
 import { useState } from "react";
 import { AlertCircle, Sparkles,  Loader2, Pencil, ChevronRight } from "lucide-react";
-import { Alert, AlertDescription } from "./ui/alert";
 import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "react-router";
 
@@ -65,7 +64,6 @@ export default function AdminProductCard({ product, handleGenerateAd, onEdit, up
   setLoading: (loading: boolean) => void;
 }) {
   const { name, imageURL } = product;
-  const [insufficientCredits, setInsufficientCredits] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [personalizing, setPersonalizing] = useState(false);
   const [selectedGender, setSelectedGender] = useState<string | null>(null);
@@ -75,6 +73,8 @@ export default function AdminProductCard({ product, handleGenerateAd, onEdit, up
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [isFrontView, setIsFrontView] = useState(true);
   const [isAdultView, setIsAdultView] = useState(true);
+  const [isKidView, setIsKidView] = useState<boolean | null>(null);
+  const [isBabyView, setIsBabyView] = useState<boolean | null>(null);
 
   // Obtener información del usuario actual
   const { user, setUser } = useAuth();
@@ -86,6 +86,7 @@ export default function AdminProductCard({ product, handleGenerateAd, onEdit, up
   
   const handleGenerateClick = async () => {
     setIsGenerating(true);
+    console.log(isAdultView, isBabyView, isKidView);
     try {
       if (isFrontView && isAdultView) {
         // Generate front view adult (normal generation)
@@ -120,7 +121,7 @@ export default function AdminProductCard({ product, handleGenerateAd, onEdit, up
         } else {
           alert(data.message || 'Error al generar la imagen de vista trasera');
         }
-      } else if (isFrontView && !isAdultView) {
+      } else if (isBabyView) {
         // Generate front view baby
         // Show dialog and loading state, set up comparison view
         setIsAdDialogOpen(true);
@@ -150,35 +151,33 @@ export default function AdminProductCard({ product, handleGenerateAd, onEdit, up
         } else {
           alert(data.message || 'Error al generar la imagen de bebé');
         }
-      } else {
-        // Generate back view baby
-        // Show dialog and loading state, set up comparison view
+      } else if (isKidView) {
         setIsAdDialogOpen(true);
         setCurrentAdImageUrl(null);
         setOriginalImageUrl(product.imageURL);
         setCurrentProductId(product.id);
         setLoading(true);
         
-        const res = await fetch(`https://api.tiendia.app/api/products/baby-image/${product.id}`, {
+        const res = await fetch(`https://api.tiendia.app/api/products/kid-image/${product.id}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           credentials: 'include',
-          body: JSON.stringify({}), // Empty payload for default baby view
+          body: JSON.stringify({}), // Empty payload for default kid view
         });
         
         const data = await res.json();
-        if (res.ok && data.babyImageUrl) {
+        if (res.ok && data.kidImageUrl) {
           if (typeof updateGeneratedImage === 'function') {
-            updateGeneratedImage(data.babyImageUrl, false, false);
+            updateGeneratedImage(data.kidImageUrl, false, false);
           }
-          // Descontar 50 créditos por imagen de bebé
+          // Descontar 50 créditos por imagen de niño
           setUser(prevUser => (
             prevUser ? { ...prevUser, credits: prevUser.credits - 50 } : null
           ));
         } else {
-          alert(data.message || 'Error al generar la imagen de bebé');
+          alert(data.message || 'Error al generar la imagen de niño');
         }
       }
     } finally {
@@ -191,10 +190,7 @@ export default function AdminProductCard({ product, handleGenerateAd, onEdit, up
     <Drawer open={drawerOpen} onOpenChange={(open) => { 
       setDrawerOpen(open); 
       if (!open) {
-        setInsufficientCredits(false);
         setPersonalizing(false);
-        // Reset personalization settings when drawer is closed
-        // updatePersonalizationSettings(null); // <--- COMENTA O ELIMINA ESTA LÍNEA
       }
     }}>
       <DrawerTrigger asChild>
@@ -392,7 +388,7 @@ export default function AdminProductCard({ product, handleGenerateAd, onEdit, up
                </span>
                <Switch
                  checked={!isFrontView}
-                 onCheckedChange={(checked) => setIsFrontView(!checked)}
+                 onCheckedChange={(checked) => isAdultView ? setIsFrontView(!checked) : setIsFrontView(true)}
                  className="data-[state=checked]:bg-blue-600"
                />
                <span className={`text-sm font-medium transition-colors ${!isFrontView ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'}`}>
@@ -401,45 +397,45 @@ export default function AdminProductCard({ product, handleGenerateAd, onEdit, up
              </div>
 
              <div className="flex items-center justify-center space-x-4 mb-4">
-               <span className={`text-sm font-medium transition-colors ${isAdultView ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'}`}>
-                 Adulto
-               </span>
-               <Switch
-                 checked={!isAdultView}
-                 onCheckedChange={(checked) => setIsAdultView(!checked)}
-                 className="data-[state=checked]:bg-blue-600"
-               />
-               <span className={`text-sm font-medium transition-colors ${!isAdultView ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'}`}>
-                 Bebé
-               </span>
+               {/* Edad: Bebé, Niño, Adulto con emojis */}
+               {[
+                 { label: 'Bebé', value: 'bebe', emoji: '👶' },
+                 { label: 'Niño', value: 'nino', emoji: '🧒' },
+                 { label: 'Adulto', value: 'adulto', emoji: '🧑' },
+               ].map(opt => (
+                 <button
+                   key={opt.value}
+                   onClick={() => {
+                     if (opt.value === 'bebe') {
+                       setIsAdultView(false);
+                       setIsKidView(false);
+                       setIsBabyView(true);
+                       setIsFrontView(true);
+                     } else if (opt.value === 'nino') {
+                       setIsAdultView(false);
+                       setIsKidView(true);
+                       setIsBabyView(false);
+                       setIsFrontView(true);
+                     } else {
+                       setIsAdultView(true);
+                       setIsKidView(false);
+                       setIsBabyView(false);
+                     }
+                   }}
+                   className={`flex flex-col items-center px-3 py-2 rounded-lg border-2 transition-all font-medium text-sm
+                     ${
+                       (opt.value === 'bebe' && !isAdultView && (!isKidView || typeof isKidView === 'undefined')) ||
+                       (opt.value === 'nino' && !isAdultView && isKidView) ||
+                       (opt.value === 'adulto' && isAdultView)
+                         ? 'bg-blue-600 border-blue-400 text-white' : 'bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300'
+                     }
+                   `}
+                 >
+                   <span className="text-2xl mb-1">{opt.emoji}</span>
+                   {opt.label}
+                 </button>
+               ))}
              </div>
-
-           <div className="mb-5 p-3 bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-              <div className="text-sm text-gray-600 dark:text-gray-300 flex justify-between items-center">
-                <span>Imágenes disponibles:</span>
-                 <span className={`font-semibold ${hasEnoughCredits ? 'text-green-600 dark:text-green-400' : 'text-red-500 dark:text-red-400'}`}>
-                   {user?.credits != null ? (user.credits/50).toLocaleString('es-AR') : '0'}
-                 </span>
-              </div>
-             <div className="text-xs text-gray-500 dark:text-gray-400 text-right mt-1">
-                 Necesarias para generar: 1 imagen
-             </div>
-             {insufficientCredits && (
-               <Alert variant="destructive" className="mt-3 bg-red-50 dark:bg-red-900/30 border-red-200 dark:border-red-700/50 text-red-700 dark:text-red-300">
-                 <AlertCircle className="h-4 w-4" />
-                 <AlertDescription className="text-xs">
-                   No tienes suficientes imágenes.
-                   <Button
-                     variant="link"
-                     className="p-0 h-auto ml-1 text-red-700 dark:text-red-300 underline"
-                     onClick={() => { navigate('/credits') }}
-                    >
-                      Recargar
-                    </Button>
-                 </AlertDescription>
-               </Alert>
-              )}
-           </div>
 
            <div className="mb-6">
              <h3 className="font-medium text-gray-700 dark:text-gray-300 mb-2 text-sm">Opciones de Generación</h3>
