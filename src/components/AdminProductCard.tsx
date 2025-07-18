@@ -388,7 +388,6 @@ export default function AdminProductCard({ product, handleGenerateAd, onEdit, up
                {[
                  { label: 'Bebé', value: 'bebe', emoji: '👶' },
                  { label: 'Niño', value: 'nino', emoji: '🧒' },
-                 { label: 'Niña', value: 'nina', emoji: '👧' },
                  { label: 'Adulto', value: 'adulto', emoji: '🧑' },
                ].map(opt => (
                  <button
