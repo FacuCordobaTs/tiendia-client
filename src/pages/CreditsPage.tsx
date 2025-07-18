@@ -125,8 +125,8 @@ function CreditsPage() {
             const response = await fetch('https://ipapi.co/json/');
             const data = await response.json();
             const country = data.country_code;
-            setUserCountry("PE")
-            // setUserCountry(country);
+            // setUserCountry("PE")
+            setUserCountry(country);
             console.log('Detected country:', country);
         } catch (error) {
             console.log('Could not detect country automatically');
