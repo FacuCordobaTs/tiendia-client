@@ -11,15 +11,15 @@ import { useAuth } from '@/context/AuthContext';
 const BASE_PACKS = [
     { id: 1, images: 1, priceUSD: 0.125, credits: 50 },
     { id: 2, images: 10, priceUSD: 1.25, credits: 500 },
-    { id: 3, images: 50, priceUSD: 5.5, credits: 2500, discount: 12.5 },
+    { id: 3, images: 50, priceUSD: 4.4, credits: 2500, discount: 30 },
     { id: 4, images: 100, priceUSD: 10.625, credits: 5000, discount: 15 }
 ];
 
 const ARG_PACKS = [
-    { id: 1, images: 1, priceUSD: 0.125, price: 120, credits: 50 },
-    { id: 2, images: 10, priceUSD: 1.25, price: 1200, credits: 500 },
-    { id: 3, images: 50, priceUSD: 5.5, price: 5280, credits: 2500, discount: 12.5 },
-    { id: 4, images: 100, priceUSD: 10.625, price: 10000, credits: 5000, discount: 16 }
+    { id: 1, images: 1, priceUSD: 0.1, price: 120, credits: 50 },
+    { id: 2, images: 10, priceUSD: 1, price: 1200, credits: 500 },
+    { id: 3, images: 50, priceUSD: 3.5, price: 4200, credits: 2500, discount: 30 },
+    { id: 4, images: 100, priceUSD: 10, price: 10000, credits: 5000, discount: 16 }
 ];
 
 // Exchange rates from USD to other currencies
@@ -125,7 +125,8 @@ function CreditsPage() {
             const response = await fetch('https://ipapi.co/json/');
             const data = await response.json();
             const country = data.country_code;
-            setUserCountry(country);
+            setUserCountry("PE")
+            // setUserCountry(country);
             console.log('Detected country:', country);
         } catch (error) {
             console.log('Could not detect country automatically');
@@ -140,9 +141,9 @@ function CreditsPage() {
             packsToUse = ARG_PACKS;
         }
         // Filter packs for limited countries
-        if (userCountry && LIMITED_PACK_COUNTRIES.includes(userCountry)) {
-            packsToUse = packsToUse.filter(pack => pack.id === 3 || pack.id === 4);
-        }
+        // if (userCountry && LIMITED_PACK_COUNTRIES.includes(userCountry)) {
+        //     packsToUse = packsToUse.filter(pack => pack.id === 3 || pack.id === 4);
+        // }
         if (!exchangeRate && currency !== 'USD') {
             setConvertedPacks(packsToUse);
             return;
@@ -265,6 +266,11 @@ function CreditsPage() {
         }
     };
 
+    // 2. Agregar función para saber si el pack está deshabilitado
+    const isPackDisabled = (pack: any) => {
+      return userCountry && LIMITED_PACK_COUNTRIES.includes(userCountry) && !(pack.id === 3 || pack.id === 4);
+    };
+
     return (
         <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-950 dark:to-gray-900 md:pt-6 md:pl-72 pt-16 pl-4 pr-4 flex flex-col">
             <AdminSidebar />
@@ -323,28 +329,41 @@ function CreditsPage() {
                                 <div
                                     key={pack.id}
                                     onClick={() => {
+                                        if (isPackDisabled(pack)) return;
                                         if (userCountry === 'AR') {
                                             setSelectedPack(ARG_PACKS[pack.id - 1]);
                                         } else {
                                             setSelectedPack(pack);
                                         }
                                     }}
-                                    className={`group relative p-4 md:p-8 rounded-xl md:rounded-2xl cursor-pointer transition-all duration-300 ${
-                                        selectedPack?.id === pack.id
+                                    className={`group relative p-4 md:p-8 rounded-xl md:rounded-2xl transition-all duration-300
+                                        ${selectedPack?.id === pack.id
                                             ? 'bg-gradient-to-br from-primary/20 to-primary/10 dark:from-primary/30 dark:to-primary/20 border-2 border-primary/50'
-                                            : 'bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 hover:border-primary/30 hover:shadow-lg dark:hover:shadow-primary/10'
-                                    } ${pack.id === 3 ? 'ring-2 ring-primary/20 hover:ring-primary/40 dark:ring-primary/30 dark:hover:ring-primary/50' : ''}`}
+                                            : 'bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 hover:border-primary/30 hover:shadow-lg dark:hover:shadow-primary/10'}
+                                        ${pack.id === 3 ? 'ring-2 ring-primary/20 hover:ring-primary/40 dark:ring-primary/30 dark:hover:ring-primary/50' : ''}
+                                        ${isPackDisabled(pack) ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'cursor-pointer'}
+                                    `}
                                 >
                                     {pack.id === 3 && (
-                                        <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-primary to-primary/90 dark:from-primary/90 dark:to-primary text-white dark:text-black px-4 py-1 rounded-full text-xs font-medium shadow-lg dark:shadow-primary/20">
-                                            Más elegido
+                                        <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-purple-600 to-blue-500 text-white px-4 py-1 rounded-full text-s font-medium shadow-lg dark:shadow-primary/20">
+                                            🎉 30% de descuento
                                         </div>
                                     )}
-                                    <div className="flex flex-col items-center text-center">
+                                    <div className={`flex flex-col items-center text-center ${pack.id === 3 ? 'pt-12' : ''}`}>
                                         <h3 className="text-2xl md:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300">
                                             {pack.images} {pack.images === 1 ? 'Imagen' : 'Imágenes'}
                                         </h3>
-                                        <p className="text-3xl md:text-4xl font-bold text-primary dark:text-primary/90 mt-2 md:mt-4">
+                                        <p className="text-3xl md:text-4xl font-bold text-primary dark:text-primary/90 mt-2 md:mt-4 flex flex-col">
+                                            {pack.id === 3 && ( 
+                                                <span className="line-through text-gray-500 dark:text-gray-400">
+                                                    {formatPrice(pack.price + pack.price*0.425, userCurrency)}
+                                                </span>
+                                            )}
+                                            {pack.id === 4 && ( 
+                                                <span className="line-through text-gray-500 dark:text-gray-400">
+                                                    {formatPrice(pack.price + pack.price*0.15, userCurrency)}
+                                                </span>
+                                            )}
                                             {formatPrice(pack.price, userCurrency)}
                                         </p>
                                         {pack.discount && (
@@ -361,6 +380,11 @@ function CreditsPage() {
                                             </div>
                                         )}
                                     </div>
+                                    {isPackDisabled(pack) && (
+                                        <div className="mt-4 text-xs text-red-600 dark:text-red-400 font-semibold">
+                                            No disponible en tu país
+                                        </div>
+                                    )}
                                 </div>
                             ))}
                         </div>

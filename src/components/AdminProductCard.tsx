@@ -50,7 +50,7 @@ export default function AdminProductCard({ product, handleGenerateAd, onEdit, up
   product: Product;
   handleGenerateAd: (id: number, includeModel: boolean, originalImageUrl: string | null, isPro: boolean) => void;
   onEdit: () => void;
-  updateGeneratedImage: (imageUrl: string, isFrontView: boolean, isAdultView: boolean, isBabyView: boolean, isKidView: boolean) => void;
+  updateGeneratedImage: (imageUrl: string, isFrontView: boolean, isAdultView: boolean, isBabyView: boolean, isKidView: boolean ) => void;
   updatePersonalizationSettings: (settings: {
     gender?: string;
     age?: string;
@@ -180,6 +180,7 @@ export default function AdminProductCard({ product, handleGenerateAd, onEdit, up
           alert(data.message || 'Error al generar la imagen de niño');
         }
       }
+
     } finally {
       setIsGenerating(false);
       setLoading(false);
@@ -322,7 +323,7 @@ export default function AdminProductCard({ product, handleGenerateAd, onEdit, up
                         
                         if (res.ok && imageUrl) {
                           if (typeof updateGeneratedImage === 'function') {
-                            updateGeneratedImage(imageUrl, isFrontView, isAdultView, isBabyView, isKidView);
+                            updateGeneratedImage(imageUrl, isFrontView, isAdultView, isBabyView, isKidView );
                           }
                           setPersonalizedImageFlag(true);
                           // Descontar 50 créditos por imagen personalizada
@@ -387,6 +388,7 @@ export default function AdminProductCard({ product, handleGenerateAd, onEdit, up
                {[
                  { label: 'Bebé', value: 'bebe', emoji: '👶' },
                  { label: 'Niño', value: 'nino', emoji: '🧒' },
+                 { label: 'Niña', value: 'nina', emoji: '👧' },
                  { label: 'Adulto', value: 'adulto', emoji: '🧑' },
                ].map(opt => (
                  <button

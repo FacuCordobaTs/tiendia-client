@@ -356,7 +356,7 @@ const handleRegenerateImage = async () => {
             <div className="hidden md:flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
               <span className="flex items-center gap-1">
                 <Sparkles className="h-3 w-3 text-yellow-500" />
-                Ahorra hasta 15%
+                Ahorra hasta 30%
               </span>
               <span>•</span>
               <span className="flex items-center gap-1">
@@ -409,31 +409,33 @@ const handleRegenerateImage = async () => {
 
       <main className="p-2 md:p-4 flex-grow">
         <div className="mb-6 pl-0 md:pl-4">
-          <div className="bg-gradient-to-r from-purple-600 to-blue-500 rounded-xl p-4 md:p-6 shadow-lg">
+          <div className="bg-white text-black dark:text-whtie dark:bg-gray-800 rounded-xl p-4 md:p-6 shadow-lg border border-gray-200 dark:border-gray-700">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
               <div className="flex-1 text-center md:text-left">
-                <h2 className="text-xl md:text-2xl font-bold text-white mb-2 flex items-center justify-center md:justify-start gap-2">
+                <h2 className="text-black dark:text-white text-xl md:text-2xl font-bold mb-2 flex items-center justify-center md:justify-start gap-2">
                   <Sparkles className="h-5 w-5" />
                   ¡Mejora tus fotos de productos!
                 </h2>
-                <p className="text-white/90 text-sm md:text-base">
+                <p className="text-black/90 dark:text-white text-sm md:text-base">
                   Te ayudamos a tener fotos más lindas para tu tienda, desde 100 pesos argentinos por imagen
                 </p>
               </div>
               <div className="flex flex-col sm:flex-row items-center gap-3">
-                <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-lg px-3 py-2">
-                  <CreditCard className="h-5 w-5 text-white" />
-                  <div className="text-white">
-                    <p className="text-xs font-medium">Ahorra hasta</p>
-                    <p className="text-lg font-bold">15%</p>
-                  </div>
-                </div>
                 <Button
                   onClick={navigateToCredits}
                   className="bg-white text-purple-600 hover:bg-white/90 px-6 py-2 rounded-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300"
                 >
                   Comprar imágenes
                 </Button>
+                {/* Cartel de oferta limitada */}
+                <div className="w-full sm:w-auto order-3 sm:order-2 mt-3 sm:mt-0 sm:ml-4 flex justify-center sm:justify-end hover:cursor-pointer" onClick={() => navigateToCredits()}>
+                  <div className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-blue-500 hover:from-purple-700 hover:to-blue-600 text-white shadow-md hover:shadow-lg transition-all duration-300 border-2 border-blue-400 dark:border-purple-500 rounded-lg px-4 py-2 shadow-md">
+                    <Sparkles className="h-5 w-5 animate-bounce" />
+                    <span className="font-bold text-sm md:text-base uppercase tracking-wide">
+                      ¡Oferta limitada! <span className="font-extrabold">30% de descuento 🎉</span> 
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -445,59 +447,52 @@ const handleRegenerateImage = async () => {
         
         {
           user?.username ? (
-            <div className="mb-6 pl-0 md:pl-4">
-              <div className="bg-gradient-to-r from-purple-600 to-blue-500 rounded-xl p-4 md:p-6 shadow-lg">
-                <h2 className="text-xl md:text-2xl font-bold text-white mb-2 flex items-center justify-center md:justify-start gap-2">
-                  <Sparkles className="h-5 w-5" />
-                  ¡Bienvenido de nuevo, {user.name}!
-                </h2>
-                <p className="text-white/90 text-sm md:text-base">
-                  Tu tienda virtual está lista para que puedas empezar a vender.
-                </p>
-                <Button
-                  onClick={() => navigate('/mi-tiendia-admin')}
-                  className="bg-white text-purple-600 hover:bg-white/90 px-6 py-2 rounded-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300"
-                >
-                  Ir a Tu Tiendia
-                </Button>
+            <div className="mb-3 pl-0 md:pl-4">
+              <div className="bg-white dark:bg-gray-800 rounded-lg p-2 md:p-3 border border-gray-100 dark:border-gray-700">
+                <div className="flex flex-col md:flex-row items-center justify-between gap-2">
+                  <div className="flex-1 text-center md:text-left">
+                    <h2 className="text-base md:text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1 flex items-center justify-center md:justify-start gap-1">
+                      <Sparkles className="h-4 w-4 text-yellow-500" />
+                      ¡Bienvenido de nuevo, {user.name}!
+                    </h2>
+                    <p className="text-gray-600 dark:text-gray-300 text-xs md:text-sm mb-0">
+                      Tu tienda virtual está lista para que puedas empezar a vender.
+                    </p>
+                  </div>
+                  <Button
+                    onClick={() => navigate('/mi-tiendia-admin')}
+                    className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded font-normal text-sm shadow-none transition-all duration-200"
+                  >
+                    Ir a Tu Tiendia
+                  </Button>
+                </div>
               </div>
             </div>
           ):
           (
 
-            <div className="mb-8 pl-0 md:pl-4">
-            <div className="bg-white dark:bg-gray-800 rounded-xl p-4 md:p-6 shadow-lg border border-gray-200 dark:border-gray-700">
-              <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-                <div className="flex-1 text-center md:text-left">
-                  <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2 flex items-center justify-center md:justify-start gap-2">
-                    <Store className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                    ¡Prueba Tu Tiendia!
-                  </h2>
-                  <p className="text-gray-700 dark:text-gray-300 text-sm md:text-base">
-                    Vende tus productos online con una tienda virtual basada en los artículos que ya subiste. Recibe pedidos directamente por WhatsApp.
-                  </p>
-                </div>
-                <div className="flex flex-col sm:flex-row items-center gap-3">
-                  <div className="flex items-center gap-2 bg-blue-50 dark:bg-blue-900/30 rounded-lg px-3 py-2">
-                    <MessageCircle className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                    <div className="text-gray-900 dark:text-gray-100">
-                      <p className="text-xs font-medium">Pedidos por</p>
-                      <p className="text-lg font-bold">WhatsApp</p>
-                    </div>
+            <div className="mb-4 pl-0 md:pl-4">
+              <div className="bg-white dark:bg-gray-800 rounded-lg p-2 md:p-3 border border-gray-100 dark:border-gray-700">
+                <div className="flex flex-col md:flex-row items-center justify-between gap-2">
+                  <div className="flex-1 text-center md:text-left">
+                    <h2 className="text-base md:text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1 flex items-center justify-center md:justify-start gap-1">
+                      <Store className="h-4 w-4 text-blue-500 dark:text-blue-400" />
+                      Prueba Tu Tiendia
+                    </h2>
+                    <p className="text-gray-600 dark:text-gray-300 text-xs md:text-sm mb-0">
+                      Vende online con una tienda virtual y recibe pedidos por WhatsApp.
+                    </p>
                   </div>
-                  <div className="flex flex-col gap-2">
-                    <Button
-                      onClick={navigateToMiTiendia}
-                      className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-2 rounded-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300"
-                    >
-                      <Store className="mr-2 h-4 w-4" />
-                      Crear Ahora
-                    </Button>
-                  </div>
+                  <Button
+                    onClick={navigateToMiTiendia}
+                    className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded font-normal text-sm shadow-none transition-all duration-200"
+                  >
+                    <Store className="mr-1 h-3 w-3" />
+                    Crear
+                  </Button>
                 </div>
               </div>
             </div>
-          </div>
           )
         }
         
