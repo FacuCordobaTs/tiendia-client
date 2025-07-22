@@ -504,7 +504,7 @@ function PayMiTiendia() {
                   <div className="text-4xl font-bold text-purple-600 dark:text-purple-400 mb-2">
                     {formatPrice(convertedPrice, userCurrency)}
                   </div>
-                  <p className="text-gray-600 dark:text-gray-400">por mes</p>
+                  <p className="text-gray-600 dark:text-gray-400">pago único</p>
                 </div>
 
                 <div className="space-y-4">

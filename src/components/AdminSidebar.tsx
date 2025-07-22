@@ -208,10 +208,10 @@ export default function AdminSidebar() {
             </Button>
             <Button 
               className="justify-start gap-3 h-12 text-base bg-green-600 hover:bg-green-700 text-white"
-              onClick={() => window.open('https://wa.me/3408681915', '_blank')}
+              onClick={() => window.open('https://wa.me/543408681915', '_blank')}
             >
               <FaWhatsapp className="h-5 w-5" />
-              3408 681915
+              +54 3408 681915
             </Button>
           </div>
         </DialogContent>

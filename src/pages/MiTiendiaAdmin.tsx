@@ -76,7 +76,6 @@ function MiTiendiaAdmin() {
   const [selectedImagesInModal, setSelectedImagesInModal] = useState<string[]>([]);
   const [productForImageSelection, setProductForImageSelection] = useState<Product | null>(null);
 
-  const [quotaDueDate, setQuotaDueDate] = useState<Date | null>(null);
   const [logoEditMode, setLogoEditMode] = useState(false);
   const [newLogoPreview, setNewLogoPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -100,14 +99,7 @@ function MiTiendiaAdmin() {
       const profileData = await profileResponse.json();
       const user = profileData.user[0];
 
-      const gracePeriodEnd = new Date(user.paidMiTiendaDate);
-      gracePeriodEnd.setMonth(gracePeriodEnd.getMonth() + 1);
-      gracePeriodEnd.setDate(gracePeriodEnd.getDate() + 2);
-
-      const now = new Date();
-      setIsPaid(now < gracePeriodEnd);
-      setQuotaDueDate(gracePeriodEnd);
-
+      setIsPaid(user.paidMiTienda);
       const storeData: StoreData = {
         name: user.name || '',
         username: user.username || '',
@@ -634,10 +626,8 @@ function MiTiendiaAdmin() {
                 <div className="bg-green-50 dark:bg-green-900 rounded-2xl p-4 md:p-6 shadow-sm border border-green-200 dark:border-green-700 mb-6 md:mb-8 flex items-center gap-3">
                   <span className="text-2xl">✅</span>
                   <div>
-                    <h2 className="text-lg md:text-xl font-semibold text-green-800 dark:text-green-200">Cuota al día</h2>
-                    {quotaDueDate && (
-                      <p className="text-green-700 dark:text-green-300 text-sm mt-1">Vence el {quotaDueDate.toLocaleDateString('es-AR', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
-                    )}
+                    <h2 className="text-lg md:text-xl font-semibold text-green-800 dark:text-green-200">Tu Tiendia Pagada</h2>
+                    <p className="text-green-700 dark:text-green-300 text-sm mt-1">Tu Pago único fue realizado, tu tienda está activa.</p>
                   </div>
                 </div>
               </div>
@@ -646,8 +636,8 @@ function MiTiendiaAdmin() {
                 <div className="bg-red-50 dark:bg-red-900 rounded-2xl p-4 md:p-6 shadow-sm border border-red-200 dark:border-red-700 mb-6 md:mb-8 flex flex-col md:flex-row items-center gap-3">
                   <span className="text-2xl">⚠️</span>
                   <div className="flex-1">
-                    <h2 className="text-lg md:text-xl font-semibold text-red-800 dark:text-red-200">Cuota vencida</h2>
-                    <p className="text-red-700 dark:text-red-300 text-sm mt-1">Tu suscripción ha expirado. Renueva para seguir usando tu tienda virtual.</p>
+                    <h2 className="text-lg md:text-xl font-semibold text-red-800 dark:text-red-200">Tu Tiendia no está pagada</h2>
+                    <p className="text-red-700 dark:text-red-300 text-sm mt-1">Tu Tiendia no está pagada. Paga para poder usar tu tienda virtual.</p>
                   </div>
                   <button
                     onClick={() => navigate('/pay-mi-tiendia')}
