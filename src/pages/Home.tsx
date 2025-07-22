@@ -429,11 +429,17 @@ const handleRegenerateImage = async () => {
                 </Button>
                 {/* Cartel de oferta limitada */}
                 <div className="w-full sm:w-auto order-3 sm:order-2 mt-3 sm:mt-0 sm:ml-4 flex justify-center sm:justify-end hover:cursor-pointer" onClick={() => navigateToCredits()}>
-                  <div className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-blue-500 hover:from-purple-700 hover:to-blue-600 text-white shadow-md hover:shadow-lg transition-all duration-300 border-2 border-blue-400 dark:border-purple-500 rounded-lg px-4 py-2 shadow-md">
+                  <div className="flex flex-col items-center gap-2 bg-gradient-to-r from-purple-600 to-blue-500 hover:from-purple-700 hover:to-blue-600 text-white shadow-md hover:shadow-lg transition-all duration-300 border-2 border-blue-400 dark:border-purple-500 rounded-lg px-4 py-2 shadow-md">
+                    <div className="flex items-center gap-2">
                     <Sparkles className="h-5 w-5 animate-bounce" />
                     <span className="font-bold text-sm md:text-base uppercase tracking-wide">
                       ¡Oferta limitada! <span className="font-extrabold">30% de descuento 🎉</span> 
                     </span>
+                    </div>
+                    
+                    <div className="flex flex-col font-bold text-white/90">
+                      <span>En packs de 50 y 100 imágenes</span>
+                    </div>
                   </div>
                 </div>
               </div>
