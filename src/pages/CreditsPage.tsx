@@ -19,28 +19,7 @@ const ARG_PACKS = [
     { id: 1, images: 1, priceUSD: 0.1, price: 120, credits: 50 },
     { id: 2, images: 10, priceUSD: 1, price: 1200, credits: 500 },
     { id: 3, images: 50, priceUSD: 3.5, price: 4200, credits: 2500, discount: 30 },
-    { id: 4, images: 100, priceUSD: 8.8, price: 8400, credits: 5000, discount: 30 }
-];
-
-// Exchange rates from USD to other currencies
-const EXCHANGE_RATES = [
-    { source_currency: "USD", target_currency: "BRL", value: 6.65227 },
-    { source_currency: "USD", target_currency: "CLP", value: 1083.95280 },
-    { source_currency: "USD", target_currency: "COP", value: 4689.88920 },
-    { source_currency: "USD", target_currency: "MXN", value: 21.85355 },
-    { source_currency: "USD", target_currency: "PEN", value: 3.96795 },
-    { source_currency: "USD", target_currency: "UYU", value: 47.26736 },
-    { source_currency: "USD", target_currency: "ARS", value: 1320.47300 },
-    { source_currency: "USD", target_currency: "PYG", value: 8281.67550 },
-    { source_currency: "USD", target_currency: "BOB", value: 11.53600 },
-    { source_currency: "USD", target_currency: "DOP", value: 61.52700 },
-    { source_currency: "USD", target_currency: "EUR", value: 1.02940 },
-    { source_currency: "USD", target_currency: "GTQ", value: 8.18511 },
-    { source_currency: "USD", target_currency: "CRC", value: 536.19994 },
-    { source_currency: "USD", target_currency: "MYR", value: 4.64839 },
-    { source_currency: "USD", target_currency: "IDR", value: 17419.61070 },
-    { source_currency: "USD", target_currency: "KES", value: 137.45974 },
-    { source_currency: "USD", target_currency: "NGN", value: 2867.14850 }
+    { id: 4, images: 100, priceUSD: 7, price: 8400, credits: 5000, discount: 30 }
 ];
 
 // Country to currency mapping
@@ -105,20 +84,37 @@ function CreditsPage() {
     const [userCountry, setUserCountry] = useState<string | null>(null);
     const [userCurrency, setUserCurrency] = useState<string>('USD');
     const [convertedPacks, setConvertedPacks] = useState<any[]>([]);
+    const [exchangeRates, setExchangeRates] = useState<any[]>([]); // Estado para guardar las tasas
 
     const API_BASE_URL = 'https://api.tiendia.app';
 
     useEffect(() => {
+        // Función para obtener las tasas de cambio desde tu backend
+        const fetchExchangeRates = async () => {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/payments/exchange-rates`);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const data = await response.json();
+                setExchangeRates(data);
+            } catch (error) {
+                console.error("Failed to fetch exchange rates:", error);
+                // Opcional: manejar el error, quizás usando precios en USD como fallback
+            }
+        };
+
+        fetchExchangeRates();
         detectUserCountry();
-    }, []);
+    }, []); // Se ejecuta una vez al cargar el componente
 
     useEffect(() => {
-        if (userCountry) {
+        if (userCountry && exchangeRates.length > 0) { // Asegúrate de que las tasas ya se cargaron
             const currency = COUNTRY_CURRENCY_MAP[userCountry] || 'USD';
             setUserCurrency(currency);
             convertPacksToCurrency(currency);
         }
-    }, [userCountry]);
+    }, [userCountry, exchangeRates]); // Se ejecuta cuando el país o las tasas cambian
 
     const detectUserCountry = async () => {
         try {
@@ -135,26 +131,35 @@ function CreditsPage() {
     };
 
     const convertPacksToCurrency = (currency: string) => {
-        const exchangeRate = EXCHANGE_RATES.find(rate => rate.target_currency === currency);
+        // Ahora usa el estado 'exchangeRates' en lugar de la constante
+        const exchangeRate = exchangeRates.find(rate => rate.target_currency === currency);
         let packsToUse = BASE_PACKS;
         if (userCountry === 'AR') {
             packsToUse = ARG_PACKS;
-        }
-        // Filter packs for limited countries
-        // if (userCountry && LIMITED_PACK_COUNTRIES.includes(userCountry)) {
-        //     packsToUse = packsToUse.filter(pack => pack.id === 3 || pack.id === 4);
-        // }
-        if (!exchangeRate && currency !== 'USD') {
+            // Para Argentina, usamos los precios fijos en ARS, así que no se necesita conversión
             setConvertedPacks(packsToUse);
             return;
         }
-        const rate = exchangeRate ? exchangeRate.value : 1;
-        const converted = packsToUse.map(pack => ({
-            ...pack,
-            price: 'price' in pack ? pack.price : Math.round(pack.priceUSD * rate * 100) / 100,
-            originalPriceUSD: pack.priceUSD
-        }));
-        setConvertedPacks(converted);
+
+        // Si es un país de dLocal y tenemos la tasa, convertimos
+        if (exchangeRate) {
+            const rate = exchangeRate.value;
+            const converted = packsToUse.map(pack => ({
+                ...pack,
+                price: Math.round(pack.priceUSD * rate * 100) / 100, // Calcula el precio local
+                originalPriceUSD: pack.priceUSD // Mantenemos el precio original en USD
+            }));
+            setConvertedPacks(converted);
+        } else {
+            // Fallback: si no hay tasa, muestra precios en USD
+            const packsInUSD = packsToUse.map(pack => ({
+                ...pack,
+                price: pack.priceUSD,
+                originalPriceUSD: pack.priceUSD
+            }));
+            setConvertedPacks(packsInUSD);
+            setUserCurrency('USD'); // Forzamos la moneda a USD
+        }
     };
 
     const formatPrice = (price: number, currency: string) => {
@@ -221,6 +226,7 @@ function CreditsPage() {
                         'Content-Type': 'application/json',
                     },
                     credentials: 'include',
+                    // El backend necesita el precio en USD para cobrar correctamente
                     body: JSON.stringify({ credits: selectedPack.priceUSD }),
                 });
                 console.log(response)
