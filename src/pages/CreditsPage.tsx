@@ -121,7 +121,7 @@ function CreditsPage() {
             const response = await fetch('https://ipapi.co/json/');
             const data = await response.json();
             const country = data.country_code;
-            // setUserCountry("PE")
+            // setUserCountry("BO")
             setUserCountry(country);
             console.log('Detected country:', country);
         } catch (error) {
@@ -391,6 +391,22 @@ function CreditsPage() {
                                             No disponible en tu país
                                         </div>
                                     )}
+                                    {
+                                        selectedPack && selectedPack.id === pack.id && (
+
+                                            <Button
+                                                className="w-full py-2 mt-4 rounded-lg text-sm font-medium transition bg-gradient-to-r from-primary/90 to-primary hover:shadow-md"
+                                                onClick={handlePurchase}
+                                                disabled={loading || !selectedPack}
+                                            >
+                                                {loading ? (
+                                                    <Loader2 className="h-4 w-4 animate-spin mx-auto" />
+                                                ) : (
+                                                    `Pagar ${selectedPack ? formatPrice(selectedPack.price, userCurrency) : ''}`
+                                                )}
+                                            </Button>
+                                        )
+                                    }
                                 </div>
                             ))}
                         </div>
