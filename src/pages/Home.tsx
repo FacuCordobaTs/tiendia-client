@@ -384,10 +384,10 @@ const handleRegenerateImage = async () => {
                     className="w-full h-full object-cover"
                     onError={(e) => {
                       e.currentTarget.style.display = 'none';
-                      e.currentTarget.nextElementSibling!.style.display = 'flex';
+                      (e.currentTarget.nextElementSibling as HTMLElement).style.display = 'flex';
                     }}
                   />
-                  <div className="hidden w-full h-full bg-white/20 rounded-xl flex items-center justify-center">
+                  <div className="w-full h-full bg-white/20 rounded-xl flex items-center justify-center">
                     <Smartphone className="h-6 w-6 text-white" />
                   </div>
                 </div>
@@ -464,7 +464,7 @@ const handleRegenerateImage = async () => {
                 </Button>
                 {/* Cartel de oferta limitada */}
                 <div className="w-full sm:w-auto order-3 sm:order-2 mt-3 sm:mt-0 sm:ml-4 flex justify-center sm:justify-end hover:cursor-pointer" onClick={() => navigateToCredits()}>
-                  <div className="flex flex-col items-center gap-2 bg-gradient-to-r from-purple-600 to-blue-500 hover:from-purple-700 hover:to-blue-600 text-white shadow-md hover:shadow-lg transition-all duration-300 border-2 border-blue-400 dark:border-purple-500 rounded-lg px-4 py-2 shadow-md">
+                  <div className="flex flex-col items-center gap-2 bg-gradient-to-r from-purple-600 to-blue-500 hover:from-purple-700 hover:to-blue-600 text-white shadow-md hover:shadow-lg transition-all duration-300 border-2 border-blue-400 dark:border-purple-500 rounded-lg px-4 py-2">
                     <div className="flex items-center gap-2">
                     <Sparkles className="h-5 w-5 animate-bounce" />
                     <span className="font-bold text-sm md:text-base uppercase tracking-wide">
@@ -633,7 +633,7 @@ const handleRegenerateImage = async () => {
                       />
                     ) : (
                       <div className="flex items-center justify-center h-full text-gray-400">
-                        <ImageIcon className="w-8 h-8 sm:w-10 sm:w-10" />
+                        <ImageIcon className="w-8 h-8 sm:w-10" />
                       </div>
                     )}
                   </div>
@@ -652,7 +652,7 @@ const handleRegenerateImage = async () => {
                           />
                         ) : (
                           <div className="flex items-center justify-center h-full text-gray-400">
-                            <ImageIcon className="w-8 h-8 sm:w-10 sm:w-10" />
+                            <ImageIcon className="w-8 h-8 sm:w-10" />
                           </div>
                         )}
                       </div>
@@ -664,7 +664,7 @@ const handleRegenerateImage = async () => {
                       {isModifying && (
                         <div className="absolute inset-0 bg-white/70 dark:bg-gray-900/70 backdrop-blur-sm flex items-center justify-center rounded-lg sm:rounded-xl z-10">
                           <div className="flex flex-col items-center gap-2">
-                            <div className="relative h-8 w-8 sm:h-10 sm:h-10">
+                            <div className="relative h-8 w-8 sm:h-10">
                               <div className="absolute inset-0 rounded-full border-2 border-t-transparent border-blue-400 animate-spin"></div>
                             </div>
                             <p className="text-xs text-blue-600 dark:text-blue-300 animate-pulse">Modificando...</p>
@@ -683,7 +683,7 @@ const handleRegenerateImage = async () => {
                           />
                         ) : (
                           <div className="flex items-center justify-center h-full text-gray-400 flex-col gap-1 sm:gap-2 px-2 sm:px-4 text-center">
-                            <ImageIcon className="w-8 h-8 sm:w-10 sm:w-10" />
+                            <ImageIcon className="w-8 h-8 sm:w-10" />
                             {!loading && <span className="text-xs text-red-500">No se pudo generar.</span>}
                           </div>
                         )}
