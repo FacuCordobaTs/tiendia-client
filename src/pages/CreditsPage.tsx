@@ -356,11 +356,6 @@ function CreditsPage() {
                                             {pack.images} {pack.images === 1 ? 'Imagen' : 'Imágenes'}
                                         </h3>
                                         <p className="text-3xl md:text-4xl font-bold text-primary dark:text-primary/90 mt-2 md:mt-4 flex flex-col">
-                                            {pack.id === 4 && ( 
-                                                <span className="line-through text-gray-500 dark:text-gray-400">
-                                                    {formatPrice(pack.price + pack.price*0.45, userCurrency)}
-                                                </span>
-                                            )}
                                             {formatPrice(pack.price, userCurrency)}
                                         </p>
                                         {pack.discount && (
