@@ -11,15 +11,15 @@ import { useAuth } from '@/context/AuthContext';
 const BASE_PACKS = [
     { id: 1, images: 1, priceUSD: 0.125, credits: 50 },
     { id: 2, images: 10, priceUSD: 1.25, credits: 500 },
-    { id: 3, images: 50, priceUSD: 4.4, credits: 2500, discount: 30 },
-    { id: 4, images: 100, priceUSD: 8.8, credits: 5000, discount: 30 }
+    { id: 3, images: 50, priceUSD: 6.25, credits: 2500 },
+    { id: 4, images: 100, priceUSD: 12.5, credits: 5000 }
 ];
 
 const ARG_PACKS = [
     { id: 1, images: 1, priceUSD: 0.1, price: 120, credits: 50 },
     { id: 2, images: 10, priceUSD: 1, price: 1200, credits: 500 },
-    { id: 3, images: 50, priceUSD: 3.5, price: 4200, credits: 2500, discount: 30 },
-    { id: 4, images: 100, priceUSD: 7, price: 8400, credits: 5000, discount: 30 }
+    { id: 3, images: 50, priceUSD: 3.5, price: 6000, credits: 2500 },
+    { id: 4, images: 100, priceUSD: 7, price: 12000, credits: 5000 }
 ];
 
 // Country to currency mapping
@@ -350,21 +350,12 @@ function CreditsPage() {
                                         ${isPackDisabled(pack) ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'cursor-pointer'}
                                     `}
                                 >
-                                    {(pack.id === 3 || pack.id === 4) && (
-                                        <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-purple-600 to-blue-500 text-white px-4 py-1 rounded-full text-s font-medium shadow-lg dark:shadow-primary/20">
-                                            🎉 30% de descuento
-                                        </div>
-                                    )}
+                                    
                                     <div className={`flex flex-col items-center text-center ${(pack.id === 3 || pack.id === 4) ? 'pt-12' : ''}`}>
                                         <h3 className="text-2xl md:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300">
                                             {pack.images} {pack.images === 1 ? 'Imagen' : 'Imágenes'}
                                         </h3>
                                         <p className="text-3xl md:text-4xl font-bold text-primary dark:text-primary/90 mt-2 md:mt-4 flex flex-col">
-                                            {pack.id === 3 && ( 
-                                                <span className="line-through text-gray-500 dark:text-gray-400">
-                                                    {formatPrice(pack.price + pack.price*0.43, userCurrency)}
-                                                </span>
-                                            )}
                                             {pack.id === 4 && ( 
                                                 <span className="line-through text-gray-500 dark:text-gray-400">
                                                     {formatPrice(pack.price + pack.price*0.45, userCurrency)}
