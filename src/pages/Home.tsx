@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dialog";
 // Importar Check si es necesario (no se usa en el código final actual) o quitar si no se usa.
 // import { Download, CreditCard, Sparkles, HelpCircle, Wand2, Image as ImageIcon, Check } from 'lucide-react';
-import { Download, CreditCard, Sparkles, HelpCircle, Wand2, Image as ImageIcon, RefreshCw, X, Instagram, MessageCircle, Pencil, Store, Smartphone  } from 'lucide-react'; // Asegurarse de que ImageIcon esté importado
+import { Download, CreditCard, Sparkles, HelpCircle, Wand2, Image as ImageIcon, RefreshCw, X, Instagram, MessageCircle, Pencil, Store  } from 'lucide-react'; // Asegurarse de que ImageIcon esté importado
 import { ScrollArea } from '@/components/ui/scroll-area';
 import AdminProductCard from '@/components/AdminProductCard';
 import { Button } from '@/components/ui/button';
@@ -60,7 +60,7 @@ function App() {
   const { products, getProducts } = useProduct();
   const navigate = useNavigate();
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
-  const maintenance = false;
+  const maintenance = true;
   // Add new function to update generated image
   const updateGeneratedImage = (imageUrl: string, isFrontView: boolean = true, isAdultView: boolean = true, isBabyView: boolean = false, isKidView: boolean = false) => {
     console.log('🖼️ Updating generated image URL:', imageUrl, 'View:', isFrontView ? 'Front' : 'Back', 'Type:', isAdultView ? 'Adult' : 'Baby');
