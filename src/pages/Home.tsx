@@ -427,6 +427,26 @@ const handleRegenerateImage = async () => {
           Sube tus productos y genera imágenes profesionales en segundos ✨
         </p>
         
+        {/* Mensaje de mejora de calidad */}
+        <div className="mb-6 pl-0 md:pl-4">
+          <div className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 border border-green-200 dark:border-green-700 rounded-lg p-4">
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0">
+                <Sparkles className="h-5 w-5 text-green-600 dark:text-green-400" />
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-green-800 dark:text-green-200 mb-1">
+                  ¡Nueva mejora en la calidad! 🎉
+                </h3>
+                <p className="text-sm text-green-700 dark:text-green-300">
+                  Ahora generamos imágenes más <strong>fieles</strong> y de mejor calidad. 
+                  Nuestro sistema ha sido actualizado para ofrecer resultados más precisos y profesionales.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
         {
           user?.username ? (
             <div className="mb-3 pl-0 md:pl-4">
