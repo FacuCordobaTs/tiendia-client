@@ -11,8 +11,8 @@ import { useAuth } from '@/context/AuthContext';
 const BASE_PACKS = [
     { id: 1, images: 1, priceUSD: 0.125, credits: 50 },
     { id: 2, images: 10, priceUSD: 1.25, credits: 500 },
-    { id: 3, images: 50, priceUSD: 6.25, credits: 2500 },
-    { id: 4, images: 100, priceUSD: 12.5, credits: 5000 }
+    { id: 3, images: 50, priceUSD: 4-4, credits: 2500 },
+    { id: 4, images: 100, priceUSD: 8.8, credits: 5000 }
 ];
 
 const ARG_PACKS = [
