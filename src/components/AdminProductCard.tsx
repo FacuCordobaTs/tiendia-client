@@ -50,7 +50,7 @@ export default function AdminProductCard({ product, handleGenerateAd, onEdit, up
   product: Product;
   handleGenerateAd: (id: number, includeModel: boolean, originalImageUrl: string | null, isPro: boolean) => void;
   onEdit: () => void;
-  updateGeneratedImage: (imageUrl: string, isFrontView: boolean, isAdultView: boolean, isBabyView: boolean, isKidView: boolean, isOutfitView: boolean) => void;
+  updateGeneratedImage: (imageUrl: string, isFrontView: boolean, isAdultView: boolean, isBabyView: boolean, isKidView: boolean, isGirlKidView: boolean, isOutfitView: boolean) => void;
   updatePersonalizationSettings: (settings: {
     gender?: string;
     age?: string;
@@ -75,6 +75,7 @@ export default function AdminProductCard({ product, handleGenerateAd, onEdit, up
   const [isFrontView, setIsFrontView] = useState(true);
   const [isAdultView, setIsAdultView] = useState(true);
   const [isKidView, setIsKidView] = useState<boolean>(false);
+  const [isGirlKidView, setIsGirlKidView] = useState<boolean>(false);
   const [isBabyView, setIsBabyView] = useState<boolean>(false);
   const [isOutfitView, setIsOutfitView] = useState<boolean>(false);
 
@@ -113,7 +114,7 @@ export default function AdminProductCard({ product, handleGenerateAd, onEdit, up
         const data = await res.json();
         if (res.ok && data.backImageUrl) {
           if (typeof updateGeneratedImage === 'function') {
-            updateGeneratedImage(data.backImageUrl, false, true, false, false, false);
+            updateGeneratedImage(data.backImageUrl, false, true, false, false, false, false);
           }
           // Descontar 50 créditos por imagen de espalda
           setUser(prevUser => (
@@ -143,7 +144,7 @@ export default function AdminProductCard({ product, handleGenerateAd, onEdit, up
         const data = await res.json();
         if (res.ok && data.babyImageUrl) {
           if (typeof updateGeneratedImage === 'function') {
-            updateGeneratedImage(data.babyImageUrl, true, false, true, false, false);
+            updateGeneratedImage(data.babyImageUrl, true, false, true, false, false, false);
           }
           // Descontar 50 créditos por imagen de bebé
           setUser(prevUser => (
@@ -171,7 +172,7 @@ export default function AdminProductCard({ product, handleGenerateAd, onEdit, up
         const data = await res.json();
         if (res.ok && data.kidImageUrl) {
           if (typeof updateGeneratedImage === 'function') {
-            updateGeneratedImage(data.kidImageUrl, false, false, false, true, false);
+            updateGeneratedImage(data.kidImageUrl, false, false, false, true, false, false);
           }
           // Descontar 50 créditos por imagen de niño
           setUser(prevUser => (
@@ -179,6 +180,34 @@ export default function AdminProductCard({ product, handleGenerateAd, onEdit, up
           ));
         } else {
           alert(data.message || 'Error al generar la imagen de niño');
+        }
+      } else if (isGirlKidView) {
+        setIsAdDialogOpen(true);
+        setCurrentAdImageUrl(null);
+        setOriginalImageUrl(product.imageURL);
+        setCurrentProductId(product.id);
+        setLoading(true);
+        
+        const res = await fetch(`https://api.tiendia.app/api/products/girl-kid-image/${product.id}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify({}), // Empty payload for default girl kid view
+        });
+        
+        const data = await res.json();
+        if (res.ok && data.girlKidImageUrl) {
+          if (typeof updateGeneratedImage === 'function') {
+            updateGeneratedImage(data.girlKidImageUrl, false, false, false, false, true, false);
+          }
+          // Descontar 50 créditos por imagen de niña
+          setUser(prevUser => (
+            prevUser ? { ...prevUser, credits: prevUser.credits - 50 } : null
+          ));
+        } else {
+          alert(data.message || 'Error al generar la imagen de niña');
         }
       } else if (isOutfitView) {
         setIsAdDialogOpen(true);
@@ -199,7 +228,7 @@ export default function AdminProductCard({ product, handleGenerateAd, onEdit, up
         const data = await res.json();
         if (res.ok && data.outfitImageUrl) {
           if (typeof updateGeneratedImage === 'function') {
-            updateGeneratedImage(data.outfitImageUrl, true, true, false, false, true);
+            updateGeneratedImage(data.outfitImageUrl, true, true, false, false, false, true);
           }
           // Descontar 50 créditos por imagen de conjunto
           setUser(prevUser => (
@@ -352,7 +381,7 @@ export default function AdminProductCard({ product, handleGenerateAd, onEdit, up
                         
                         if (res.ok && imageUrl) {
                           if (typeof updateGeneratedImage === 'function') {
-                            updateGeneratedImage(imageUrl, isFrontView, isAdultView, isBabyView, isKidView, isOutfitView );
+                            updateGeneratedImage(imageUrl, isFrontView, isAdultView, isBabyView, isKidView, isGirlKidView, isOutfitView );
                           }
                           setPersonalizedImageFlag(true);
                           // Descontar 50 créditos por imagen personalizada
@@ -426,11 +455,12 @@ export default function AdminProductCard({ product, handleGenerateAd, onEdit, up
                </span>
              </div>
 
-             <div className="flex items-center justify-center space-x-4 mb-4">
-               {/* Edad: Bebé, Niño, Adulto con emojis */}
+             <div className="flex items-center justify-center space-x-2 mb-4">
+               {/* Edad: Bebé, Niño, Niña, Adulto con emojis */}
                {[
                  { label: 'Bebé', value: 'bebe', emoji: '👶' },
                  { label: 'Niño', value: 'nino', emoji: '🧒' },
+                 { label: 'Niña', value: 'nina', emoji: '👧' },
                  { label: 'Adulto', value: 'adulto', emoji: '🧑' },
                ].map(opt => (
                  <button
@@ -439,27 +469,38 @@ export default function AdminProductCard({ product, handleGenerateAd, onEdit, up
                      if (opt.value === 'bebe') {
                        setIsAdultView(false);
                        setIsKidView(false);
+                       setIsGirlKidView(false);
                        setIsBabyView(true);
                        setIsFrontView(true);
                        setIsOutfitView(false);
                      } else if (opt.value === 'nino') {
                        setIsAdultView(false);
                        setIsKidView(true);
+                       setIsGirlKidView(false);
+                       setIsBabyView(false);
+                       setIsFrontView(true);
+                       setIsOutfitView(false);
+                     } else if (opt.value === 'nina') {
+                       setIsAdultView(false);
+                       setIsKidView(false);
+                       setIsGirlKidView(true);
                        setIsBabyView(false);
                        setIsFrontView(true);
                        setIsOutfitView(false);
                      } else {
                        setIsAdultView(true);
                        setIsKidView(false);
+                       setIsGirlKidView(false);
                        setIsBabyView(false);
                        setIsOutfitView(false);
                      }
                    }}
-                   className={`flex flex-col items-center px-3 py-2 rounded-lg border-2 transition-all font-medium text-sm
+                   className={`flex flex-col items-center px-2 py-2 rounded-lg border-2 transition-all font-medium text-sm
                      ${
-                       (opt.value === 'bebe' && !isAdultView && (!isKidView || typeof isKidView === 'undefined')) ||
-                       (opt.value === 'nino' && !isAdultView && isKidView) ||
-                       (opt.value === 'adulto' && isAdultView)
+                       (opt.value === 'bebe' && !isAdultView && !isKidView && !isGirlKidView) ||
+                       (opt.value === 'nino' && !isAdultView && isKidView && !isGirlKidView) ||
+                       (opt.value === 'nina' && !isAdultView && !isKidView && isGirlKidView) ||
+                       (opt.value === 'adulto' && isAdultView && !isKidView && !isGirlKidView)
                          ? 'bg-blue-600 border-blue-400 text-white' : 'bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300'
                      }
                    `}

@@ -56,6 +56,7 @@ function App() {
   const [isDialogViewAdult, setIsDialogViewAdult] = useState(true);
   const [isDialogViewBaby, setIsDialogViewBaby] = useState(false);
   const [isDialogViewKid, setIsDialogViewKid] = useState(false);
+  const [isDialogViewGirlKid, setIsDialogViewGirlKid] = useState(false);
   const [isDialogViewOutfit, setIsDialogViewOutfit] = useState(false);
   const { user, setUser } = useAuth();
   const { products, getProducts } = useProduct();
@@ -63,13 +64,14 @@ function App() {
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
   const maintenance = false;
   // Add new function to update generated image
-  const updateGeneratedImage = (imageUrl: string, isFrontView: boolean = true, isAdultView: boolean = true, isBabyView: boolean = false, isKidView: boolean = false, isOutfitView: boolean = false) => {
-    console.log('🖼️ Updating generated image URL:', imageUrl, 'View:', isFrontView ? 'Front' : 'Back', 'Type:', isAdultView ? 'Adult' : 'Baby', 'Outfit:', isOutfitView);
+  const updateGeneratedImage = (imageUrl: string, isFrontView: boolean = true, isAdultView: boolean = true, isBabyView: boolean = false, isKidView: boolean = false, isGirlKidView: boolean = false, isOutfitView: boolean = false) => {
+    console.log('🖼️ Updating generated image URL:', imageUrl, 'View:', isFrontView ? 'Front' : 'Back', 'Type:', isAdultView ? 'Adult' : 'Baby', 'Girl Kid:', isGirlKidView, 'Outfit:', isOutfitView);
     setCurrentAdImageUrl(imageUrl);
     setIsDialogViewFront(isFrontView);
     setIsDialogViewAdult(isAdultView);
     setIsDialogViewBaby(isBabyView);
     setIsDialogViewKid(isKidView);
+    setIsDialogViewGirlKid(isGirlKidView);
     setIsDialogViewOutfit(isOutfitView);
     setLoading(false);
   };
@@ -210,6 +212,8 @@ const handleRegenerateImage = async () => {
         endpoint = `https://api.tiendia.app/api/products/baby-image/${currentProductId}`;
       } else if (isDialogViewKid) {
         endpoint = `https://api.tiendia.app/api/products/kid-image/${currentProductId}`;
+      } else if (isDialogViewGirlKid) {
+        endpoint = `https://api.tiendia.app/api/products/girl-kid-image/${currentProductId}`;
       } else if (isDialogViewOutfit) {
         endpoint = `https://api.tiendia.app/api/products/outfit-image/${currentProductId}`;
       }
@@ -248,6 +252,8 @@ const handleRegenerateImage = async () => {
         imageUrl = result.babyImageUrl;
       } else if (isDialogViewKid) {
         imageUrl = result.kidImageUrl;
+      } else if (isDialogViewGirlKid) {
+        imageUrl = result.girlKidImageUrl;
       } else if (isDialogViewOutfit) {
         imageUrl = result.outfitImageUrl;
       }
@@ -304,6 +310,7 @@ const handleRegenerateImage = async () => {
     console.log(isPersonalizedImage)
     setIsDialogViewFront(true); // Reset view to front
     setIsDialogViewAdult(true); // Reset view to adult
+    setIsDialogViewGirlKid(false); // Reset girl kid view
     setIsDialogViewOutfit(false); // Reset outfit view
   };
 
