@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dialog";
 // Importar Check si es necesario (no se usa en el código final actual) o quitar si no se usa.
 // import { Download, CreditCard, Sparkles, HelpCircle, Wand2, Image as ImageIcon, Check } from 'lucide-react';
-import { Download, CreditCard, Sparkles, HelpCircle, Wand2, Image as ImageIcon, RefreshCw, X, Instagram, MessageCircle, Pencil, Store  } from 'lucide-react'; // Asegurarse de que ImageIcon esté importado
+import { Download, CreditCard, Sparkles, HelpCircle, Wand2, Image as ImageIcon, RefreshCw, X, Instagram, MessageCircle, Pencil } from 'lucide-react'; // Asegurarse de que ImageIcon esté importado
 import { ScrollArea } from '@/components/ui/scroll-area';
 import AdminProductCard from '@/components/AdminProductCard';
 import { Button } from '@/components/ui/button';
@@ -25,6 +25,8 @@ import toast from 'react-hot-toast';
 import { FaTiktok } from 'react-icons/fa';
 // Quitar Separator si ya no se usa en el nuevo layout
 // import { Separator } from '@/components/ui/separator';
+import Loader from '@/components/Loader';
+import { Progress } from "@/components/ui/progress"
 
 interface Product {
   id: number;
@@ -38,6 +40,7 @@ function App() {
   const [currentAdImageUrl, setCurrentAdImageUrl] = useState<string | null>(null);
   const [originalImageUrl, setOriginalImageUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const [progressValue, setProgressValue] = useState<number>(0);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isTutorialOpen, setIsTutorialOpen] = useState(false);
@@ -284,11 +287,42 @@ const handleRegenerateImage = async () => {
   const navigateToCredits = () => {
     navigate('/credits');
   };
-
-  const navigateToMiTiendia = () => {
-    navigate('/mi-tiendia');
-  };
   
+  useEffect(() => {
+    if (!loading) {
+      setProgressValue(0);
+      return;
+    }
+
+    const duration = 7000; // 7 seconds
+    const startTime = performance.now();
+    let animationFrame: number;
+    let isCancelled = false;
+
+    const easeInOutCubic = (t: number) =>
+      t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+    const animate = (now: number) => {
+      if (isCancelled) return;
+      const elapsed = now - startTime;
+      const normalizedProgress = Math.min(elapsed / duration, 1);
+      setProgressValue(Math.round(easeInOutCubic(normalizedProgress) * 100));
+
+      if (normalizedProgress < 1) {
+        animationFrame = requestAnimationFrame(animate);
+      }
+    };
+
+    animationFrame = requestAnimationFrame(animate);
+
+    return () => {
+      isCancelled = true;
+      if (animationFrame) {
+        cancelAnimationFrame(animationFrame);
+      }
+    };
+  }, [loading]);
+
   useEffect(() => {
     getProducts();
     const tutorialSeen = localStorage.getItem('tutorialSeen');
@@ -336,14 +370,12 @@ const handleRegenerateImage = async () => {
 
       <header className="py-6 md:py-8 px-2 md:px-4">
         <h1 className="text-3xl md:text-4xl font-bold text-gray-800 dark:text-gray-100 pl-0 md:pl-4">
-          <div className="flex items-center gap-2">
-            <img src="/logoblanco.png" alt="tiendia.app logo" className="h-8 w-8" />
+          <div className="flex flex-col items-center gap-2">
+            <img src="/logotransparente.png" alt="tiendia.app logo" className="h-32 w-32" />
             <span>tiendia.app</span>
           </div>
         </h1>
-        <p className="text-sm text-gray-600 dark:text-gray-400 mt-2 pl-0 md:pl-4">
-          {user?.email}
-        </p>
+
         <div className="flex flex-wrap gap-3 mt-4 items-center pl-0 md:pl-4">
           <div className="flex items-center bg-white dark:bg-gray-800 shadow-sm rounded-lg px-3 py-1.5 border border-gray-200 dark:border-gray-700">
             <Sparkles className="h-4 w-4 text-yellow-500 mr-2" />
@@ -380,6 +412,7 @@ const handleRegenerateImage = async () => {
             <HelpCircle className="h-4 w-4" />
             <span>Ayuda</span>
           </Button>
+          
           <div className="flex gap-2 ml-auto">
             <Button
               variant="ghost"
@@ -407,7 +440,12 @@ const handleRegenerateImage = async () => {
             </Button>
           </div>
         </div>
+        
+        <p className="text-sm text-gray-600 dark:text-gray-400 mt-2 pl-0 md:pl-4">
+          {user?.email}
+        </p>
       </header>
+      
 
       <main className="p-2 md:p-4 flex-grow">
         <div className="mb-6 pl-0 md:pl-4">
@@ -419,95 +457,23 @@ const handleRegenerateImage = async () => {
                   ¡Mejora tus fotos de productos!
                 </h2>
                 <p className="text-black/90 dark:text-white text-sm md:text-base">
-                  Te ayudamos a tener fotos más lindas para tu tienda, desde 100 pesos argentinos por imagen
+                  Te ayudamos a tener fotos más lindas para tu tienda
                 </p>
               </div>
               <div className="flex flex-col sm:flex-row items-center gap-3">
-                <Button
-                  onClick={navigateToCredits}
-                  className="bg-white text-purple-600 hover:bg-white/90 px-6 py-2 rounded-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300"
-                >
-                  Comprar imágenes
-                </Button>
+              <Button
+              onClick={navigateToCredits}
+              className="bg-gradient-to-r from-purple-600 to-blue-500 hover:from-purple-700 hover:to-blue-600 text-white shadow-md hover:shadow-lg transition-all duration-300 px-4 py-1.5 h-auto flex items-center gap-2 text-sm rounded-lg"
+            >
+              <CreditCard className="h-4 w-4" />
+              <span>Comprar imágenes</span>
+            </Button>
               </div>
             </div>
           </div>
         </div>
 
-        <p className="text-base text-gray-600 dark:text-gray-400 mb-6 pl-0 md:pl-4">
-          Sube tus productos y genera imágenes profesionales en segundos ✨
-        </p>
         
-        {/* Mensaje de mejora de calidad */}
-        <div className="mb-6 pl-0 md:pl-4">
-          <div className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 border border-green-200 dark:border-green-700 rounded-lg p-4">
-            <div className="flex items-start gap-3">
-              <div className="flex-shrink-0">
-                <Sparkles className="h-5 w-5 text-green-600 dark:text-green-400" />
-              </div>
-              <div>
-                <h3 className="text-sm font-semibold text-green-800 dark:text-green-200 mb-1">
-                  ¡Nueva mejora en la calidad! 🎉
-                </h3>
-                <p className="text-sm text-green-700 dark:text-green-300">
-                  Ahora generamos imágenes más <strong>fieles</strong> y de mejor calidad. 
-                  Nuestro sistema ha sido actualizado para ofrecer resultados más precisos y profesionales.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        {
-          user?.username ? (
-            <div className="mb-3 pl-0 md:pl-4">
-              <div className="bg-white dark:bg-gray-800 rounded-lg p-2 md:p-3 border border-gray-100 dark:border-gray-700">
-                <div className="flex flex-col md:flex-row items-center justify-between gap-2">
-                  <div className="flex-1 text-center md:text-left">
-                    <h2 className="text-base md:text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1 flex items-center justify-center md:justify-start gap-1">
-                      <Sparkles className="h-4 w-4 text-yellow-500" />
-                      ¡Bienvenido de nuevo, {user.name}!
-                    </h2>
-                    <p className="text-gray-600 dark:text-gray-300 text-xs md:text-sm mb-0">
-                      Tu tienda virtual está lista para que puedas empezar a vender.
-                    </p>
-                  </div>
-                  <Button
-                    onClick={() => navigate('/mi-tiendia-admin')}
-                    className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded font-normal text-sm shadow-none transition-all duration-200"
-                  >
-                    Ir a Tu Tiendia
-                  </Button>
-                </div>
-              </div>
-            </div>
-          ):
-          (
-
-            <div className="mb-4 pl-0 md:pl-4">
-              <div className="bg-white dark:bg-gray-800 rounded-lg p-2 md:p-3 border border-gray-100 dark:border-gray-700">
-                <div className="flex flex-col md:flex-row items-center justify-between gap-2">
-                  <div className="flex-1 text-center md:text-left">
-                    <h2 className="text-base md:text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1 flex items-center justify-center md:justify-start gap-1">
-                      <Store className="h-4 w-4 text-blue-500 dark:text-blue-400" />
-                      Prueba Tu Tiendia
-                    </h2>
-                    <p className="text-gray-600 dark:text-gray-300 text-xs md:text-sm mb-0">
-                      Vende online con una tienda virtual y recibe pedidos por WhatsApp.
-                    </p>
-                  </div>
-                  <Button
-                    onClick={navigateToMiTiendia}
-                    className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded font-normal text-sm shadow-none transition-all duration-200"
-                  >
-                    <Store className="mr-1 h-3 w-3" />
-                    Crear
-                  </Button>
-                </div>
-              </div>
-            </div>
-          )
-        }
         
         <AddProductForm
           open={isAddProductDialogOpen}
@@ -560,13 +526,9 @@ const handleRegenerateImage = async () => {
           {/* Indicador de Carga General */}
           {loading ? (
             <div className="flex items-center justify-center min-h-[350px] sm:min-h-[400px] flex-col gap-4 p-6">
-              <div className="relative h-16 w-16 sm:h-20 sm:w-20">
-                <div className="absolute inset-0 rounded-full border-4 border-t-transparent border-purple-500 animate-spin"></div>
-                <div className="absolute inset-2 rounded-full bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 opacity-50 animate-pulse"></div>
-                <div className="absolute inset-0 flex items-center justify-center text-purple-300">
-                  <Sparkles className="h-6 w-6 sm:h-8 sm:w-8 animate-bounce opacity-75" />
-                </div>
-              </div>
+              
+              <Loader />
+              <Progress value={progressValue}  className="w-full max-w-xs sm:max-w-sm [&>*]:bg-blue-500" />
               <p className="text-base sm:text-lg text-muted-foreground animate-pulse mt-4">Generando imagen...</p>
             </div>
           ) : (
