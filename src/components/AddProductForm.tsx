@@ -5,7 +5,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Label } from "@/components/ui/label";
 import { Loader2, PlusCircle, AlertCircle, Wand2, Download, Camera, Image as ImageIcon, Upload } from 'lucide-react';
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { FiImage } from 'react-icons/fi';
 import { useAuth } from '@/context/AuthContext';
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useNavigate } from 'react-router';
@@ -245,7 +244,6 @@ const AddProductForm = ({ open, onOpenChange }: AddProductFormProps) => {
     setIsCapturing(false);
   };
 
-  const hasEnoughCredits = user && user.credits >= REQUIRED_CREDITS;
 
   const startCamera = async () => {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
@@ -329,7 +327,7 @@ const AddProductForm = ({ open, onOpenChange }: AddProductFormProps) => {
       <DialogTrigger asChild>
         <Button>
           <PlusCircle className="h-5 w-5 mr-2" />
-          Agregar Producto con IA
+          Sube imagenes de tus productos
         </Button>
       </DialogTrigger>
       <DialogContent className="w-[95vw] sm:w-[90vw] md:max-w-2xl lg:max-w-3xl max-h-[90vh] flex flex-col bg-white dark:bg-gray-900 rounded-xl shadow-2xl p-0 overflow-hidden">
@@ -542,31 +540,6 @@ const AddProductForm = ({ open, onOpenChange }: AddProductFormProps) => {
                         </>
                       )}
                     </Button>
-                    {imagePreviews.length === 1 && (
-                      <Button
-                        type="button"
-                        disabled={isLoading || !imageFiles[0]}
-                        onClick={hasEnoughCredits ? handleGenerateClick : () => navigate('/credits')}
-                        className={`bg-gradient-to-r from-blue-500 to-cyan-400 transition-all duration-500 text-white flex-1`}
-                      >
-                        {isLoading ? (
-                          <>
-                            <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                            Generando...
-                          </>
-                        ) : !hasEnoughCredits ? (
-                          <>
-                          <FiImage className="w-4 h-4 mr-2" />
-                          Generar (1 imagen)
-                          </>
-                        ) : (
-                          <>
-                            <FiImage className="w-4 h-4 mr-2" />
-                            Generar (1 imagen)
-                          </>
-                        )}
-                      </Button>
-                    )}
                   </div>
                 )}
                 {insufficientCredits && (

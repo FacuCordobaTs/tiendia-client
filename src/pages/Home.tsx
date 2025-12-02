@@ -1,4 +1,3 @@
-// src/App.jsx
 import AdminSidebar from '@/components/AdminSidebar';
 import AddProductForm from '@/components/AddProductForm';
 import { useEffect, useState } from 'react';
@@ -8,12 +7,10 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter, // Importar DialogFooter
+  DialogFooter,
   DialogDescription,
 } from "@/components/ui/dialog";
-// Importar Check si es necesario (no se usa en el código final actual) o quitar si no se usa.
-// import { Download, CreditCard, Sparkles, HelpCircle, Wand2, Image as ImageIcon, Check } from 'lucide-react';
-import { Download, CreditCard, Sparkles, HelpCircle, Wand2, Image as ImageIcon, RefreshCw, X, Instagram, MessageCircle, Pencil } from 'lucide-react'; // Asegurarse de que ImageIcon esté importado
+import { Download, CreditCard, Sparkles, Wand2, Image as ImageIcon, RefreshCw, X, MessageCircle, Pencil } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import AdminProductCard from '@/components/AdminProductCard';
 import { Button } from '@/components/ui/button';
@@ -23,15 +20,13 @@ import { useNavigate } from 'react-router';
 import TutorialDialog from '@/components/TutorialDialog';
 import toast from 'react-hot-toast';
 import { FaTiktok } from 'react-icons/fa';
-// Quitar Separator si ya no se usa en el nuevo layout
-// import { Separator } from '@/components/ui/separator';
 import Loader from '@/components/Loader';
 import { Progress } from "@/components/ui/progress"
 
 interface Product {
   id: number;
   name: string;
-  imageURL: string | null; // Permitir null aquí también
+  imageURL: string | null;
 }
 
 function App() {
@@ -44,72 +39,51 @@ function App() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isTutorialOpen, setIsTutorialOpen] = useState(false);
-  // const [modificationPrompt, setModificationPrompt] = useState<string>('');
   const [isModifying, setIsModifying] = useState<boolean>(false);
-  // const [currentImageId, setCurrentImageId] = useState<number | null>(null);
   const [currentProductId, setCurrentProductId] = useState<number | null>(null);
-  const [currentPersonalization, setCurrentPersonalization] = useState<{
-    gender?: string;
-    age?: string;
-    skinTone?: string;
-    bodyType?: string;
-  } | null>(null);
-  const [isPersonalizedImage, setIsPersonalizedImage] = useState(false);
-  const [isDialogViewFront, setIsDialogViewFront] = useState(true);
-  const [isDialogViewAdult, setIsDialogViewAdult] = useState(true);
-  const [isDialogViewBaby, setIsDialogViewBaby] = useState(false);
-  const [isDialogViewKid, setIsDialogViewKid] = useState(false);
-  const [isDialogViewGirlKid, setIsDialogViewGirlKid] = useState(false);
-  const [isDialogViewOutfit, setIsDialogViewOutfit] = useState(false);
+  
+  // --- NUEVOS ESTADOS SIMPLIFICADOS ---
+  // Tipos: 'model' | 'remove-background' | 'universal'
+  const [generationType, setGenerationType] = useState<string>('model');
+  const [currentPersonalization, setCurrentPersonalization] = useState<any>(null);
+
   const { user, setUser } = useAuth();
   const { products, getProducts } = useProduct();
   const navigate = useNavigate();
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
   const maintenance = false;
-  // Add new function to update generated image
-  const updateGeneratedImage = (imageUrl: string, isFrontView: boolean = true, isAdultView: boolean = true, isBabyView: boolean = false, isKidView: boolean = false, isGirlKidView: boolean = false, isOutfitView: boolean = false) => {
-    console.log('🖼️ Updating generated image URL:', imageUrl, 'View:', isFrontView ? 'Front' : 'Back', 'Type:', isAdultView ? 'Adult' : 'Baby', 'Girl Kid:', isGirlKidView, 'Outfit:', isOutfitView);
+
+  // Función unificada para actualizar la imagen generada y el tipo de generación
+  const updateGeneratedImage = (imageUrl: string, type: string = 'model', params: any = null) => {
+    console.log('🖼️ Updating generated image:', imageUrl, 'Type:', type);
     setCurrentAdImageUrl(imageUrl);
-    setIsDialogViewFront(isFrontView);
-    setIsDialogViewAdult(isAdultView);
-    setIsDialogViewBaby(isBabyView);
-    setIsDialogViewKid(isKidView);
-    setIsDialogViewGirlKid(isGirlKidView);
-    setIsDialogViewOutfit(isOutfitView);
+    setGenerationType(type);
+    if (params) {
+      setCurrentPersonalization(params);
+    }
     setLoading(false);
   };
 
-  const updatePersonalizationSettings = (settings: {
-    gender?: string;
-    age?: string;
-    skinTone?: string;
-    bodyType?: string;
-  } | null) => {
+  const updatePersonalizationSettings = (settings: any) => {
     setCurrentPersonalization(settings);
-  };
-
-  const setPersonalizedImageFlag = (isPersonalized: boolean) => {
-    setIsPersonalizedImage(isPersonalized);
   };
 
   const handleGenerateAd = async (id: number, includeModel: boolean, originalUrl: string | null, isPro: boolean) => {
     console.log('🔄 Starting handleGenerateAd:', { id, includeModel, isPro });
 
     if (!user || (isPro ? user.credits < 100 : user.credits < 50)) {
-      console.log('❌ Insufficient credits:', { 
-        userCredits: user?.credits, 
-        required: isPro ? 100 : 50 
-      });
       toast.error('No te quedan imágenes disponibles.');
       return;
     }
 
-    console.log('📱 Setting up UI state for generation');
     setLoading(true);
     setIsAdDialogOpen(true);
     setCurrentAdImageUrl(null);
     setOriginalImageUrl(originalUrl);
     setCurrentProductId(id);
+
+    // Default a modelo standard
+    setGenerationType('model');
 
     if (!isPro) {
       try {
@@ -123,37 +97,25 @@ function App() {
         });
 
         if (!response.ok) {
-          let errorMessage = `Error: ${response.status} ${response.statusText}`;
-          try {
-            const errorBody = await response.json();
-            errorMessage = errorBody.error || errorBody.message || errorMessage;
-            console.error('❌ API error response:', errorBody);
-          } catch (e) {
-            console.error("❌ Could not parse error response body:", e);
-          }
-          const rawError = await response.text().catch(() => "");
-          console.error("❌ Raw error details:", rawError);
-          toast.error(`Error al generar la imagen`);
-          throw new Error(errorMessage);
+          const errorBody = await response.json().catch(() => ({}));
+          throw new Error(errorBody.error || errorBody.message || response.statusText);
         }
 
         const result = await response.json();
 
-        if (result && result.adImageUrl && result.imageId) {
+        if (result && result.adImageUrl) {
           setUser(prevUser => (
             prevUser ? { ...prevUser, credits: prevUser.credits - 50 } : null
           ));
           setCurrentAdImageUrl(result.adImageUrl);
           toast.success('¡Imagen generada con éxito!');
         } else {
-          console.error('❌ Unexpected API response format:', result);
           toast.error('Error al obtener la imagen generada.');
         }
       } catch (error: any) {
         console.error('❌ Error in handleGenerateAd:', error);
         toast.error('Ocurrió un error inesperado.');
       } finally {
-        console.log('🏁 Finishing generation process');
         setLoading(false);
       }
     }
@@ -161,128 +123,89 @@ function App() {
 
   const handleDownloadImage = async () => {
     if (!currentAdImageUrl) return;
-
     try {
       const noCacheUrl = `${currentAdImageUrl}?t=${Date.now()}`;
-      console.log("Descargando imagen:", noCacheUrl);
       const response = await fetch(noCacheUrl);
-      if (!response.ok) {
-        throw new Error(`Network response was not ok: ${response.statusText}`);
-      }
+      if (!response.ok) throw new Error('Network response not ok');
       const blob = await response.blob();
       const downloadUrl = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = downloadUrl;
       const originalFileName = originalImageUrl?.split('/').pop()?.split('.')[0] || 'producto';
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-      const filename = `tiendia_${originalFileName}_${timestamp}.png`;
-      link.download = filename;
+      link.download = `tiendia_${originalFileName}_${timestamp}.png`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(downloadUrl);
       toast.success('Imagen descargada.');
     } catch (error) {
-      console.error('Error al descargar la imagen:', error);
+      console.error('Error:', error);
       toast.error("No se pudo descargar la imagen.");
     }
   };
 
-const handleRegenerateImage = async () => {
+  // --- LÓGICA DE REGENERACIÓN SIMPLIFICADA ---
+  const handleRegenerateImage = async () => {
     if (!currentProductId || !user || user.credits < 50) {
       toast.error('No te quedan imágenes disponibles.');
-      if (user && user.credits < 50) {
-        navigate('/credits');
-      }
+      if (user && user.credits < 50) navigate('/credits');
       return;
     }
 
     setLoading(true);
 
     try {
-      const isPersonalized = currentPersonalization && Object.keys(currentPersonalization).length > 0;
       let endpoint = '';
-      let body: object = isPersonalized ? currentPersonalization : {};
-    
-      if (isPersonalized) {
-        endpoint = `https://api.tiendia.app/api/products/personalize/${currentProductId}`;
-      } else if (isDialogViewFront && isDialogViewAdult && !isDialogViewOutfit) {
+      let body: any = {};
+      
+      // Selección de endpoint basado en el tipo de la última generación
+      if (generationType === 'model') {
         endpoint = `https://api.tiendia.app/api/products/generate-ad/${currentProductId}`;
         body = { includeModel: true };
-      } else if (!isDialogViewFront && isDialogViewAdult && !isDialogViewOutfit) {
-        endpoint = `https://api.tiendia.app/api/products/back-image/${currentProductId}`;
-      } else if (isDialogViewBaby) {
-        endpoint = `https://api.tiendia.app/api/products/baby-image/${currentProductId}`;
-      } else if (isDialogViewKid) {
-        endpoint = `https://api.tiendia.app/api/products/kid-image/${currentProductId}`;
-      } else if (isDialogViewGirlKid) {
-        endpoint = `https://api.tiendia.app/api/products/girl-kid-image/${currentProductId}`;
-      } else if (isDialogViewOutfit) {
-        endpoint = `https://api.tiendia.app/api/products/outfit-image/${currentProductId}`;
+      } else if (generationType === 'remove-background') {
+        endpoint = `https://api.tiendia.app/api/products/remove-background-image/${currentProductId}`;
+        body = {};
+      } else if (generationType === 'universal') {
+        endpoint = `https://api.tiendia.app/api/products/universal-image/${currentProductId}`;
+        body = currentPersonalization || {}; // Usar los parámetros guardados
       }
-      
 
       const response = await fetch(endpoint, {
         method: "POST",
         credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       });
 
       if (!response.ok) {
-        let errorMessage = `Error: ${response.status} ${response.statusText}`;
-        try {
-          const errorBody = await response.json();
-          errorMessage = errorBody.error || errorBody.message || errorMessage;
-        } catch (e) {
-          console.error("Could not parse error response body:", e);
-        }
-        toast.error(`Error al regenerar`);
-        throw new Error(errorMessage);
+        const errorBody = await response.json().catch(() => ({}));
+        throw new Error(errorBody.error || errorBody.message || response.statusText);
       }
 
       const result = await response.json();
       
-      // 3. Extraer la URL de la imagen de la respuesta
-      let imageUrl;
-      if (isDialogViewFront && isDialogViewAdult && !isDialogViewOutfit) {
-        imageUrl = result.personalizedImageUrl || result.adImageUrl;
-      } else if (!isDialogViewFront && isDialogViewAdult && !isDialogViewOutfit) {
-        imageUrl = result.backImageUrl;
-      } else if (isDialogViewBaby) {
-        imageUrl = result.babyImageUrl;
-      } else if (isDialogViewKid) {
-        imageUrl = result.kidImageUrl;
-      } else if (isDialogViewGirlKid) {
-        imageUrl = result.girlKidImageUrl;
-      } else if (isDialogViewOutfit) {
-        imageUrl = result.outfitImageUrl;
-      }
-      
-      // 4. Actualizar el estado si la operación fue exitosa
-      if (result && imageUrl) {
-        setUser(prevUser => (
-          prevUser ? { ...prevUser, credits: prevUser.credits - 50 } : null
-        ));
+      // Mapeo de respuesta según el tipo (cada endpoint devuelve una propiedad distinta para la URL)
+      let imageUrl = null;
+      if (generationType === 'model') imageUrl = result.adImageUrl;
+      else if (generationType === 'remove-background') imageUrl = result.removeBackgroundImageUrl;
+      else if (generationType === 'universal') imageUrl = result.imageUrl;
+
+      if (imageUrl) {
+        setUser(prevUser => (prevUser ? { ...prevUser, credits: prevUser.credits - 50 } : null));
         setCurrentAdImageUrl(imageUrl);
         toast.success('¡Imagen regenerada con éxito!');
       } else {
-        console.error("Respuesta inesperada de la API:", result);
         toast.error('Error al obtener la imagen regenerada.');
       }
 
     } catch (error: any) {
       console.error("Error en handleRegenerateImage:", error);
-      toast.error('Ocurrió un error inesperado.');
+      toast.error('Ocurrió un error inesperado al regenerar.');
     } finally {
       setLoading(false);
     }
   };
-
-
-
 
   const navigateToCredits = () => {
     navigate('/credits');
@@ -293,43 +216,27 @@ const handleRegenerateImage = async () => {
       setProgressValue(0);
       return;
     }
-
-    const duration = 7000; // 7 seconds
+    const duration = 7000;
     const startTime = performance.now();
     let animationFrame: number;
     let isCancelled = false;
-
-    const easeInOutCubic = (t: number) =>
-      t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    const easeInOutCubic = (t: number) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
     const animate = (now: number) => {
       if (isCancelled) return;
       const elapsed = now - startTime;
       const normalizedProgress = Math.min(elapsed / duration, 1);
       setProgressValue(Math.round(easeInOutCubic(normalizedProgress) * 100));
-
-      if (normalizedProgress < 1) {
-        animationFrame = requestAnimationFrame(animate);
-      }
+      if (normalizedProgress < 1) animationFrame = requestAnimationFrame(animate);
     };
-
     animationFrame = requestAnimationFrame(animate);
-
-    return () => {
-      isCancelled = true;
-      if (animationFrame) {
-        cancelAnimationFrame(animationFrame);
-      }
-    };
+    return () => { isCancelled = true; if (animationFrame) cancelAnimationFrame(animationFrame); };
   }, [loading]);
 
   useEffect(() => {
     getProducts();
     const tutorialSeen = localStorage.getItem('tutorialSeen');
-    if (!tutorialSeen) {
-      // setIsTutorialOpen(true); // Descomentar si se quiere mostrar al inicio
-      localStorage.setItem('tutorialSeen', 'true');
-    }
+    if (!tutorialSeen) localStorage.setItem('tutorialSeen', 'true');
   }, []);
 
   const closeAdDialog = () => {
@@ -339,25 +246,17 @@ const handleRegenerateImage = async () => {
     setCurrentAdImageUrl(null);
     setOriginalImageUrl(null);
     setCurrentProductId(null);
-    setCurrentPersonalization(null); // Reset personalization settings
-    setIsPersonalizedImage(false); // Reset personalized image flag
-    console.log(isPersonalizedImage)
-    setIsDialogViewFront(true); // Reset view to front
-    setIsDialogViewAdult(true); // Reset view to adult
-    setIsDialogViewGirlKid(false); // Reset girl kid view
-    setIsDialogViewOutfit(false); // Reset outfit view
+    // No reseteamos currentPersonalization ni generationType aquí para permitir regenerar inmediatamente si se reabre por alguna razón, o simplemente se limpia al iniciar nueva generación.
   };
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-950 md:pt-6 md:pl-72 pt-16 px-4 flex flex-col">
-      {/* MODAL DE MANTENIMIENTO */}
       <Dialog open={maintenance}>
         <DialogContent className="max-w-md text-center flex flex-col items-center justify-center">
           <DialogTitle className="text-2xl font-bold mb-2">Sitio en mantenimiento</DialogTitle>
           <p className="text-base text-gray-700 dark:text-gray-200 mb-4">La generación de imágenes está temporalmente deshabilitada.<br/>Estamos trabajando para restablecer el servicio.<br/></p>
         </DialogContent>
       </Dialog>
-      {/* RESTO DE LA UI (queda bloqueada por el modal) */}
       <AdminSidebar />
       {isDialogOpen && editingProduct && (
         <EditProductForm
@@ -404,24 +303,8 @@ const handleRegenerateImage = async () => {
               </span>
             </div>
           </div>
-          <Button
-            variant="outline"
-            onClick={() => setIsTutorialOpen(true)}
-            className="flex items-center gap-2 px-4 py-1.5 h-auto text-sm rounded-lg border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-          >
-            <HelpCircle className="h-4 w-4" />
-            <span>Ayuda</span>
-          </Button>
           
-          <div className="flex gap-2 ml-auto">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="rounded-full hover:bg-pink-100 dark:hover:bg-pink-900/30"
-              onClick={() => window.open('https://instagram.com/tiendia.app', '_blank')}
-            >
-              <Instagram className="h-5 w-5 text-pink-500" />
-            </Button>
+          <div className="flex gap-2">
             <Button
               variant="ghost"
               size="icon"
@@ -446,35 +329,7 @@ const handleRegenerateImage = async () => {
         </p>
       </header>
       
-
       <main className="p-2 md:p-4 flex-grow">
-        <div className="mb-6 pl-0 md:pl-4">
-          <div className="bg-white text-black dark:text-whtie dark:bg-gray-800 rounded-xl p-4 md:p-6 shadow-lg border border-gray-200 dark:border-gray-700">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-              <div className="flex-1 text-center md:text-left">
-                <h2 className="text-black dark:text-white text-xl md:text-2xl font-bold mb-2 flex items-center justify-center md:justify-start gap-2">
-                  <Sparkles className="h-5 w-5" />
-                  ¡Mejora tus fotos de productos!
-                </h2>
-                <p className="text-black/90 dark:text-white text-sm md:text-base">
-                  Te ayudamos a tener fotos más lindas para tu tienda
-                </p>
-              </div>
-              <div className="flex flex-col sm:flex-row items-center gap-3">
-              <Button
-              onClick={navigateToCredits}
-              className="bg-gradient-to-r from-purple-600 to-blue-500 hover:from-purple-700 hover:to-blue-600 text-white shadow-md hover:shadow-lg transition-all duration-300 px-4 py-1.5 h-auto flex items-center gap-2 text-sm rounded-lg"
-            >
-              <CreditCard className="h-4 w-4" />
-              <span>Comprar imágenes</span>
-            </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        
-        
         <AddProductForm
           open={isAddProductDialogOpen}
           onOpenChange={setIsAddProductDialogOpen}
@@ -507,7 +362,6 @@ const handleRegenerateImage = async () => {
                   }}
                   updateGeneratedImage={updateGeneratedImage}
                   updatePersonalizationSettings={updatePersonalizationSettings}
-                  setPersonalizedImageFlag={setPersonalizedImageFlag}
                   setIsAdDialogOpen={setIsAdDialogOpen}
                   setCurrentAdImageUrl={setCurrentAdImageUrl}
                   setOriginalImageUrl={setOriginalImageUrl}
@@ -519,21 +373,17 @@ const handleRegenerateImage = async () => {
           )}
         </section>
       </main>
-      <Dialog open={isAdDialogOpen} onOpenChange={closeAdDialog}>
-        {/* AJUSTE DE TAMAÑO: Ancho relativo en móvil, max-w en desktop */}
-        <DialogContent className="w-[95vw] sm:w-[90vw] md:max-w-2xl lg:max-w-3xl max-h-[90vh] flex flex-col bg-white dark:bg-gray-900 rounded-xl shadow-2xl p-0 overflow-hidden">
 
-          {/* Indicador de Carga General */}
+      <Dialog open={isAdDialogOpen} onOpenChange={closeAdDialog}>
+        <DialogContent className="w-[95vw] sm:w-[90vw] md:max-w-2xl lg:max-w-3xl max-h-[90vh] flex flex-col bg-white dark:bg-gray-900 rounded-xl shadow-2xl p-0 overflow-hidden">
           {loading ? (
             <div className="flex items-center justify-center min-h-[350px] sm:min-h-[400px] flex-col gap-4 p-6">
-              
               <Loader />
               <Progress value={progressValue}  className="w-full max-w-xs sm:max-w-sm [&>*]:bg-blue-500" />
               <p className="text-base sm:text-lg text-muted-foreground animate-pulse mt-4">Generando imagen...</p>
             </div>
           ) : (
             <>
-              {/* Encabezado del Diálogo */}
               <DialogHeader className="px-4 sm:px-6 pt-5 pb-4 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
                 <DialogTitle className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-gray-50 flex items-center justify-between">
                   <div className="flex items-center">
@@ -546,10 +396,8 @@ const handleRegenerateImage = async () => {
                 </DialogDescription>
               </DialogHeader>
 
-              {/* Contenido del Diálogo */}
               <ScrollArea className="flex-1 overflow-y-auto p-4 sm:p-6">
                 {isFullscreen ? (
-                  // Fullscreen Image View
                   <div className="relative w-full h-full min-h-[350px] sm:min-h-[400px] flex items-center justify-center">
                     <Button
                       variant="ghost"
@@ -562,7 +410,7 @@ const handleRegenerateImage = async () => {
                     {currentAdImageUrl ? (
                       <img
                         src={currentAdImageUrl}
-                        alt="Anuncio generado o modificado"
+                        alt="Anuncio generado"
                         className="max-w-full max-h-[400px] object-contain rounded-lg"
                       />
                     ) : (
@@ -572,9 +420,7 @@ const handleRegenerateImage = async () => {
                     )}
                   </div>
                 ) : (
-                  // Comparison View
                   <div className="grid grid-cols-2 gap-3 sm:gap-4 ">
-                    {/* Columna "Antes" */}
                     <div className="w-full">
                       <h3 className="text-center text-xs font-medium text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider">Antes</h3>
                       <div className="aspect-w-1 aspect-h-1 bg-gray-100 dark:bg-gray-800 rounded-lg sm:rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm">
@@ -592,7 +438,6 @@ const handleRegenerateImage = async () => {
                       </div>
                     </div>
 
-                    {/* Columna "Después" */}
                     <div className="w-full relative">
                       <h3 className="text-center text-xs font-medium text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider">Después ✨</h3>
                       {isModifying && (
@@ -612,7 +457,7 @@ const handleRegenerateImage = async () => {
                         {currentAdImageUrl ? (
                           <img
                             src={currentAdImageUrl}
-                            alt="Anuncio generado o modificado"
+                            alt="Anuncio generado"
                             className="w-full h-full object-contain"
                           />
                         ) : (
@@ -627,13 +472,12 @@ const handleRegenerateImage = async () => {
                 )}
               </ScrollArea>
 
-              {/* Footer del Diálogo con Botones Principales */}
               <DialogFooter className="px-4 sm:px-6 py-3 sm:py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-3 flex-shrink-0">
                 <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto order-2 sm:order-1">
                   
                   {currentAdImageUrl && (
                     <div className="flex flex-col gap-2">
-                      {currentPersonalization && Object.keys(currentPersonalization).length > 0 && (
+                      {generationType === 'universal' && (
                         <div className="flex items-center gap-2 text-xs text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 py-1 rounded-md">
                           <Pencil className="w-3 h-3" />
                           <span>Personalización activa</span>
